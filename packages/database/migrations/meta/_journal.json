@@ -15,6 +15,13 @@
       "when": 1792772462207,
       "tag": "0001_institution_platform_rbac",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792861205526,
+      "tag": "0002_perpetual_kitty_pryde",
+      "breakpoints": true
     }
   ]
 }

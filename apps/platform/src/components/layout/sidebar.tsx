@@ -7,9 +7,8 @@ import {
   Users,
   X,
   CreditCard,
-  MessageSquare,
 } from 'lucide-react';
-import { usePreview } from '../providers/preview-provider';
+import { usePlatformAccess } from '../providers/platform-access-provider';
 import { Button } from '@eduos/ui';
 import { useQuery } from '@tanstack/react-query';
 import { identityQuery } from '../../app/_api/platform';
@@ -21,7 +20,7 @@ export function Sidebar({
   onNavigate?: () => void;
   onClose?: () => void;
 }) {
-  const { canManageOperators } = usePreview();
+  const { canManageOperators, canManageSubscriptions } = usePlatformAccess();
   const identity = useQuery(identityQuery).data;
   const name = identity?.name ?? 'Platform operator';
   return (
@@ -60,24 +59,17 @@ export function Sidebar({
         </Link>
         {canManageOperators && (
           <>
-            <Link
-              to="/subscriptions"
-              activeProps={{ 'data-active': true }}
-              onClick={onNavigate}
-              className="nav-item"
-            >
-              <CreditCard aria-hidden="true" className="size-4" strokeWidth={1.5} />
-              Subscriptions
-            </Link>
-            <Link
-              to="/messages"
-              activeProps={{ 'data-active': true }}
-              onClick={onNavigate}
-              className="nav-item"
-            >
-              <MessageSquare aria-hidden="true" className="size-4" strokeWidth={1.5} />
-              School messages
-            </Link>
+            {canManageSubscriptions && (
+              <Link
+                to="/subscriptions"
+                activeProps={{ 'data-active': true }}
+                onClick={onNavigate}
+                className="nav-item"
+              >
+                <CreditCard aria-hidden="true" className="size-4" strokeWidth={1.5} />
+                Subscriptions
+              </Link>
+            )}
             <Link
               to="/operators"
               activeProps={{ 'data-active': true }}

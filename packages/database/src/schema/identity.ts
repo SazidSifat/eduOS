@@ -10,8 +10,30 @@ import {
   check,
   pgEnum,
   foreignKey,
+  integer,
+  date,
 } from 'drizzle-orm/pg-core';
 import { user } from './auth.js';
+export const institutionType = pgEnum('institution_type', [
+  'kindergarten',
+  'high_school',
+  'coaching_center',
+]);
+export const institutionStatus = pgEnum('institution_status', ['active', 'frozen', 'inactive']);
+export const institutionModule = pgEnum('institution_module', [
+  'academics',
+  'admissions',
+  'attendance',
+  'assessment',
+  'fees',
+]);
+export const institutionSubscriptionStatus = pgEnum('institution_subscription_status', [
+  'trial',
+  'active',
+  'past_due',
+  'cancelled',
+]);
+export const institutionBillingCycle = pgEnum('institution_billing_cycle', ['monthly', 'annual']);
 export const institution = pgTable(
   'institution',
   {
@@ -19,6 +41,10 @@ export const institution = pgTable(
     name: text('name').notNull(),
     slug: text('slug').notNull().unique(),
     timezone: text('timezone').default('Asia/Dhaka').notNull(),
+    type: institutionType('type'),
+    status: institutionStatus('status').default('active').notNull(),
+    statusReason: text('status_reason'),
+    statusUpdatedAt: timestamp('status_updated_at', { withTimezone: true }).defaultNow().notNull(),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   },
   (t) => [check('institution_slug_format', sql`${t.slug} ~ '^[a-z0-9]+(-[a-z0-9]+)*$'`)],
@@ -48,6 +74,39 @@ export const membership = pgTable(
     primaryKey({ columns: [t.institutionId, t.userId] }),
     index('membership_user_idx').on(t.userId, t.active),
     index('membership_institution_role_idx').on(t.institutionId, t.active, t.role),
+  ],
+);
+export const institutionModuleGrant = pgTable(
+  'institution_module_grant',
+  {
+    institutionId: uuid('institution_id')
+      .notNull()
+      .references(() => institution.id, { onDelete: 'restrict' }),
+    module: institutionModule('module').notNull(),
+    enabled: boolean('enabled').default(false).notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.institutionId, t.module] }),
+    index('institution_module_enabled_idx').on(t.institutionId, t.enabled),
+  ],
+);
+export const institutionSubscription = pgTable(
+  'institution_subscription',
+  {
+    institutionId: uuid('institution_id')
+      .primaryKey()
+      .references(() => institution.id, { onDelete: 'restrict' }),
+    planName: text('plan_name').notNull(),
+    status: institutionSubscriptionStatus('status').notNull(),
+    billingCycle: institutionBillingCycle('billing_cycle').notNull(),
+    amountTaka: integer('amount_taka').notNull(),
+    periodEndsAt: date('period_ends_at', { mode: 'string' }),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [
+    check('institution_subscription_amount_nonnegative', sql`${t.amountTaka} >= 0`),
+    index('institution_subscription_status_idx').on(t.status, t.periodEndsAt),
   ],
 );
 export const membershipChange = pgTable(

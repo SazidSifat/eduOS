@@ -4,6 +4,9 @@ export const platformPermissionKeys = [
   'platform.access.read',
   'platform.operators.manage',
   'platform.institutions.read',
+  'platform.institutions.create',
+  'platform.institutions.manage',
+  'platform.subscriptions.manage',
 ] as const;
 export type PlatformPermission = (typeof platformPermissionKeys)[number];
 export interface PlatformContext {

@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { CreateSchoolPage } from './_component/create-school-page';
+import { CreateInstitutionPage } from './_component/create-institution-page';
 function Page() {
-  return <CreateSchoolPage />;
+  return <CreateInstitutionPage />;
 }
 export const Route = createFileRoute('/institutions/new/')({ component: Page });

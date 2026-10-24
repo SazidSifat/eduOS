@@ -19,7 +19,6 @@ import { Route as SubscriptionsPageRouteImport } from './app/subscriptions/page'
 import { Route as InstitutionsInstitutionIdPageRouteImport } from './app/institutions/$institutionId/page';
 import { Route as InstitutionsNewPageRouteImport } from './app/institutions/new/page';
 import { Route as OperatorsOperatorIdPageRouteImport } from './app/operators/$operatorId/page';
-import { Route as SubscriptionsInstitutionIdPageRouteImport } from './app/subscriptions/$institutionId/page';
 
 const PageRoute = PageRouteImport.update({
   id: '/',
@@ -72,12 +71,6 @@ const OperatorsOperatorIdPageRoute = OperatorsOperatorIdPageRouteImport.update({
   path: '/operators/$operatorId/',
   getParentRoute: () => rootRouteImport,
 } as any);
-const SubscriptionsInstitutionIdPageRoute =
-  SubscriptionsInstitutionIdPageRouteImport.update({
-    id: '/subscriptions/$institutionId/',
-    path: '/subscriptions/$institutionId/',
-    getParentRoute: () => rootRouteImport,
-  } as any);
 
 export interface FileRoutesByFullPath {
   '/': typeof PageRoute;
@@ -90,7 +83,6 @@ export interface FileRoutesByFullPath {
   '/institutions/$institutionId/': typeof InstitutionsInstitutionIdPageRoute;
   '/institutions/new/': typeof InstitutionsNewPageRoute;
   '/operators/$operatorId/': typeof OperatorsOperatorIdPageRoute;
-  '/subscriptions/$institutionId/': typeof SubscriptionsInstitutionIdPageRoute;
 }
 export interface FileRoutesByTo {
   '/': typeof PageRoute;
@@ -103,7 +95,6 @@ export interface FileRoutesByTo {
   '/institutions/$institutionId': typeof InstitutionsInstitutionIdPageRoute;
   '/institutions/new': typeof InstitutionsNewPageRoute;
   '/operators/$operatorId': typeof OperatorsOperatorIdPageRoute;
-  '/subscriptions/$institutionId': typeof SubscriptionsInstitutionIdPageRoute;
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport;
@@ -117,7 +108,6 @@ export interface FileRoutesById {
   '/institutions/$institutionId/': typeof InstitutionsInstitutionIdPageRoute;
   '/institutions/new/': typeof InstitutionsNewPageRoute;
   '/operators/$operatorId/': typeof OperatorsOperatorIdPageRoute;
-  '/subscriptions/$institutionId/': typeof SubscriptionsInstitutionIdPageRoute;
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
@@ -131,8 +121,7 @@ export interface FileRouteTypes {
     | '/subscriptions/'
     | '/institutions/$institutionId/'
     | '/institutions/new/'
-    | '/operators/$operatorId/'
-    | '/subscriptions/$institutionId/';
+    | '/operators/$operatorId/';
   fileRoutesByTo: FileRoutesByTo;
   to:
     | '/'
@@ -144,8 +133,7 @@ export interface FileRouteTypes {
     | '/subscriptions'
     | '/institutions/$institutionId'
     | '/institutions/new'
-    | '/operators/$operatorId'
-    | '/subscriptions/$institutionId';
+    | '/operators/$operatorId';
   id:
     | '__root__'
     | '/'
@@ -157,8 +145,7 @@ export interface FileRouteTypes {
     | '/subscriptions/'
     | '/institutions/$institutionId/'
     | '/institutions/new/'
-    | '/operators/$operatorId/'
-    | '/subscriptions/$institutionId/';
+    | '/operators/$operatorId/';
   fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
@@ -172,7 +159,6 @@ export interface RootRouteChildren {
   InstitutionsInstitutionIdPageRoute: typeof InstitutionsInstitutionIdPageRoute;
   InstitutionsNewPageRoute: typeof InstitutionsNewPageRoute;
   OperatorsOperatorIdPageRoute: typeof OperatorsOperatorIdPageRoute;
-  SubscriptionsInstitutionIdPageRoute: typeof SubscriptionsInstitutionIdPageRoute;
 }
 
 declare module '@tanstack/react-router' {
@@ -247,13 +233,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OperatorsOperatorIdPageRouteImport;
       parentRoute: typeof rootRouteImport;
     };
-    '/subscriptions/$institutionId/': {
-      id: '/subscriptions/$institutionId/';
-      path: '/subscriptions/$institutionId';
-      fullPath: '/subscriptions/$institutionId/';
-      preLoaderRoute: typeof SubscriptionsInstitutionIdPageRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
   }
 }
 
@@ -268,7 +247,6 @@ const rootRouteChildren: RootRouteChildren = {
   InstitutionsInstitutionIdPageRoute: InstitutionsInstitutionIdPageRoute,
   InstitutionsNewPageRoute: InstitutionsNewPageRoute,
   OperatorsOperatorIdPageRoute: OperatorsOperatorIdPageRoute,
-  SubscriptionsInstitutionIdPageRoute: SubscriptionsInstitutionIdPageRoute,
 };
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,18 +1,27 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigate } from '@tanstack/react-router';
 import { ArrowRight, Eye, EyeOff } from 'lucide-react';
-import { loginSchema, type LoginInput } from '@eduos/contracts';
+import {
+  identitySchema,
+  loginSchema,
+  platformAccessSchema,
+  type LoginInput,
+} from '@eduos/contracts';
 import { Button, Input } from '@eduos/ui';
 import { authClient } from '../../_api/auth';
 import { queryClient } from '../../../lib/query-client';
+import { ApiError, apiGet } from '../../../lib/api-client';
 
 export function LoginPage() {
-  const navigate = useNavigate();
   const [failure, setFailure] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const form = useForm<LoginInput>({ resolver: zodResolver(loginSchema) });
+  const clearSession = async () => {
+    await authClient.signOut().catch(() => undefined);
+    await queryClient.cancelQueries();
+    queryClient.clear();
+  };
   const submit = form.handleSubmit(async (values) => {
     setFailure(null);
     try {
@@ -21,11 +30,23 @@ export function LoginPage() {
         setFailure('Sign in failed. Check your credentials or try again later.');
         return;
       }
+      const identity = await apiGet('/api/v1/me', identitySchema);
+      if (identity.email.toLowerCase() !== values.email.trim().toLowerCase()) {
+        await clearSession();
+        setFailure('A different account session was active and has been signed out. Try again.');
+        return;
+      }
+      await apiGet('/api/v1/platform/access', platformAccessSchema);
       await queryClient.cancelQueries();
       queryClient.clear();
-      await navigate({ to: '/', replace: true });
-    } catch {
-      setFailure('Unable to connect. Please try again.');
+      window.location.replace('/');
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 403) {
+        await clearSession();
+        setFailure('This account has no active Super Admin or Platform Manager assignment.');
+        return;
+      }
+      setFailure('Sign-in could not be confirmed. Check your connection and try again.');
     }
   });
   const { errors, isSubmitting } = form.formState;

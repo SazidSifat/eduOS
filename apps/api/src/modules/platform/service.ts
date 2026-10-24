@@ -1,10 +1,5 @@
 import { and, asc, eq, ne, sql, type Database, type DatabaseTransaction } from '@eduos/database';
-import {
-  institution,
-  platformOperator,
-  platformOperatorChange,
-  user,
-} from '@eduos/database/schema';
+import { platformOperator, platformOperatorChange, user } from '@eduos/database/schema';
 import {
   permissionsForPlatformRole,
   type PlatformPermission,
@@ -12,6 +7,8 @@ import {
   type PlatformRole,
 } from '@eduos/permissions';
 import { conflict, forbidden } from '../../lib/errors.js';
+import { createPlatformInstitutionService } from './institutions-service.js';
+import { createPlatformSubscriptionService } from './subscriptions-service.js';
 
 // One transaction-scoped lock serializes platform staff changes, including bootstrap.
 // Stable namespace/key: callers must acquire it before locking operator rows.
@@ -46,27 +43,12 @@ export function createPlatformService(db: Database) {
   }
   return {
     resolver,
+    ...createPlatformInstitutionService(db),
+    ...createPlatformSubscriptionService(db),
     async getAccess(userId: string) {
       const context = await resolver.resolve(userId);
       if (!context) forbidden();
       return { ...context, permissions: [...context.permissions] };
-    },
-    async listInstitutions(userId: string, limit: number, offset: number) {
-      return readAuthorized(userId, 'platform.institutions.read', async (tx) => ({
-        items: await tx
-          .select({
-            id: institution.id,
-            name: institution.name,
-            slug: institution.slug,
-            timezone: institution.timezone,
-          })
-          .from(institution)
-          .orderBy(asc(institution.id))
-          .limit(limit)
-          .offset(offset),
-        limit,
-        offset,
-      }));
     },
     async listOperators(userId: string, limit: number, offset: number) {
       return readAuthorized(userId, 'platform.operators.manage', async (tx) => ({

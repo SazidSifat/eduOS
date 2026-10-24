@@ -6,6 +6,13 @@ import {
   memberListQuerySchema,
   platformAccessSchema,
   platformInstitutionsSchema,
+  platformInstitutionCreateSchema,
+  platformInstitutionSchema,
+  platformInstitutionStatusSchema,
+  platformInstitutionModulesSchema,
+  platformInstitutionSubscriptionInputSchema,
+  platformInstitutionSubscriptionSchema,
+  platformSubscriptionsSchema,
   platformOperatorsSchema,
   platformOperatorSchema,
   platformOperatorStateSchema,
@@ -33,6 +40,19 @@ export function createPlatformRoutes(auth: SessionAuth, platform: PlatformServic
     requirePlatform(platform.resolver, 'platform.access.read'),
     async (c) => c.json(platformAccessSchema.parse(await platform.getAccess(c.get('identity').id))),
   );
+  app.post(
+    '/institutions',
+    session,
+    requirePlatform(platform.resolver, 'platform.institutions.create'),
+    validator('json', (value) => validated(platformInstitutionCreateSchema, value)),
+    async (c) =>
+      c.json(
+        platformInstitutionSchema.parse(
+          await platform.createInstitution(c.get('identity').id, c.req.valid('json')),
+        ),
+        201,
+      ),
+  );
   app.get(
     '/institutions',
     session,
@@ -43,6 +63,100 @@ export function createPlatformRoutes(auth: SessionAuth, platform: PlatformServic
       return c.json(
         platformInstitutionsSchema.parse(
           await platform.listInstitutions(c.get('identity').id, limit, offset),
+        ),
+      );
+    },
+  );
+  app.get(
+    '/institutions/:institutionId',
+    session,
+    requirePlatform(platform.resolver, 'platform.institutions.read'),
+    validator('param', (value) => validated(z.object({ institutionId: z.uuid() }), value)),
+    async (c) =>
+      c.json(
+        platformInstitutionSchema.parse(
+          await platform.getInstitution(c.get('identity').id, c.req.valid('param').institutionId),
+        ),
+      ),
+  );
+  app.put(
+    '/institutions/:institutionId/status',
+    session,
+    requirePlatform(platform.resolver, 'platform.institutions.manage'),
+    validator('param', (value) => validated(z.object({ institutionId: z.uuid() }), value)),
+    validator('json', (value) => validated(platformInstitutionStatusSchema, value)),
+    async (c) =>
+      c.json(
+        platformInstitutionSchema.parse(
+          await platform.updateInstitutionStatus(
+            c.get('identity').id,
+            c.req.valid('param').institutionId,
+            c.req.valid('json'),
+          ),
+        ),
+      ),
+  );
+  app.put(
+    '/institutions/:institutionId/modules',
+    session,
+    requirePlatform(platform.resolver, 'platform.institutions.manage'),
+    validator('param', (value) => validated(z.object({ institutionId: z.uuid() }), value)),
+    validator('json', (value) => validated(platformInstitutionModulesSchema, value)),
+    async (c) =>
+      c.json(
+        platformInstitutionSchema.parse(
+          await platform.updateInstitutionModules(
+            c.get('identity').id,
+            c.req.valid('param').institutionId,
+            c.req.valid('json'),
+          ),
+        ),
+      ),
+  );
+  app.get(
+    '/institutions/:institutionId/subscription',
+    session,
+    requirePlatform(platform.resolver, 'platform.subscriptions.manage'),
+    validator('param', (value) => validated(z.object({ institutionId: z.uuid() }), value)),
+    async (c) =>
+      c.json(
+        platformInstitutionSubscriptionSchema
+          .nullable()
+          .parse(
+            await platform.getSubscription(
+              c.get('identity').id,
+              c.req.valid('param').institutionId,
+            ),
+          ),
+      ),
+  );
+  app.put(
+    '/institutions/:institutionId/subscription',
+    session,
+    requirePlatform(platform.resolver, 'platform.subscriptions.manage'),
+    validator('param', (value) => validated(z.object({ institutionId: z.uuid() }), value)),
+    validator('json', (value) => validated(platformInstitutionSubscriptionInputSchema, value)),
+    async (c) =>
+      c.json(
+        platformInstitutionSubscriptionSchema.parse(
+          await platform.updateSubscription(
+            c.get('identity').id,
+            c.req.valid('param').institutionId,
+            c.req.valid('json'),
+          ),
+        ),
+      ),
+  );
+  app.get(
+    '/subscriptions',
+    session,
+    requirePlatform(platform.resolver, 'platform.subscriptions.manage'),
+    query,
+    async (c) => {
+      const { limit, offset } = c.req.valid('query');
+      return c.json(
+        platformSubscriptionsSchema.parse(
+          await platform.listSubscriptions(c.get('identity').id, limit, offset),
         ),
       );
     },

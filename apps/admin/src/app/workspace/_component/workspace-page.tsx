@@ -112,6 +112,12 @@ function WorkspaceContent({ userId, name }: { userId: string; name: string }) {
           <div className="rounded-lg border border-border p-6">
             <h2 className="text-xl font-semibold">{workspace.data.name}</h2>
             <p className="mt-2 text-muted-foreground">Time zone: {workspace.data.timezone}</p>
+            <p className="mt-2 text-muted-foreground">
+              Enabled modules:{' '}
+              {workspace.data.modules.length
+                ? workspace.data.modules.map((module) => module.replaceAll('_', ' ')).join(', ')
+                : 'None enabled. Contact your institution administrator.'}
+            </p>
           </div>
         ))}
     </section>

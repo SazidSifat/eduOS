@@ -11,6 +11,13 @@ export function createMembershipService(db: Database) {
   return {
     async listMembers(userId: string, institutionId: string, limit: number, offset: number) {
       return db.transaction(async (tx) => {
+        // Institution locks precede membership locks in every read/write path.
+        const [school] = await tx
+          .select({ status: institution.status })
+          .from(institution)
+          .where(eq(institution.id, institutionId))
+          .for('share');
+        if (school?.status !== 'active') forbidden();
         // Hold authorization stable until the protected read completes.
         const [actor] = await tx
           .select()
@@ -48,11 +55,11 @@ export function createMembershipService(db: Database) {
         // All role mutations in an institution take this lock first, preventing
         // concurrent demotions from removing the last active Admin.
         const [school] = await tx
-          .select({ id: institution.id })
+          .select({ id: institution.id, status: institution.status })
           .from(institution)
           .where(eq(institution.id, institutionId))
           .for('update');
-        if (!school) forbidden();
+        if (!school || school.status !== 'active') forbidden();
         const [actor] = await tx
           .select()
           .from(membership)
@@ -69,6 +76,7 @@ export function createMembershipService(db: Database) {
               userId: actorUserId,
               role: actor.role,
               permissions: new Set(permissionsForRole(actor.role)),
+              modules: new Set(),
             },
             'memberships.manage',
           )

@@ -7,10 +7,18 @@ import {
   text,
   timestamp,
   uuid,
+  jsonb,
 } from 'drizzle-orm/pg-core';
 import { user } from './auth.js';
+import { institution } from './identity.js';
 
 export const platformRole = pgEnum('platform_role', ['platform_owner', 'platform_manager']);
+export const platformInstitutionChangeType = pgEnum('platform_institution_change_type', [
+  'created',
+  'status',
+  'modules',
+  'subscription',
+]);
 // Separate from institution memberships: platform access never implies tenant access.
 export const platformOperator = pgTable(
   'platform_operator',
@@ -46,4 +54,23 @@ export const platformOperatorChange = pgTable(
     ),
     index('platform_operator_change_created_idx').on(t.createdAt),
   ],
+);
+
+export const platformInstitutionChange = pgTable(
+  'platform_institution_change',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    institutionId: uuid('institution_id')
+      .notNull()
+      .references(() => institution.id, { onDelete: 'restrict' }),
+    actorUserId: text('actor_user_id')
+      .notNull()
+      .references(() => platformOperator.userId, { onDelete: 'restrict' }),
+    changeType: platformInstitutionChangeType('change_type').notNull(),
+    previousValue: jsonb('previous_value'),
+    value: jsonb('value').notNull(),
+    reason: text('reason'),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [index('platform_institution_change_created_idx').on(t.institutionId, t.createdAt)],
 );

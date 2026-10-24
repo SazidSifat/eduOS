@@ -10,17 +10,20 @@ import {
   platformRoleSchema,
   platformPermissionSchema,
   membersSchema,
+  institutionModuleSchema,
 } from '@eduos/contracts';
-import { institutionRole, platformRole } from '@eduos/database/schema';
+import { institutionModule, institutionRole, platformRole } from '@eduos/database/schema';
 import {
   roleKeys,
   permissionKeys,
   platformRoleKeys,
   platformPermissionKeys,
+  institutionModuleKeys,
   permissionsForRole,
   permissionsForPlatformRole,
   type Role,
   type PlatformRole,
+  type InstitutionModule,
 } from '@eduos/permissions';
 import { createApp } from './create-app.js';
 import { parseEnv } from '../config/env.js';
@@ -49,6 +52,7 @@ function fixture(
         institutionId: schoolId,
         role: schoolRole,
         permissions: new Set(permissionsForRole(schoolRole)),
+        modules: new Set<InstitutionModule>(),
       }
     : null;
   const operatorContext = operatorRole
@@ -64,7 +68,7 @@ function fixture(
     getWorkspace: vi.fn<IdentityService['getWorkspace']>(),
     getAccess: vi.fn<IdentityService['getAccess']>(async () => {
       if (!schoolContext) throw new HTTPException(403);
-      return { ...schoolContext, permissions: [...schoolContext.permissions] };
+      return { ...schoolContext, permissions: [...schoolContext.permissions], modules: [] };
     }),
     listMembers: vi.fn<IdentityService['listMembers']>(
       async (_actor, _institution, limit, offset) => ({
@@ -90,6 +94,13 @@ function fixture(
       limit,
       offset,
     })),
+    getInstitution: vi.fn<PlatformService['getInstitution']>(),
+    createInstitution: vi.fn<PlatformService['createInstitution']>(),
+    updateInstitutionStatus: vi.fn<PlatformService['updateInstitutionStatus']>(),
+    updateInstitutionModules: vi.fn<PlatformService['updateInstitutionModules']>(),
+    listSubscriptions: vi.fn<PlatformService['listSubscriptions']>(),
+    getSubscription: vi.fn<PlatformService['getSubscription']>(),
+    updateSubscription: vi.fn<PlatformService['updateSubscription']>(),
     listOperators: vi.fn<PlatformService['listOperators']>(async (_actor, limit, offset) => ({
       items: [],
       limit,
@@ -134,6 +145,8 @@ describe('role definitions agree at the wire and persistence boundaries', () => 
     expect(roleSchema.options).toEqual(roleKeys);
     expect(institutionRole.enumValues).toEqual(roleKeys);
     expect(permissionSchema.options).toEqual(permissionKeys);
+    expect(institutionModuleSchema.options).toEqual(institutionModuleKeys);
+    expect(institutionModule.enumValues).toEqual(institutionModuleKeys);
   });
   it('keeps platform catalogs aligned and separate', () => {
     expect(platformRoleSchema.options).toEqual(platformRoleKeys);

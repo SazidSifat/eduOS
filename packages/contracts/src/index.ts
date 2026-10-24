@@ -1,5 +1,7 @@
 import { z } from 'zod';
+import { institutionModuleSchema } from './institution.js';
 export * from './platform.js';
+export * from './institution.js';
 export const errorSchema = z.object({
   error: z.object({ code: z.string(), message: z.string(), requestId: z.string() }),
 });
@@ -30,6 +32,7 @@ export const accessSchema = z.object({
   userId: z.uuid(),
   role: roleSchema,
   permissions: z.array(permissionSchema),
+  modules: z.array(institutionModuleSchema),
 });
 export const membershipStateSchema = z.strictObject({
   role: roleSchema.nullable(),
@@ -55,6 +58,7 @@ export const workspaceSchema = z.object({
   institutionId: institutionIdSchema,
   name: z.string(),
   timezone: z.string(),
+  modules: z.array(institutionModuleSchema),
 });
 export const membershipsSchema = z.array(membershipSchema);
 export type Identity = z.infer<typeof identitySchema>;

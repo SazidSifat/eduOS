@@ -18,6 +18,7 @@ describe('institution role policy', () => {
       institutionId: 'school',
       role,
       permissions: new Set(permissionsForRole(role)),
+      modules: new Set(),
     };
     expect(can(context, 'workspace.read', { institutionId: 'school' })).toBe(true);
     expect(can(context, 'workspace.read', { institutionId: 'foreign' })).toBe(false);

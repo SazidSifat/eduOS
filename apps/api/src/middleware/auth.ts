@@ -6,6 +6,7 @@ import type {
   PlatformContext,
   PlatformPermission,
   PlatformResolver,
+  InstitutionModule,
 } from '@eduos/permissions';
 import { can, canPlatform } from '@eduos/permissions';
 import { forbidden, unauthorized } from '../lib/errors.js';
@@ -48,6 +49,20 @@ export function requireTenant(resolver: MembershipResolver, permission: Permissi
     if (!institutionId) forbidden();
     const context = await resolver.resolve(c.get('identity').id, institutionId);
     if (!context || !can(context, permission)) forbidden();
+    c.set('tenant', context);
+    await next();
+  });
+}
+export function requireTenantModule(
+  resolver: MembershipResolver,
+  permission: Permission,
+  module: InstitutionModule,
+) {
+  return createMiddleware<{ Variables: ApiVariables }>(async (c, next) => {
+    const institutionId = c.req.param('institutionId');
+    if (!institutionId) forbidden();
+    const context = await resolver.resolve(c.get('identity').id, institutionId);
+    if (!context || !can(context, permission) || !context.modules.has(module)) forbidden();
     c.set('tenant', context);
     await next();
   });

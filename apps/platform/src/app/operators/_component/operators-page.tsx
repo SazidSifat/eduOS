@@ -28,7 +28,7 @@ import { PageHeader } from '../../../components/page-header';
 import { EmptyState } from '../../../components/empty-state';
 import { StatusBadge } from '../../../components/status-badge';
 import { operatorsQuery } from '../../_api/platform';
-import { usePreview } from '../../../components/providers/preview-provider';
+import { usePlatformAccess } from '../../../components/providers/platform-access-provider';
 import { OwnerAccessRequired } from '../../../components/owner-access-required';
 import { apiPut } from '../../../lib/api-client';
 
@@ -36,7 +36,7 @@ type RoleFilter = 'all' | 'platform_owner' | 'platform_manager';
 type StatusFilter = 'all' | 'active' | 'inactive';
 
 export function OperatorsPage() {
-  const { canManageOperators } = usePreview();
+  const { canManageOperators } = usePlatformAccess();
   const queryClient = useQueryClient();
   const operators = useQuery({ ...operatorsQuery, enabled: canManageOperators });
   const [search, setSearch] = useState('');

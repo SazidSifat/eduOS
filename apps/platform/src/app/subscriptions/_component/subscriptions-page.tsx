@@ -1,16 +1,17 @@
-import { useState } from 'react';
-import { Link } from '@tanstack/react-router';
-import { ArrowUpRight, Search } from 'lucide-react';
-import { z } from 'zod';
 import {
+  subscriptionStatusVariants as statusVariant,
+  subscriptionStatusLabels as statusLabel,
+  institutionTypeLabels as typeLabel,
+} from '../../../lib/institution-display';
+import { useMemo, useState } from 'react';
+import { Link } from '@tanstack/react-router';
+import { useQuery } from '@tanstack/react-query';
+import { Search } from 'lucide-react';
+import {
+  Badge,
   Button,
   Card,
   Input,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
   Table,
   TableBody,
   TableCaption,
@@ -22,144 +23,127 @@ import {
 import { PageHeader } from '../../../components/page-header';
 import { EmptyState } from '../../../components/empty-state';
 import { OwnerAccessRequired } from '../../../components/owner-access-required';
-import { SubscriptionBadge } from '../../../components/school-badges';
-import { usePreview } from '../../../components/providers/preview-provider';
-import { useSchoolPreview } from '../../../components/providers/school-preview-provider';
-import { directorySearchSchema } from '../../../lib/preview-data';
-import { dateLabel, money, planNames } from '../../../lib/school-preview-model';
+import { usePlatformAccess } from '../../../components/providers/platform-access-provider';
+import { subscriptionsQuery } from '../../_api/platform';
 
-const filterSchema = z.enum(['all', 'not_configured', 'trial', 'active', 'overdue', 'cancelled']);
+const amountLabel = new Intl.NumberFormat('en-BD', { maximumFractionDigits: 0 });
+
 export function SubscriptionsPage() {
-  const { role } = usePreview();
-  const { schools } = useSchoolPreview();
+  const { canManageSubscriptions } = usePlatformAccess();
+  const subscriptions = useQuery({ ...subscriptionsQuery, enabled: canManageSubscriptions });
   const [search, setSearch] = useState('');
-  const [status, setStatus] = useState<z.infer<typeof filterSchema>>('all');
-  if (role !== 'platform_owner') return <OwnerAccessRequired />;
-  const visible = schools.filter(
-    (school) =>
-      school.name.toLowerCase().includes(search.toLowerCase().trim()) &&
-      (status === 'all' || school.subscription.status === status),
-  );
-  const summaries = [
-    {
-      label: 'Active subscriptions',
-      value: schools.filter((school) => school.subscription.status === 'active').length,
-    },
-    {
-      label: 'Needs attention',
-      value: schools.filter((school) => school.subscription.status === 'overdue').length,
-    },
-    {
-      label: 'Not configured',
-      value: schools.filter((school) => school.subscription.status === 'not_configured').length,
-    },
-  ];
+  const records = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    return (subscriptions.data?.items ?? []).filter(({ institution, subscription }) =>
+      `${institution.name} ${institution.slug} ${subscription?.planName ?? ''}`
+        .toLowerCase()
+        .includes(query),
+    );
+  }, [subscriptions.data, search]);
+  if (!canManageSubscriptions) return <OwnerAccessRequired />;
+
   return (
     <div className="space-y-7">
       <PageHeader
-        title="School subscriptions"
-        description="Review plans, billing cycles and renewal dates. All amounts and plans are sample settings."
+        title="Institution subscriptions"
+        description="Manage subscription metadata for institutions. Billing collection is not automated."
       />
-      <Card as="dl" className="grid grid-cols-3 divide-x divide-border">
-        {summaries.map((summary) => (
-          <div key={summary.label} className="space-y-2 px-3 py-5 sm:px-5">
-            <dt className="text-xs text-muted-foreground">{summary.label}</dt>
-            <dd className="text-2xl font-semibold tabular-nums">
-              {summary.value.toString().padStart(2, '0')}
-            </dd>
-          </div>
-        ))}
-      </Card>
-      <Card as="section" className="overflow-hidden" aria-label="Subscription directory">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border p-4 sm:px-5">
-          <div className="relative min-w-0 grow sm:max-w-80">
+      <Card
+        as="section"
+        className="overflow-hidden"
+        aria-label="Institution subscription directory"
+      >
+        <div className="flex flex-wrap items-center gap-3 border-b border-border p-4 sm:px-5">
+          <div className="relative min-w-0 grow sm:max-w-96">
             <Search
               aria-hidden="true"
               className="pointer-events-none absolute left-3 top-2.5 size-4 text-muted-foreground"
             />
             <Input
               aria-label="Search subscriptions"
-              placeholder="Search schools"
-              className="h-9 w-full pl-9"
               value={search}
               maxLength={200}
-              onChange={(event) => {
-                const value = directorySearchSchema.safeParse(event.target.value);
-                if (value.success) setSearch(value.data);
-              }}
+              onChange={(event) => setSearch(event.target.value)}
+              className="h-9 w-full pl-9"
+              placeholder="Search institution or plan"
             />
           </div>
-          <Select
-            value={status}
-            onValueChange={(next) => {
-              const value = filterSchema.safeParse(next);
-              if (value.success) setStatus(value.data);
-            }}
-          >
-            <SelectTrigger aria-label="Filter subscription status" className="w-auto">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All statuses</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="trial">Trial</SelectItem>
-              <SelectItem value="overdue">Overdue</SelectItem>
-              <SelectItem value="cancelled">Cancelled</SelectItem>
-              <SelectItem value="not_configured">Not configured</SelectItem>
-            </SelectContent>
-          </Select>
+          <span className="text-xs text-muted-foreground">
+            {subscriptions.data
+              ? `${subscriptions.data.items.length} institutions returned`
+              : 'First 100 institutions'}
+          </span>
         </div>
-        {visible.length ? (
+        {subscriptions.isPending ? (
+          <output className="block px-5 py-8 text-sm text-muted-foreground">
+            Loading subscriptions…
+          </output>
+        ) : subscriptions.isError ? (
+          <div className="grid justify-items-start gap-3 p-6">
+            <p role="alert" className="text-sm text-destructive">
+              Subscription data could not be loaded.
+            </p>
+            <Button variant="outline" onClick={() => void subscriptions.refetch()}>
+              Try again
+            </Button>
+          </div>
+        ) : records.length ? (
           <div className="overflow-x-auto">
-            <Table className="min-w-[720px]">
-              <TableCaption className="sr-only">Sample school subscriptions</TableCaption>
+            <Table className="min-w-[760px]">
+              <TableCaption className="sr-only">
+                Institution subscription records from the platform API
+              </TableCaption>
               <TableHeader>
                 <TableRow>
-                  <TableHead scope="col">School</TableHead>
+                  <TableHead scope="col">Institution</TableHead>
                   <TableHead scope="col">Plan</TableHead>
                   <TableHead scope="col">Status</TableHead>
-                  <TableHead scope="col">Amount</TableHead>
-                  <TableHead scope="col">Renewal / review</TableHead>
+                  <TableHead scope="col">Price / cycle</TableHead>
+                  <TableHead scope="col">Period ends</TableHead>
                   <TableHead scope="col">
                     <span className="sr-only">Manage</span>
                   </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {visible.map((school) => (
-                  <TableRow key={school.id}>
-                    <TableCell className="font-medium">
+                {records.map(({ institution, subscription }) => (
+                  <TableRow key={institution.id}>
+                    <TableCell>
                       <Link
                         to="/institutions/$institutionId"
-                        params={{ institutionId: school.id }}
-                        className="hover:text-primary"
+                        params={{ institutionId: institution.id }}
+                        className="font-medium hover:text-primary"
                       >
-                        {school.name}
+                        {institution.name}
                       </Link>
+                      <span className="mt-1 block text-xs text-muted-foreground">
+                        {institution.type ? typeLabel[institution.type] : 'Type not set'}
+                      </span>
                     </TableCell>
+                    <TableCell>{subscription?.planName ?? 'Not configured'}</TableCell>
                     <TableCell>
-                      <p className="text-sm">{planNames[school.subscription.plan]}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {school.subscription.billingCycle === 'monthly' ? 'Monthly' : 'Annual'}
-                      </p>
+                      {subscription ? (
+                        <Badge variant={statusVariant[subscription.status]}>
+                          {statusLabel[subscription.status]}
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline">Not configured</Badge>
+                      )}
                     </TableCell>
+                    <TableCell className="tabular-nums">
+                      {subscription
+                        ? `BDT ${amountLabel.format(subscription.amountTaka)} / ${subscription.billingCycle === 'annual' ? 'year' : 'month'}`
+                        : '—'}
+                    </TableCell>
+                    <TableCell>{subscription?.periodEndsAt ?? '—'}</TableCell>
                     <TableCell>
-                      <SubscriptionBadge status={school.subscription.status} />
-                    </TableCell>
-                    <TableCell className="whitespace-nowrap tabular-nums">
-                      {money(school.subscription.amount)}
-                    </TableCell>
-                    <TableCell className="whitespace-nowrap text-muted-foreground">
-                      {dateLabel(school.subscription.renewalDate)}
-                    </TableCell>
-                    <TableCell>
-                      <Button asChild variant="outline" size="icon">
+                      <Button asChild variant="outline" size="sm">
                         <Link
-                          to="/subscriptions/$institutionId"
-                          params={{ institutionId: school.id }}
-                          aria-label={`Manage subscription for ${school.name}`}
+                          to="/institutions/$institutionId"
+                          params={{ institutionId: institution.id }}
+                          hash="institution-subscription"
                         >
-                          <ArrowUpRight aria-hidden="true" className="size-4" />
+                          Manage
                         </Link>
                       </Button>
                     </TableCell>
@@ -169,13 +153,10 @@ export function SubscriptionsPage() {
             </Table>
           </div>
         ) : (
-          <EmptyState title="No matching subscriptions">
-            Adjust your school search or subscription status.
+          <EmptyState title="No matching institutions">
+            Adjust the search or create an institution.
           </EmptyState>
         )}
-        <output className="block border-t border-border px-5 py-3 text-xs text-muted-foreground">
-          {visible.length} sample subscriptions
-        </output>
       </Card>
     </div>
   );

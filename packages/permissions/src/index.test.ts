@@ -5,6 +5,7 @@ const context: TenantContext = {
   role: 'teacher',
   institutionId: 'school-a',
   permissions: new Set(['workspace.read']),
+  modules: new Set(),
 };
 describe('resource authorization', () => {
   it('denies missing permissions', () => expect(can(context, 'memberships.manage')).toBe(false));

@@ -1,6 +1,6 @@
 # Frontend
 
-`apps/admin` contains the school administration app. `apps/platform` is a separate control-plane app on port 5174 with its own Better Auth sign-in, server-guarded route access and TanStack Query client. It reads access, institution metadata and operator assignments through `/api/v1/platform/*`. School creation, status changes, subscriptions and messages remain local design previews. See [platform integration](../development/platform-preview.md) and [ADR 0008](../decisions/0008-platform-design-preview.md).
+`apps/admin` contains the school administration app. `apps/platform` is a separate control-plane app on port 5174 with Better Auth sign-in, server-guarded routes and TanStack Query. Its institution creation/settings, first Admin provisioning, manual subscriptions and operator assignments call `/api/v1/platform/*`. There are no seeded preview records. School communications and automated billing remain deferred. See [platform integration](../development/platform-preview.md) and [ADR 0009](../decisions/0009-platform-institution-management.md).
 
 React/Vite uses TanStack file-based routes rooted at `src/app`, following folder/page conventions similar to the Next.js App Router. Vite's TanStack plugin generates `src/routeTree.gen.ts` and automatically splits page components. It runs before the React plugin.
 

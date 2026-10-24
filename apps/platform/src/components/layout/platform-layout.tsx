@@ -16,7 +16,7 @@ export function PlatformLayout() {
   const closeNavigation = () => navigation.current?.close();
 
   return (
-    <div className="platform-preview min-h-dvh bg-[var(--sidebar)] lg:grid lg:grid-cols-[224px_minmax(0,1fr)]">
+    <div className="platform-shell min-h-dvh bg-[var(--sidebar)] lg:grid lg:grid-cols-[224px_minmax(0,1fr)]">
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:fixed focus:z-50 focus:bg-background focus:p-3"
@@ -81,13 +81,6 @@ export function PlatformLayout() {
             </Button>
           </div>
         </header>
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-border px-5 py-2.5 text-xs sm:px-8">
-          <span className="font-medium text-primary">Authenticated platform</span>
-          <span className="text-muted-foreground">
-            Access and directory reads are live. School changes, subscriptions and messages are
-            preview-only.
-          </span>
-        </div>
         <main
           id="main-content"
           tabIndex={-1}

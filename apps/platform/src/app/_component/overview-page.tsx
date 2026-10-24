@@ -14,11 +14,11 @@ import {
 } from '@eduos/ui';
 import { PageHeader } from '../../components/page-header';
 import { AccessScope } from '../../components/access-scope';
-import { usePreview } from '../../components/providers/preview-provider';
+import { usePlatformAccess } from '../../components/providers/platform-access-provider';
 import { institutionsQuery, operatorsQuery } from '../_api/platform';
 
 export function OverviewPage() {
-  const { role, canManageOperators } = usePreview();
+  const { role, canManageOperators } = usePlatformAccess();
   const institutions = useQuery(institutionsQuery);
   const operators = useQuery({ ...operatorsQuery, enabled: canManageOperators });
   const activeOperators = operators.data?.items.filter((operator) => operator.active) ?? [];
@@ -27,7 +27,7 @@ export function OverviewPage() {
     <div className="space-y-7">
       <PageHeader
         title="Platform overview"
-        description="Authenticated institution metadata and platform access."
+        description="Institution access and the platform team."
         action={
           <Button asChild variant="outline">
             <Link to="/institutions">
@@ -107,7 +107,7 @@ export function OverviewPage() {
             </p>
           )}
           <p className="border-t border-border px-5 py-3 text-xs text-muted-foreground">
-            School states, subscriptions and operational metrics are not returned by this API.
+            Open an institution to manage its access state, school modules and subscription.
           </p>
         </Card>
         <div className="space-y-6">

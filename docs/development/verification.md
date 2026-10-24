@@ -1,5 +1,7 @@
 # Bootstrap verification — 20 October 2026
 
+This is the historical bootstrap report. Later live database/auth/browser results are recorded in [platform management verification, 24 October 2026](platform-management-verification.md).
+
 The source foundation is implemented, but setup is **not fully verified or ready for production deployment**. This environment prevents a clean install, live services and skill installation. No successful install, CI run, database connection, credential flow or browser smoke is claimed.
 
 ## Environment and dependencies

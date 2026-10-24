@@ -4,6 +4,7 @@ import { cors } from 'hono/cors';
 import { secureHeaders } from 'hono/secure-headers';
 import { bodyLimit } from 'hono/body-limit';
 import { HTTPException } from 'hono/http-exception';
+import { ProvisioningConflict } from '../lib/errors.js';
 import { healthSchema, readySchema } from '@eduos/contracts';
 import type { ApiEnv } from '../config/env.js';
 import type { Logger } from '../lib/logger.js';
@@ -100,6 +101,14 @@ export function createApp({
       );
     }
   });
+  app.use('/api/auth/*', async (c, next) => {
+    if (
+      !['GET', 'HEAD', 'OPTIONS'].includes(c.req.method) &&
+      !env.CORS_TRUSTED_ORIGINS.includes(c.req.header('origin') ?? '')
+    )
+      throw new HTTPException(403);
+    await next();
+  });
   app.on(['GET', 'POST'], '/api/auth/*', (c) => auth.handler(c.req.raw));
   app.route('/api/v1', createIdentityRoutes(auth, identity));
   app.route('/api/v1/platform', createPlatformRoutes(auth, platform));
@@ -129,7 +138,10 @@ export function createApp({
     return c.json(
       {
         error: {
-          code: codes[status] ?? 'INTERNAL_ERROR',
+          code:
+            error instanceof ProvisioningConflict
+              ? error.code
+              : (codes[status] ?? 'INTERNAL_ERROR'),
           message: status >= 500 ? 'Unexpected server error' : 'Request rejected',
           requestId: c.get('requestId'),
         },

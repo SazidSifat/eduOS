@@ -65,7 +65,7 @@ const schoolA = randomUUID(),
   schoolB = randomUUID();
 const userIds = Object.values(ids);
 const password = 'Synthetic-rbac-password-42';
-const ipPrefix = `2001:db8:${schoolA.slice(0, 4)}:${schoolA.slice(4, 8)}`;
+const ipPrefix = `2001:db8:${schoolA.slice(0, 4)}`;
 const cookies = new Map<string, string>();
 let fixturesStarted = false;
 const memberPath = (target: string) => `/api/v1/institutions/${schoolA}/memberships/${target}`;
@@ -128,7 +128,7 @@ beforeAll(async () => {
       headers: {
         origin: env.ADMIN_URL,
         'content-type': 'application/json',
-        'x-eduos-client-ip': `${ipPrefix}::${index + 1}`,
+        'x-eduos-client-ip': `${ipPrefix}:${(index + 1).toString(16)}::1`,
       },
       body: JSON.stringify({ email: `${id}@example.test`, password }),
     });

@@ -2,6 +2,8 @@
 
 Status: accepted. Date: 2026-10-24. Extends ADRs 0006 and 0007.
 
+The institution-management preview boundaries in this historical decision are superseded by [ADR 0009](0009-platform-institution-management.md).
+
 ## Context
 
 The user prioritizes the super-admin/platform interface and explicitly chooses a clickable design preview before API integration. EduOS already separates Platform Owner/Manager operators from institution memberships; no school role grants platform access.

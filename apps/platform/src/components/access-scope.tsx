@@ -18,6 +18,26 @@ export function AccessScope({ role }: { role: PlatformRole }) {
           </dd>
         </div>
         <div className="flex items-center justify-between gap-4 py-4">
+          <dt>Institution access and modules</dt>
+          <dd>
+            {permissions.includes('platform.institutions.manage') ? (
+              <Check aria-label="Allowed" className="size-4 text-primary" />
+            ) : (
+              <Minus aria-label="Not included" className="size-4 text-muted-foreground" />
+            )}
+          </dd>
+        </div>
+        <div className="flex items-center justify-between gap-4 py-4">
+          <dt>Institution subscriptions</dt>
+          <dd>
+            {permissions.includes('platform.subscriptions.manage') ? (
+              <Check aria-label="Allowed" className="size-4 text-primary" />
+            ) : (
+              <Minus aria-label="Not included" className="size-4 text-muted-foreground" />
+            )}
+          </dd>
+        </div>
+        <div className="flex items-center justify-between gap-4 py-4">
           <dt>Platform team access</dt>
           <dd>
             {canManage ? (

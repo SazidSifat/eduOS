@@ -6,6 +6,7 @@ export class ApiError extends Error {
   constructor(
     public readonly status: number,
     public readonly requestId?: string,
+    public readonly code?: string,
   ) {
     super(
       status === 401
@@ -26,7 +27,11 @@ async function request<T>(path: string, schema: z.ZodType<T>, init: RequestInit)
   const body: unknown = await response.json();
   if (!response.ok) {
     const error = errorSchema.safeParse(body);
-    throw new ApiError(response.status, error.success ? error.data.error.requestId : undefined);
+    throw new ApiError(
+      response.status,
+      error.success ? error.data.error.requestId : undefined,
+      error.success ? error.data.error.code : undefined,
+    );
   }
   return schema.parse(body);
 }
@@ -38,6 +43,14 @@ export function apiGet<T>(path: string, schema: z.ZodType<T>, signal?: AbortSign
 export function apiPut<T>(path: string, schema: z.ZodType<T>, body: unknown) {
   return request(path, schema, {
     method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+}
+
+export function apiPost<T>(path: string, schema: z.ZodType<T>, body: unknown) {
+  return request(path, schema, {
+    method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });

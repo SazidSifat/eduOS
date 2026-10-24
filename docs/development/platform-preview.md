@@ -1,31 +1,35 @@
-# Platform design preview
+# Platform console
 
-`apps/platform` is a separate React/Vite application on port 5174. It uses generated TanStack routes, shared UI/contracts/permissions, and a Better Auth session. The route guard validates `/api/v1/me` and `/api/v1/platform/access`; unauthenticated users see `/login`, while non-operators see `/access-denied`. The overview and directories read live institution metadata and operator assignments. School creation, state changes, subscriptions, messages, and their histories remain labeled in-memory previews.
+`apps/platform` is a separate React/Vite app on port 5174. Generated TanStack routes validate `/api/v1/me` and `/api/v1/platform/access`. Anonymous users go to `/login`; school users without a separate operator assignment go to `/access-denied`. No institution, operator, subscription or message sample records are seeded or displayed.
 
 ```sh
+pnpm db:migrate
 pnpm dev:platform
 ```
 
-Open http://localhost:5174. The command builds shared dependencies first. The school administration app remains on port 5173. The Vite dev server proxies `/api` requests to the local API, and the API trusts the exact `http://localhost:5174` origin for auth/CSRF checks. `apps/platform/.env` is generated non-destructively by `pnpm env:setup`. A provisioned active platform operator is required to enter the console.
+Open http://localhost:5174. Shared packages build before dev. The Vite server proxies `/api` to the local API; trusted origins include the exact platform origin. `apps/platform/.env` contains only public origins. The school administration app remains on http://localhost:5173 and receives the new first school Admin's login.
 
-| Route                           | Preview                                                                       |
-| ------------------------------- | ----------------------------------------------------------------------------- |
-| `/`                             | Live institution count/metadata, operator assignments (Owner) and role grants |
-| `/institutions`                 | Search live institution names, slugs and identifiers                          |
-| `/institutions/new`             | Validated school name, unique slug and synthetic contact details              |
-| `/institutions/:institutionId`  | Contact/profile, freeze/deactivate/reactivate, notices, warnings and activity |
-| `/subscriptions`                | Searchable plan, billing cycle, amount, state and renewal directory           |
-| `/subscriptions/:institutionId` | Edit sample subscription settings for a school                                |
-| `/messages`                     | Prepare school notices/warnings by email or in-app channel; preview history   |
-| `/operators`                    | Live operator IDs, roles and active/inactive filters (Owner only)             |
-| `/operators/:operatorId`        | Operator profile, active state and role-permission explanation                |
+| Route                          | Current behavior                                                                                      |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------- |
+| `/`                            | Live institution directory counts, operator assignments and resolved role                             |
+| `/institutions`                | Search live institution names, slugs, type, state and identifiers                                     |
+| `/institutions/new`            | Super Admin creates an institution, selects its type and provisions its first school Admin atomically |
+| `/institutions/:institutionId` | Live institution details with access state, module controls and the inline subscription editor        |
+| `/subscriptions`               | Subscription directory; Manage opens the subscription section on institution details                  |
+| `/operators`                   | Live operator list and role/active-state updates for Super Admin                                      |
+| `/operators/:operatorId`       | Live operator assignment and role grants                                                              |
+| `/messages`                    | Unavailable state until delivery and recipient policies exist; hidden from navigation                 |
 
-Owner/Manager presentation now derives from `/api/v1/platform/access`; there is no user-controlled role selector. Institution API responses contain only ID, name, slug and timezone. Operator responses contain only user ID, role and active state. The platform API rechecks permissions independently. The current screen connects operator and institution reads; school-management flows remain Owner-only preview controls and introduce no backend permissions or writes.
+The platform access provider derives role/grants from the API. There is no client role selector. Platform Manager can inspect institution settings; only Super Admin receives institution creation/management, subscription-management and operator-management grants. Every API rechecks policy independently. Platform roles never bypass school membership checks.
 
-School creation, state changes, subscription settings, messages and activity live in React context and reset on page reload. New schools start with an unconfigured subscription. Freeze/deactivate/reactivate require a reason and preserve subscription settings; subscription edits preserve school state. Messages derive the recipient from the selected school contact and are stored only as preview entries. No email, notification, invoice or payment is sent or created. Plan names, amounts, renewal rules and the meaning of frozen/inactive access are proposed design inputs requiring product discovery before implementation.
+Platform handlers stay in `apps/api/src/modules/platform` and mount separately at `/api/v1/platform`; frontend clients retain the `/api/v1` prefix. Creation requires kindergarten, high-school or coaching-center type and a new first Admin's name/email/initial password. Every module starts off. After creation, the console opens the institution details page, where Super Admin can enable or disable school modules. A duplicate slug or existing Admin email returns a safe field-specific 409 code and rolls back the transaction. Passwords are masked in the form and excluded from responses/audit/logs. Existing identities are not automatically attached or reset by this workflow.
 
-Desktop uses a persistent 224px sidebar, compact tables, a restrained green accent and neutral surfaces. Mobile uses a native dialog for navigation and prioritizes institution names and profile links. The type scale is 12, 14 and 24px; small-screen body/controls use 16px instead of 14px. Panels use 6px radii, and controls use 4px radii. Interactions use 150ms ease-out transitions, removed under reduced motion. Light/dark preference is stored separately from the school app.
+Frozen/deactivated institutions retain their records but cannot enter the school workspace or use membership APIs. A reason is required. Reactivation restores access according to existing memberships. Module switches independently enable academic setup, admissions, attendance, assessment/results and fees/collections. Missing grants deny module access, and role permissions are still required. These settings do not implement the corresponding school business workflows.
 
-Earlier preview browser and action checks cover local school controls. They do not verify the new authenticated API integration. Do not treat those preview checks as live-auth or API verification.
+Subscription management is embedded on the institution details page; no separate subscription edit route exists. Subscriptions are manually recorded terms with a free-form plan name, trial/active/past-due/cancelled state, monthly/annual cycle, whole-taka amount and optional period end date. Saving does not charge, invoice, auto-renew or change institution access. Subscription cancellation and school deactivation remain independent explicit actions.
 
-School creation, state, contacts, subscriptions and messaging require deliberate contracts, policy, audited services and migrations; none are added here. The operator contract intentionally returns no names/emails. UI visibility must never become the access boundary. Add UI controls for the existing operator update API as a separate slice, with the server's last-Owner and audit guarantees preserved.
+Migration `0002` is additive. Existing institutions remain active with a nullable unclassified type, no configured subscription and no enabled module grants until Super Admin configures them. Institution creation/status/module/subscription changes append attributable audit records in the same transaction. Identical repeated state writes do not append duplicate events.
+
+The interface uses a persistent 224px sidebar, compact tables, restrained green controls and neutral light/matte charcoal surfaces. Type sizes are 12, 14 and 24px; small-screen body/controls use 16px. Panels use 6px radii, controls 4px and interactions 150ms ease-out with reduced-motion support. Forms use shared UI components, React Hook Form and Zod; TanStack Query owns live data.
+
+See [ADR 0009](../decisions/0009-platform-institution-management.md) for access/billing boundaries and [testing](testing.md) for dedicated-database verification.

@@ -7,6 +7,13 @@ import {
   membershipStateSchema,
   platformAccessSchema,
   platformInstitutionsSchema,
+  platformInstitutionCreateSchema,
+  platformInstitutionSchema,
+  platformInstitutionStatusSchema,
+  platformInstitutionModulesSchema,
+  platformInstitutionSubscriptionInputSchema,
+  platformInstitutionSubscriptionSchema,
+  platformSubscriptionsSchema,
   platformOperatorsSchema,
   platformOperatorSchema,
   platformOperatorStateSchema,
@@ -41,24 +48,38 @@ const pagination = [
 const invalidInput = { 400: response('Invalid request', errorSchema) };
 const mutationErrors = {
   ...invalidInput,
-  409: response('Cannot remove the last active administrator', errorSchema),
   413: response('Request body too large', errorSchema),
 };
-function read(description: string, schema: z.ZodType) {
+const missingInstitution = { 404: response('Institution not found', errorSchema) };
+function read(description: string, schema: z.ZodType, missing = false) {
   return {
     security: [{ session: [] }],
     responses: {
       200: response(description, schema),
       ...invalidInput,
       ...protectedErrors,
+      ...(missing ? missingInstitution : {}),
     },
   };
 }
-function write(description: string, input: z.ZodType, output: z.ZodType) {
+function write(
+  description: string,
+  input: z.ZodType,
+  output: z.ZodType,
+  options: { continuity?: boolean; missing?: boolean } = {},
+) {
   return {
     security: [{ session: [] }],
     requestBody: { required: true, content: json(input) },
-    responses: { 200: response(description, output), ...mutationErrors, ...protectedErrors },
+    responses: {
+      200: response(description, output),
+      ...mutationErrors,
+      ...protectedErrors,
+      ...(options.continuity
+        ? { 409: response('Cannot remove the last active administrator', errorSchema) }
+        : {}),
+      ...(options.missing ? missingInstitution : {}),
+    },
   };
 }
 export const accessPaths = {
@@ -83,6 +104,7 @@ export const accessPaths = {
         'Set role and active state of an existing institution membership',
         membershipStateSchema,
         memberSchema,
+        { continuity: true },
       ),
       parameters: [institutionId, userId],
     },
@@ -93,6 +115,76 @@ export const accessPaths = {
   '/api/v1/platform/institutions': {
     get: {
       ...read('Institution metadata visible to platform staff', platformInstitutionsSchema),
+      parameters: pagination,
+    },
+    post: {
+      security: [{ session: [] }],
+      requestBody: { required: true, content: json(platformInstitutionCreateSchema) },
+      responses: {
+        201: response(
+          'Institution and first school Admin created atomically',
+          platformInstitutionSchema,
+        ),
+        ...mutationErrors,
+        ...protectedErrors,
+        409: response('Institution slug or first Admin email already exists', errorSchema),
+      },
+    },
+  },
+  '/api/v1/platform/institutions/{institutionId}': {
+    get: {
+      ...read('Institution metadata visible to platform staff', platformInstitutionSchema, true),
+      parameters: [institutionId],
+    },
+  },
+  '/api/v1/platform/institutions/{institutionId}/status': {
+    put: {
+      ...write(
+        'Freeze, deactivate or reactivate an institution',
+        platformInstitutionStatusSchema,
+        platformInstitutionSchema,
+        { missing: true },
+      ),
+      description:
+        'Super Admin only. Frozen and inactive states require a reason of at least five characters and block tenant access.',
+      parameters: [institutionId],
+    },
+  },
+  '/api/v1/platform/institutions/{institutionId}/modules': {
+    put: {
+      ...write(
+        'Replace enabled institution modules',
+        platformInstitutionModulesSchema,
+        platformInstitutionSchema,
+        { missing: true },
+      ),
+      parameters: [institutionId],
+    },
+  },
+  '/api/v1/platform/institutions/{institutionId}/subscription': {
+    get: {
+      ...read(
+        'Institution subscription metadata',
+        platformInstitutionSubscriptionSchema.nullable(),
+        true,
+      ),
+      parameters: [institutionId],
+    },
+    put: {
+      ...write(
+        'Create or replace institution subscription metadata',
+        platformInstitutionSubscriptionInputSchema,
+        platformInstitutionSubscriptionSchema,
+        { missing: true },
+      ),
+      description:
+        'Super Admin only. Records manual BDT plan terms; no payment, invoice or automatic suspension occurs.',
+      parameters: [institutionId],
+    },
+  },
+  '/api/v1/platform/subscriptions': {
+    get: {
+      ...read('Paged institution subscription metadata', platformSubscriptionsSchema),
       parameters: pagination,
     },
   },
@@ -108,6 +200,7 @@ export const accessPaths = {
         'Assign or update platform access for an existing identity',
         platformOperatorStateSchema,
         platformOperatorSchema,
+        { continuity: true },
       ),
       parameters: [userId],
     },
