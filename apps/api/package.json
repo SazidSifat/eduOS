@@ -1,0 +1,25 @@
+{
+  "name": "@eduos/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --env-file=.env --import tsx --watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node --env-file=.env dist/index.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "auth:create-user": "node --env-file=.env --import tsx src/lib/create-user.ts"
+  },
+  "dependencies": {
+    "@eduos/auth": "workspace:*",
+    "@eduos/contracts": "workspace:*",
+    "@eduos/database": "workspace:*",
+    "@eduos/permissions": "workspace:*",
+    "@hono/node-server": "2.1.5",
+    "hono": "4.13.13",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@eduos/typescript-config": "workspace:*"
+  }
+}

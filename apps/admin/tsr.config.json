@@ -1,0 +1,9 @@
+{
+  "routesDirectory": "./src/app",
+  "generatedRouteTree": "./src/routeTree.gen.ts",
+  "indexToken": "page",
+  "routeToken": "route",
+  "routeFileIgnorePattern": "^(providers|router)$|^layout\\.tsx$",
+  "quoteStyle": "single",
+  "semicolons": true
+}

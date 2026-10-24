@@ -1,0 +1,23 @@
+{
+  "$schema": "../../node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "oxc", "react", "jsx-a11y"],
+  "categories": {
+    "correctness": "error"
+  },
+  "env": {
+    "browser": true,
+    "node": true,
+    "es2024": true
+  },
+  "rules": {
+    "eqeqeq": "error",
+    "no-debugger": "error",
+    "typescript/no-explicit-any": "error",
+    "typescript/consistent-type-imports": "error",
+    "react/rules-of-hooks": "error",
+    "react/exhaustive-deps": "error",
+    "jsx-a11y/label-has-associated-control": "error",
+    "jsx-a11y/alt-text": "error",
+    "jsx-a11y/anchor-has-content": "error"
+  }
+}

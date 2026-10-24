@@ -1,0 +1,54 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "extends": ["./packages/oxlint-config/base.json"],
+  "ignorePatterns": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/.turbo/**",
+    "**/coverage/**",
+    "**/migrations/meta/**",
+    "**/playwright-report/**",
+    "**/test-results/**",
+    "**/routeTree.gen.ts"
+  ],
+  "overrides": [
+    {
+      "files": ["apps/admin/**/*.{ts,tsx}"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              "@eduos/database",
+              "@eduos/database/*",
+              "@eduos/auth",
+              "@eduos/auth/server",
+              "**/apps/api/**"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "packages/ui/**/*.{ts,tsx}",
+        "packages/contracts/**/*.ts",
+        "packages/permissions/**/*.ts"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              "@eduos/database",
+              "@eduos/database/*",
+              "@eduos/auth",
+              "@eduos/auth/*",
+              "**/apps/**"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

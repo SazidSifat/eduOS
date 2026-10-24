@@ -1,0 +1,9 @@
+# Testing
+
+Run `pnpm build` before direct Vitest calls so package exports resolve. Root `pnpm typecheck` builds dependencies via Turbo. `pnpm test` runs node policy/HTTP/env tests and jsdom RTL form validation. No full suite runs on file save; the pre-commit hook only runs lint-staged on staged files.
+
+Integration tests exercise real PostgreSQL and Better Auth. Create a separate empty database named `eduos_test` (or `eduos_test_<suffix>`) using your local administrator, then set `TEST_DATABASE_URL` in your test process and run `pnpm test:integration`. The suite refuses other database names, migrates the test DB and uses unique synthetic fixtures. It covers login, HttpOnly/SameSite cookies, session validation, blocked signup, origin rejection, rate limits, membership revocation, foreign-tenant denial, logout and transaction rollback. It never truncates all tables. Production Secure-cookie behavior also needs HTTPS browser verification before rollout.
+
+Install browsers using `pnpm exec playwright install --with-deps chromium`. `pnpm test:e2e` starts real API/admin processes using their local env files. It checks actual browser-to-API health, protected navigation, theme interaction and accessible form validation. It can reuse local servers outside CI. `PLAYWRIGHT_CHANNEL=chrome` optionally selects installed Chrome. Authenticated browser login is not yet an E2E fixture; HTTP integration covers the credential/session flow.
+
+CI uses a dedicated PostgreSQL service and runs frozen install, agent validation, format, lint, types, tests, builds, integration and browser smoke. Failed Playwright traces may contain session data; use synthetic accounts and short retention. Test prerequisite failures must be reported separately from code failures. See verification.md for this environment's actual results.

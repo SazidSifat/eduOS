@@ -1,0 +1,54 @@
+{
+  "name": "eduos",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "oxlint --max-warnings 0 .",
+    "typecheck": "turbo run typecheck && tsc -p tsconfig.tests.json && tsc -p apps/admin/tsconfig.tests.json",
+    "test": "turbo run build --filter=\"./packages/*\" && vitest run --config vitest.config.ts",
+    "test:integration": "turbo run build --filter=\"./packages/*\" && vitest run --config vitest.integration.config.ts",
+    "test:e2e": "turbo run build --filter=\"./packages/*\" && playwright test",
+    "format": "oxfmt --write .",
+    "format:check": "oxfmt --check .",
+    "db:generate": "pnpm --filter @eduos/database db:generate",
+    "db:migrate": "pnpm --filter @eduos/database db:migrate",
+    "db:studio": "pnpm --filter @eduos/database db:studio",
+    "infra:up": "docker compose --env-file .env -f infrastructure/docker/compose.yaml up -d --wait",
+    "infra:down": "docker compose --env-file .env -f infrastructure/docker/compose.yaml down",
+    "env:setup": "node scripts/setup-env.mjs",
+    "auth:create-user": "pnpm --filter @eduos/api auth:create-user",
+    "agents:validate": "node scripts/validate-agents.mjs",
+    "agents:install": "node scripts/install-skills.mjs",
+    "prepare": "node scripts/prepare.mjs",
+    "lint:fix": "oxlint --fix ."
+  },
+  "devDependencies": {
+    "@eduos/oxlint-config": "workspace:*",
+    "@playwright/test": "1.64.1",
+    "@types/node": "24.19.2",
+    "husky": "9.1.7",
+    "lint-staged": "17.6.0",
+    "oxfmt": "0.73.0",
+    "oxlint": "1.88.0",
+    "tsx": "4.23.15",
+    "turbo": "2.11.9",
+    "typescript": "6.0.3",
+    "vitest": "4.1.11",
+    "yaml": "2.9.1"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,mjs}": [
+      "oxlint --max-warnings 0",
+      "oxfmt --write"
+    ],
+    "*.{json,yaml,yml,md,css,html}": "oxfmt --write"
+  },
+  "engines": {
+    "node": ">=24 <25",
+    "pnpm": ">=12 <13"
+  },
+  "packageManager": "pnpm@12.14.0"
+}

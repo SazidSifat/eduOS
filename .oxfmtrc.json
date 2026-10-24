@@ -1,0 +1,20 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "singleQuote": true,
+  "trailingComma": "all",
+  "printWidth": 100,
+  "ignorePatterns": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/.turbo/**",
+    "**/coverage/**",
+    "**/playwright-report/**",
+    "**/test-results/**",
+    "pnpm-lock.yaml",
+    "packages/database/migrations/meta/**",
+    "**/.env",
+    "**/.env.local",
+    "**/.env.production",
+    "**/routeTree.gen.ts"
+  ]
+}

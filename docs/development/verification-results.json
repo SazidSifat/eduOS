@@ -1,0 +1,84 @@
+{
+  "runtime": "Node 22.23.3 (requested Node 24 unavailable)",
+  "dependencySource": "Temporary ignored links to readable cached packages; selected versions were not clean-installed. Diagnostic links removed after verification.",
+  "results": [
+    {
+      "check": "build contracts",
+      "command": "node node_modules/typescript/bin/tsc -p packages/contracts/tsconfig.json",
+      "exitCode": 0
+    },
+    {
+      "check": "build database",
+      "command": "node node_modules/typescript/bin/tsc -p packages/database/tsconfig.json",
+      "exitCode": 0
+    },
+    {
+      "check": "build permissions",
+      "command": "node node_modules/typescript/bin/tsc -p packages/permissions/tsconfig.json",
+      "exitCode": 0
+    },
+    {
+      "check": "build auth",
+      "command": "node node_modules/typescript/bin/tsc -p packages/auth/tsconfig.json",
+      "exitCode": 0
+    },
+    {
+      "check": "build ui",
+      "command": "node node_modules/typescript/bin/tsc -p packages/ui/tsconfig.json",
+      "exitCode": 0
+    },
+    {
+      "check": "types apps/api/tsconfig.json",
+      "command": "node node_modules/typescript/bin/tsc -p apps/api/tsconfig.json --noEmit",
+      "exitCode": 0
+    },
+    {
+      "check": "types apps/admin/tsconfig.json",
+      "command": "node node_modules/typescript/bin/tsc -p apps/admin/tsconfig.json --noEmit",
+      "exitCode": 0
+    },
+    {
+      "check": "types tsconfig.tests.json",
+      "command": "node node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
+      "exitCode": 0
+    },
+    {
+      "check": "types apps/admin/tsconfig.tests.json",
+      "command": "node node_modules/typescript/bin/tsc -p apps/admin/tsconfig.tests.json --noEmit",
+      "exitCode": 0
+    },
+    {
+      "check": "API production build",
+      "command": "node node_modules/typescript/bin/tsc -p apps/api/tsconfig.json",
+      "exitCode": 0
+    },
+    {
+      "check": "unit and HTTP tests",
+      "command": "node node_modules/vitest/vitest.mjs run --config vitest.config.ts",
+      "exitCode": 0
+    },
+    {
+      "check": "Oxlint",
+      "command": "node node_modules/oxlint/bin/oxlint --max-warnings 0 .",
+      "exitCode": 0
+    },
+    {
+      "check": "agent validation",
+      "command": "node scripts/validate-agents.mjs",
+      "exitCode": 0
+    },
+    {
+      "check": "frontend production build",
+      "command": "node ../../node_modules/vite/bin/vite.js build (cwd apps/admin)",
+      "exitCode": 0
+    },
+    {
+      "check": "generated secrets absent from dist",
+      "exitCode": 0
+    },
+    {
+      "check": "lockfile manifest specifiers and static built exports",
+      "exitCode": 0
+    }
+  ]
+}

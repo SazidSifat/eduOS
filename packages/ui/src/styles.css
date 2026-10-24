@@ -1,0 +1,51 @@
+@import 'tailwindcss';
+@source './';
+@custom-variant dark (&:where(.dark, .dark *));
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --color-destructive: var(--destructive);
+}
+:root {
+  color-scheme: light;
+  --background: #fafaf8;
+  --foreground: #172a27;
+  --primary: #146454;
+  --primary-foreground: #ffffff;
+  --muted: #edf1ed;
+  --muted-foreground: #50615b;
+  --border: #cbd6ce;
+  --ring: #146454;
+  --destructive: #b42318;
+}
+.dark {
+  color-scheme: dark;
+  --background: #101c19;
+  --foreground: #edf6ef;
+  --primary: #92d6b6;
+  --primary-foreground: #10291e;
+  --muted: #1e3029;
+  --muted-foreground: #b6c6bd;
+  --border: #476153;
+  --ring: #92d6b6;
+  --destructive: #ffb4ab;
+}
+@layer base {
+  body {
+    margin: 0;
+    background: var(--background);
+    color: var(--foreground);
+    font-family: ui-sans-serif, system-ui, sans-serif;
+  }
+  button,
+  a,
+  input {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
