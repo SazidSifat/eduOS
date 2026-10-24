@@ -14,7 +14,7 @@
   ],
   "overrides": [
     {
-      "files": ["apps/admin/**/*.{ts,tsx}"],
+      "files": ["apps/admin/**/*.{ts,tsx}", "apps/platform/**/*.{ts,tsx}"],
       "rules": {
         "no-restricted-imports": [
           "error",

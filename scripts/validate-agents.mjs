@@ -15,15 +15,16 @@ const names = [
   'domain-modeling',
   'code-review',
 ];
-for (const file of [
+const instructionFiles = [
   'AGENTS.md',
   'CLAUDE.md',
   'apps/admin/AGENTS.md',
+  'apps/platform/AGENTS.md',
   'apps/api/AGENTS.md',
   'packages/database/AGENTS.md',
   'packages/ui/AGENTS.md',
-])
-  if (!existsSync(file)) throw new Error(`Missing ${file}`);
+];
+for (const file of instructionFiles) if (!existsSync(file)) throw new Error(`Missing ${file}`);
 function validate(base) {
   const actual = readdirSync(base, { withFileTypes: true })
     .filter((e) => e.isDirectory())
@@ -59,5 +60,5 @@ function validate(base) {
 validate('agent-skills');
 if (existsSync('.agents/skills')) validate('.agents/skills');
 console.info(
-  `Validated ${names.length} skill sources and six instruction files. Discovery installation: ${existsSync('.agents/skills') ? 'present' : 'pending (sources under agent-skills)'}.`,
+  `Validated ${names.length} skill sources and ${instructionFiles.length} instruction files. Discovery installation: ${existsSync('.agents/skills') ? 'present' : 'pending (sources under agent-skills)'}.`,
 );

@@ -20,7 +20,8 @@
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "node --env-file=../../.env --import tsx src/migrate.ts",
+    "db:migrate": "node --env-file-if-exists=../../apps/api/.env --import tsx src/migrate.ts",
+    "db:migrate:check": "node --env-file-if-exists=../../apps/api/.env --import tsx src/migrate.ts --check",
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {

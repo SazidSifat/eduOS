@@ -9,7 +9,7 @@ const { signIn, navigate, clear, cancelQueries } = vi.hoisted(() => ({
   cancelQueries: vi.fn(),
 }));
 vi.mock('@tanstack/react-router', () => ({ useNavigate: () => navigate }));
-vi.mock('../-api/auth', () => ({ authClient: { signIn: { email: signIn } } }));
+vi.mock('../_api/auth', () => ({ authClient: { signIn: { email: signIn } } }));
 vi.mock('../../../lib/query-client', () => ({ queryClient: { clear, cancelQueries } }));
 
 beforeEach(() => vi.resetAllMocks());

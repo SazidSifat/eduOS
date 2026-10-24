@@ -19,7 +19,7 @@ export const platformRoleDefinitions: readonly {
   name: string;
   permissions: readonly PlatformPermission[];
 }[] = [
-  { key: 'platform_owner', name: 'Platform Owner', permissions: platformPermissionKeys },
+  { key: 'platform_owner', name: 'Super Admin', permissions: platformPermissionKeys },
   {
     key: 'platform_manager',
     name: 'Platform Manager',

@@ -9,7 +9,7 @@ import {
 import { randomBytes } from 'node:crypto';
 const secret = randomBytes(48).toString('base64url');
 const databasePassword = randomBytes(24).toString('hex');
-for (const file of ['.env', 'apps/api/.env', 'apps/admin/.env']) {
+for (const file of ['.env', 'apps/api/.env', 'apps/admin/.env', 'apps/platform/.env']) {
   if (existsSync(file)) {
     console.info(`Kept existing ${file}`);
     continue;

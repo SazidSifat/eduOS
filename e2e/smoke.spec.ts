@@ -7,6 +7,7 @@ test('opens sign-in directly, validates credentials and switches themes', async 
   expect((await session).status()).toBe(401);
   await expect(page).toHaveURL(/\/login\/?$/);
   await expect(page.getByRole('heading', { name: 'Sign in to EduOS' })).toBeVisible();
+  await expect(page.getByLabel('Email')).toBeVisible();
   await expect(page.getByRole('link', { name: 'Open workspace' })).toHaveCount(0);
   await page.screenshot({
     path: testInfo.outputPath('login-light.png'),

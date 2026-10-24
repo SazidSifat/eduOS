@@ -8,7 +8,7 @@ The user requires an authentication entry without a landing page and asks EduOS 
 
 ## Decision
 
-Keep React/Vite, generated TanStack routing and EduOS's existing page/route tokens. Colocate route presentation, hooks and tests under `_component/`, and typed client/query helpers under `-api/`. Exclude helper directories and non-route files from route discovery. Move shared layout/providers to components/, Query infrastructure to lib/, the router to src/router.tsx and the existing theme preference to stores/. Do not copy the reference application's authentication store, hospital APIs, mobile features or branding.
+Keep React/Vite, generated TanStack routing and EduOS's existing page/route tokens. Colocate route presentation, hooks and tests under `_component/`, and typed client/query helpers under `_api/` (the user-requested adaptation of the reference app’s `-api/`). Exclude helper directories and non-route files from route discovery. Move shared layout/providers to components/, Query infrastructure to lib/, the router to src/router.tsx and the existing theme preference to stores/. Do not copy the reference application's authentication store, hospital APIs, mobile features or branding.
 
 The root route redirects to /login. The login guard checks the server identity and redirects an authenticated user to /workspace. A 401 allows sign-in; other errors stay visible and recoverable. The workspace independently validates identity and continues using institution-scoped API checks. Keep Better Auth identity, Zod contracts, React Hook Form validation, Query-owned server state, cache cancellation/clearing on identity transitions and the existing HttpOnly cookie flow.
 

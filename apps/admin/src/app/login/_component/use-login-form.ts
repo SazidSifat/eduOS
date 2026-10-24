@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from '@tanstack/react-router';
 import { loginSchema, type LoginInput } from '@eduos/contracts';
-import { authClient } from '../-api/auth';
+import { authClient } from '../_api/auth';
 import { queryClient } from '../../../lib/query-client';
 
 export function useLoginForm() {

@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "turbo run dev",
+    "dev:platform": "turbo run dev --filter=@eduos/platform",
     "build": "turbo run build",
     "lint": "oxlint --max-warnings 0 .",
     "typecheck": "turbo run typecheck && tsc -p tsconfig.tests.json && tsc -p apps/admin/tsconfig.tests.json",
@@ -15,6 +16,7 @@
     "format:check": "oxfmt --check .",
     "db:generate": "pnpm --filter @eduos/database db:generate",
     "db:migrate": "pnpm --filter @eduos/database db:migrate",
+    "db:migrate:check": "pnpm --filter @eduos/database db:migrate:check",
     "db:studio": "pnpm --filter @eduos/database db:studio",
     "infra:up": "docker compose --env-file .env -f infrastructure/docker/compose.yaml up -d --wait",
     "infra:down": "docker compose --env-file .env -f infrastructure/docker/compose.yaml down",

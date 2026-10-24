@@ -26,5 +26,10 @@ export default defineConfig({
       url: 'http://localhost:5173',
       reuseExistingServer: !process.env.CI,
     },
+    {
+      command: 'pnpm --filter @eduos/platform dev',
+      url: 'http://localhost:5174',
+      reuseExistingServer: !process.env.CI,
+    },
   ],
 });

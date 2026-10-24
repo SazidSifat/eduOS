@@ -9,6 +9,7 @@
   --muted-foreground: #686b64;
   --border: #e6e7e2;
   --control-border: #8b9085;
+  --auth-sidebar: #f0f1ec;
   --primary: #315b45;
   --primary-foreground: #ffffff;
   --ring: #315b45;
@@ -24,10 +25,19 @@
   --muted-foreground: #adb1a6;
   --border: #353a32;
   --control-border: #737b6b;
+  --auth-sidebar: #20231f;
   --primary: #c3d5bd;
   --primary-foreground: #1b2b1d;
   --ring: #c3d5bd;
   --destructive: #ffb4ab;
+}
+
+.auth-sidebar {
+  background: var(--auth-sidebar);
+}
+
+.auth-page [role='alert'] button {
+  font-size: 1rem;
 }
 
 .auth-page input,
@@ -41,6 +51,7 @@
   height: 48px;
   border-color: var(--control-border);
   caret-color: var(--primary);
+  font-size: 1rem;
 }
 
 .auth-page input::placeholder {

@@ -1,6 +1,6 @@
 # Architecture
 
-EduOS starts as a modular monolith: one browser admin app and one Node API, backed by PostgreSQL. Redis is provisioned for future jobs and is not a runtime dependency yet.
+EduOS starts as a modular monolith: a school browser admin app and one Node API, backed by PostgreSQL. A separate `apps/platform` design preview uses synthetic data and makes no API requests. Redis is provisioned for future jobs and is not a runtime dependency yet.
 
 ```mermaid
 flowchart LR

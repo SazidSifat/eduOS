@@ -12,4 +12,6 @@ The separate `platform_role` enum has `platform_owner` and `platform_manager`. `
 
 `createDatabase` returns `db`, `pool`, a transaction helper and `close`. Multi-write operations use transactions. Schema changes use `pnpm db:generate`, review SQL/snapshots, then `pnpm db:migrate`; migration execution is explicit and tracked by Drizzle, never API startup. `db:studio` requires configured reachable PostgreSQL. No automatic reset or destructive push script is provided.
 
+`db:migrate` loads the API's private `apps/api/.env` when available and respects a `DATABASE_URL` already injected into the command environment. It validates the PostgreSQL URL, checks connectivity, then applies the existing migration journal. `db:migrate:check` stops after the connectivity query. Both commands close the pool and return nonzero with sanitized configuration/connection errors. Generation and Studio retain their root `.env` configuration. No schema SQL or applied migration is rewritten by this command change.
+
 Integration tests require a dedicated `eduos_test*` database, apply committed migrations, create unique synthetic fixtures, verify authentication/isolation/rollback, and remove only their own rows. Do not point tests at development or production data. Backups, restore drills and online migration strategies need deployment-specific work before pilot use.

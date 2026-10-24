@@ -4,7 +4,9 @@ Source: [EduOS Domain & Module Feature Specification v1.0, 20 October 2026](http
 
 EduOS serves private schools in Bangladesh, initially Classes 1–10. Its planned first product slice is academic setup, enrollment, teaching assignments and daily attendance. Exams/results and fees follow. College credit/semester systems, payroll, transport and biometric integrations are outside the initial scope.
 
-**Implemented now:** identity, sessions, institution memberships with five school roles, authorized workspace reads, membership role/status management by Admin and Principal, separate Platform Owner/Manager access, platform institution-metadata reads and audited platform operator management. There are no school business modules, invitation workflows, provisioning UI or sample analytics. See [authentication](../architecture/authentication.md) for implemented permissions and verification limits.
+**Implemented now:** identity, sessions, institution memberships with five school roles, authorized workspace reads, membership role/status management by Admin and Principal, separate Super Admin (`platform_owner`) and Platform Manager access, platform institution-metadata reads and audited platform operator management. There are no school business modules, invitation workflows, provisioning UI or sample analytics. See [authentication](../architecture/authentication.md) for implemented permissions and verification limits.
+
+A separate platform interface now has authenticated access and live, read-only endpoints for platform access, institution metadata, and operator assignments. School creation, state changes, subscriptions and messages remain labeled local previews. See [platform development](../development/platform-preview.md).
 
 Preserve durable student identities, separate year-specific enrollments, effective-dated transfers and historical teaching assignments. Attendance corrections must preserve original submissions. Published results need policy versions; posted financial entries need authorized reversals. These are design constraints for future modules, not implemented functionality.
 

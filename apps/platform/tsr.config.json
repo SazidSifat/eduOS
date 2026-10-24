@@ -1,0 +1,9 @@
+{
+  "routesDirectory": "./src/app",
+  "generatedRouteTree": "./src/routeTree.gen.ts",
+  "indexToken": "page",
+  "routeToken": "route",
+  "routeFileIgnorePattern": "(^|/)(_component|_api)(/|$)|((^|/)(?!(page|route|__root)\\.(tsx|ts)$)[^/]+\\.(tsx|ts)$)",
+  "quoteStyle": "single",
+  "semicolons": true
+}

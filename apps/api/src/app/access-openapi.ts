@@ -98,7 +98,7 @@ export const accessPaths = {
   },
   '/api/v1/platform/operators': {
     get: {
-      ...read('Platform operators visible to Platform Owner', platformOperatorsSchema),
+      ...read('Platform operators visible to Super Admin', platformOperatorsSchema),
       parameters: pagination,
     },
   },
