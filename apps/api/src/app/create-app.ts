@@ -4,30 +4,31 @@ import { cors } from 'hono/cors';
 import { secureHeaders } from 'hono/secure-headers';
 import { bodyLimit } from 'hono/body-limit';
 import { HTTPException } from 'hono/http-exception';
-import { validator } from 'hono/validator';
-import { z } from 'zod';
-import type { Auth } from '@eduos/auth/server';
-import {
-  healthSchema,
-  readySchema,
-  identitySchema,
-  membershipsSchema,
-  workspaceSchema,
-  institutionIdSchema,
-} from '@eduos/contracts';
+import { healthSchema, readySchema } from '@eduos/contracts';
 import type { ApiEnv } from '../config/env.js';
 import type { Logger } from '../lib/logger.js';
 import type { IdentityService } from '../modules/identity/service.js';
-import { requireSession, requireTenant, type ApiVariables } from '../middleware/auth.js';
+import type { ApiVariables, HttpAuth } from '../middleware/auth.js';
+import { createIdentityRoutes } from '../modules/identity/routes.js';
+import { createPlatformRoutes } from '../modules/platform/routes.js';
+import type { PlatformService } from '../modules/platform/service.js';
 import { openapi } from './openapi.js';
 export interface AppDependencies {
   env: ApiEnv;
-  auth: Auth;
+  auth: HttpAuth;
   logger: Logger;
   identity: IdentityService;
+  platform: PlatformService;
   checkDatabase: () => Promise<void>;
 }
-export function createApp({ env, auth, logger, identity, checkDatabase }: AppDependencies) {
+export function createApp({
+  env,
+  auth,
+  logger,
+  identity,
+  platform,
+  checkDatabase,
+}: AppDependencies) {
   const app = new Hono<{ Variables: ApiVariables }>();
   app.use('*', async (c, next) => {
     const id = randomUUID();
@@ -100,37 +101,8 @@ export function createApp({ env, auth, logger, identity, checkDatabase }: AppDep
     }
   });
   app.on(['GET', 'POST'], '/api/auth/*', (c) => auth.handler(c.req.raw));
-  const session = requireSession(auth);
-  app.get('/api/v1/me', session, (c) => c.json(identitySchema.parse(c.get('identity'))));
-  app.get('/api/v1/memberships', session, async (c) =>
-    c.json(membershipsSchema.parse(await identity.listMemberships(c.get('identity').id))),
-  );
-  app.get(
-    '/api/v1/institutions/:institutionId/workspace',
-    session,
-    validator('param', (value, c) => {
-      const result = z.object({ institutionId: institutionIdSchema }).safeParse(value);
-      if (!result.success)
-        return c.json(
-          {
-            error: {
-              code: 'VALIDATION_ERROR',
-              message: 'Invalid institution ID',
-              requestId: c.get('requestId'),
-            },
-          },
-          400,
-        );
-      return result.data;
-    }),
-    requireTenant(identity.resolver, 'workspace.read'),
-    async (c) =>
-      c.json(
-        workspaceSchema.parse(
-          await identity.getWorkspace(c.get('identity').id, c.req.valid('param').institutionId),
-        ),
-      ),
-  );
+  app.route('/api/v1', createIdentityRoutes(auth, identity));
+  app.route('/api/v1/platform', createPlatformRoutes(auth, platform));
   app.get('/api/openapi.json', (c) => c.json(openapi));
   app.notFound((c) =>
     c.json(
@@ -145,6 +117,7 @@ export function createApp({ env, auth, logger, identity, checkDatabase }: AppDep
       401: 'UNAUTHENTICATED',
       403: 'FORBIDDEN',
       404: 'NOT_FOUND',
+      409: 'CONFLICT',
       413: 'PAYLOAD_TOO_LARGE',
       429: 'RATE_LIMITED',
     };

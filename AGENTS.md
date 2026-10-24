@@ -1,6 +1,6 @@
 # EduOS agent instructions
 
-EduOS is a Bangladesh school SaaS for Classes 1–10. This repository currently implements infrastructure and identity only. Read `docs/domain/overview.md`, the relevant bounded context, and `docs/architecture/` before implementing a feature. The linked product specification is proposed; school policies require discovery.
+EduOS is a Bangladesh school SaaS for Classes 1–10. This repository currently implements infrastructure, identity and role-based access control. Read `docs/domain/overview.md`, the relevant bounded context, and `docs/architecture/` before implementing a feature. The linked product specification is proposed; school policies require discovery.
 
 ## Architecture and code
 
@@ -17,7 +17,7 @@ EduOS is a Bangladesh school SaaS for Classes 1–10. This repository currently 
 ## Identity, data and security
 
 - Better Auth establishes identity; application policy establishes institution access. Check session, active membership, permission, and resource ownership on every tenant operation. A client tenant ID is only a selector.
-- Default deny. Keep grants out of the authentication library. Existing `workspace.read` is the only foundation grant. Revalidate membership at the data boundary; test revocation and cross-tenant denial.
+- Default deny. Keep grants out of the authentication library and resolve explicit permissions from `@eduos/permissions`. Institution roles are Admin, Principal, Admission Officer, Accountant and Teacher; Admin and Principal manage institution memberships. Platform Owner and Platform Manager use separate operator records and permissions, with no automatic tenant access or school-role platform access. Revalidate access at the data boundary; test revocation, escalation and cross-tenant denial.
 - Every tenant-owned row needs an explicit institution ID or a documented enforced ownership path. Future cross-tenant references require composite ownership constraints. RLS is **not enabled**; do not claim otherwise.
 - Schema changes require reviewed Drizzle migrations, indexes and constraints. Never edit an applied migration, run `push` against shared data, or run migrations on API startup. Persist instants as UTC `timestamptz`.
 - Never expose credentials, cookies, tokens, passwords or private student information in source, logs, errors, fixtures, screenshots or reports. Use synthetic data. Public Vite variables must contain no secrets.

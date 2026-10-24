@@ -11,7 +11,7 @@ Read root and scoped `AGENTS.md` instructions. Read `docs/domain/overview.md`, t
 
 Trace the closest existing capability from HTTP entry to SQL. Start with `apps/api/src/app/create-app.ts`, `apps/api/src/modules/identity/service.ts` and the public exports of affected packages. Distinguish implemented behavior, confirmed requirements and proposed school policy. Use the domain-modeling skill when introducing academic concepts or resolving business invariants.
 
-Describe the requested actor, trigger, current state, permitted transition, outcome and important failure cases. Identify which institution owns each resource and which permission and resource relationship authorize the action. Do not infer future grants from the foundation's `workspace.read` permission.
+Describe the requested actor, trigger, current state, permitted transition, outcome and important failure cases. Identify which institution owns each resource and which permission and resource relationship authorize the action. Do not infer future business grants from role names or the existing `workspace.read` permission.
 
 ## Choose the smallest useful boundary
 

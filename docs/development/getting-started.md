@@ -17,6 +17,10 @@ Open http://localhost:5173. API health is http://localhost:3001/api/health; read
 
 To test login, set `EDUOS_USER_EMAIL`, `EDUOS_USER_NAME`, and `EDUOS_USER_PASSWORD` in the private API `.env`, run `pnpm auth:create-user`, then remove those temporary provisioning values. Do not pass passwords in shell arguments. Sign in at `/login`; an account without memberships correctly sees an empty workspace. Institution provisioning and invitations are intentionally deferred. Synthetic institutions/memberships are created only by integration tests.
 
+For initial development access, use `pnpm auth:bootstrap` after applying migrations. Set `EDUOS_BOOTSTRAP_EMAIL` to an existing account in the private API `.env`. Set `EDUOS_BOOTSTRAP_SCOPE=platform` for the first Platform Owner, or `EDUOS_BOOTSTRAP_SCOPE=institution` with `EDUOS_BOOTSTRAP_INSTITUTION_ID` for the first Admin of an existing institution. The command is development-only, creates no institution or account, records an audit event and refuses if an active Owner/Admin already exists in that scope. Remove the temporary bootstrap variables afterward. No bootstrap runs automatically and no default credentials exist. Production provisioning/recovery needs a separate authorized workflow.
+
+Admin and Principal can update existing school memberships through the documented API. Platform Owner can assign platform roles to existing accounts; Platform Manager can inspect institution metadata. See [authentication](../architecture/authentication.md) for role grants and the login/access flow. Migrated existing school memberships have an unassigned role and require explicit assignment before workspace access. This backend change does not add role-management or platform frontend screens.
+
 ```sh
 pnpm lint
 pnpm typecheck

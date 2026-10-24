@@ -1,4 +1,3 @@
-import { z } from 'zod';
 import {
   errorSchema,
   healthSchema,
@@ -7,22 +6,15 @@ import {
   membershipsSchema,
   workspaceSchema,
 } from '@eduos/contracts';
-const json = (schema: z.ZodType) => ({ 'application/json': { schema: z.toJSONSchema(schema) } });
-const response = (description: string, schema: z.ZodType) => ({
-  description,
-  content: json(schema),
-});
-const protectedErrors = {
-  401: response('Authentication required', errorSchema),
-  403: response('Access denied', errorSchema),
-  500: response('Internal error', errorSchema),
-};
+import { response, protectedErrors } from './openapi-helpers.js';
+import { accessPaths } from './access-openapi.js';
 export const openapi = {
   openapi: '3.1.0',
   info: {
     title: 'EduOS API',
     version: '0.1.0',
-    description: 'Foundation endpoints. Better Auth manages /api/auth/* separately.',
+    description:
+      'Institution and platform access endpoints. Better Auth manages /api/auth/* separately.',
   },
   components: {
     securitySchemes: {
@@ -35,6 +27,7 @@ export const openapi = {
     },
   },
   paths: {
+    ...accessPaths,
     '/api/health': { get: { responses: { 200: response('Process is alive', healthSchema) } } },
     '/api/ready': {
       get: {

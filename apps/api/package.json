@@ -8,7 +8,8 @@
     "build": "tsc -p tsconfig.json",
     "start": "node --env-file=.env dist/index.js",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "auth:create-user": "node --env-file=.env --import tsx src/lib/create-user.ts"
+    "auth:create-user": "node --env-file=.env --import tsx src/lib/create-user.ts",
+    "auth:bootstrap": "node --env-file=.env --import tsx src/lib/bootstrap-access.ts"
   },
   "dependencies": {
     "@eduos/auth": "workspace:*",

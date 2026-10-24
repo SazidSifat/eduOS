@@ -5,6 +5,7 @@ import { createDatabase, eq, sql, migrateDatabase } from '@eduos/database';
 import { user, account, institution, membership, rateLimit } from '@eduos/database/schema';
 import { parseEnv } from '../config/env.js';
 import { createIdentityService } from '../modules/identity/service.js';
+import { createPlatformService } from '../modules/platform/service.js';
 import { createApp } from './create-app.js';
 const testUrl = process.env.TEST_DATABASE_URL;
 if (!testUrl)
@@ -31,6 +32,7 @@ const app = createApp({
   env,
   auth,
   identity: createIdentityService(connection.db),
+  platform: createPlatformService(connection.db),
   logger: { write() {} },
   checkDatabase: async () => {
     await connection.db.execute(sql`select 1`);
@@ -64,7 +66,9 @@ beforeAll(async () => {
     { id: schoolA, slug: `a-${userId}`, name: 'Synthetic A' },
     { id: schoolB, slug: `b-${userId}`, name: 'Synthetic B' },
   ]);
-  await connection.db.insert(membership).values({ userId, institutionId: schoolA });
+  await connection.db
+    .insert(membership)
+    .values({ userId, institutionId: schoolA, role: 'teacher' });
 });
 afterAll(async () => {
   await connection.db.delete(user).where(eq(user.id, userId));
@@ -99,7 +103,9 @@ describe.sequential('real database and Better Auth sessions', () => {
   });
   it('scopes membership lists and rejects another institution', async () => {
     const list = await app.request('/api/v1/memberships', { headers: { cookie } });
-    expect(await list.json()).toEqual([{ institutionId: schoolA, name: 'Synthetic A' }]);
+    expect(await list.json()).toEqual([
+      { institutionId: schoolA, name: 'Synthetic A', role: 'teacher' },
+    ]);
     expect(
       (await app.request(`/api/v1/institutions/${schoolA}/workspace`, { headers: { cookie } }))
         .status,

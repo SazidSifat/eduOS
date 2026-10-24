@@ -1,7 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { createApp } from './create-app.js';
 import { parseEnv } from '../config/env.js';
-import type { Auth } from '@eduos/auth/server';
 const env = parseEnv({
   DATABASE_URL: 'postgresql://test:test@localhost/test',
   REDIS_URL: 'redis://localhost',
@@ -15,6 +14,9 @@ function fixture(authenticated = false, ready = true) {
     resolver: { resolve: vi.fn(async () => null) },
     listMemberships: vi.fn(async () => []),
     getWorkspace: vi.fn(),
+    getAccess: vi.fn(),
+    listMembers: vi.fn(),
+    updateMembership: vi.fn(),
   };
   // Only session lookup is mocked here. Real auth and SQL are covered by the integration suite.
   const auth = {
@@ -25,14 +27,21 @@ function fixture(authenticated = false, ready = true) {
           : null,
       ),
     },
-    handler: vi.fn(),
-  } as unknown as Auth;
+    handler: vi.fn(async () => new Response()),
+  };
   return {
     identity,
     app: createApp({
       env,
       auth,
       identity,
+      platform: {
+        resolver: { resolve: vi.fn(async () => null) },
+        getAccess: vi.fn(),
+        listInstitutions: vi.fn(),
+        listOperators: vi.fn(),
+        updateOperator: vi.fn(),
+      },
       logger: { write: vi.fn() },
       checkDatabase: async () => {
         if (!ready) throw new Error('private connection string');

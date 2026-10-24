@@ -4,6 +4,7 @@ import { createDatabase, sql } from '@eduos/database';
 import { parseEnv } from './config/env.js';
 import { createLogger } from './lib/logger.js';
 import { createIdentityService } from './modules/identity/service.js';
+import { createPlatformService } from './modules/platform/service.js';
 import { createApp } from './app/create-app.js';
 const env = parseEnv(process.env);
 const logger = createLogger(env.LOG_LEVEL);
@@ -20,6 +21,7 @@ const app = createApp({
   logger,
   auth,
   identity: createIdentityService(connection.db),
+  platform: createPlatformService(connection.db),
   checkDatabase: async () => {
     await connection.db.execute(sql`select 1`);
   },

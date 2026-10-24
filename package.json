@@ -20,6 +20,7 @@
     "infra:down": "docker compose --env-file .env -f infrastructure/docker/compose.yaml down",
     "env:setup": "node scripts/setup-env.mjs",
     "auth:create-user": "pnpm --filter @eduos/api auth:create-user",
+    "auth:bootstrap": "pnpm --filter @eduos/api auth:bootstrap",
     "agents:validate": "node scripts/validate-agents.mjs",
     "agents:install": "node scripts/install-skills.mjs",
     "prepare": "node scripts/prepare.mjs",

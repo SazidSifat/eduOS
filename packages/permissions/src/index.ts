@@ -1,7 +1,10 @@
-export type Permission = `${string}.${string}`;
+import type { Permission, Role } from './roles.js';
+export * from './roles.js';
+export * from './platform.js';
 export interface TenantContext {
   readonly institutionId: string;
   readonly userId: string;
+  readonly role: Role;
   readonly permissions: ReadonlySet<Permission>;
 }
 export interface MembershipResolver {
@@ -12,11 +15,6 @@ export interface OwnedResource {
 }
 export interface ResourcePolicy<T extends OwnedResource> {
   allows(context: TenantContext, action: Permission, resource: T): boolean;
-}
-// Roles are application policy inputs; Better Auth establishes identity only.
-export interface RoleDefinition {
-  readonly key: string;
-  readonly permissions: readonly Permission[];
 }
 export function can(
   context: TenantContext,
