@@ -1,6 +1,6 @@
 import { Button } from '@eduos/ui';
-export function LoadingState() {
-  return <output className="py-8 text-muted-foreground">Loading workspace…</output>;
+export function LoadingState({ label = 'Loading workspace…' }: { label?: string }) {
+  return <output className="py-8 text-muted-foreground">{label}</output>;
 }
 export function ErrorState({ retry }: { retry: () => void }) {
   return (

@@ -3,7 +3,7 @@
   "generatedRouteTree": "./src/routeTree.gen.ts",
   "indexToken": "page",
   "routeToken": "route",
-  "routeFileIgnorePattern": "^(providers|router)$|^layout\\.tsx$",
+  "routeFileIgnorePattern": "(^|/)(_component|-api)(/|$)|((^|/)(?!(page|route|__root)\\.(tsx|ts)$)[^/]+\\.(tsx|ts)$)",
   "quoteStyle": "single",
   "semicolons": true
 }

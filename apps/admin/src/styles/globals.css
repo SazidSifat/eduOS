@@ -1,2 +1,68 @@
 @import '@eduos/ui/styles.css';
 @source '../';
+
+/* Keep the sign-in surface neutral without changing the workspace palette. */
+.auth-page {
+  --background: #fafaf9;
+  --foreground: #252724;
+  --muted: #efefec;
+  --muted-foreground: #686b64;
+  --border: #e6e7e2;
+  --control-border: #8b9085;
+  --primary: #315b45;
+  --primary-foreground: #ffffff;
+  --ring: #315b45;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Avenir Next', Avenir, 'Segoe UI Variable', 'Segoe UI', sans-serif;
+}
+
+.dark .auth-page {
+  --background: #191b19;
+  --foreground: #eeefeb;
+  --muted: #272a26;
+  --muted-foreground: #adb1a6;
+  --border: #353a32;
+  --control-border: #737b6b;
+  --primary: #c3d5bd;
+  --primary-foreground: #1b2b1d;
+  --ring: #c3d5bd;
+  --destructive: #ffb4ab;
+}
+
+.auth-page input,
+.auth-page button {
+  transition-property: background-color, border-color, color, opacity;
+  transition-duration: 150ms;
+  transition-timing-function: ease-out;
+}
+
+.auth-page input {
+  height: 48px;
+  border-color: var(--control-border);
+  caret-color: var(--primary);
+}
+
+.auth-page input::placeholder {
+  color: var(--muted-foreground);
+}
+
+.auth-page input:hover:not([aria-invalid='true']) {
+  border-color: var(--muted-foreground);
+}
+
+.auth-page input[aria-invalid='true'] {
+  border-color: var(--destructive);
+}
+
+.auth-page ::selection {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-page input,
+  .auth-page button {
+    transition: none;
+  }
+}

@@ -2,6 +2,8 @@
 
 Status: accepted. Date: 2026-10-20.
 
+The helper/provider layout and feature-folder organization below are updated by [ADR 0007](0007-auth-entry-and-route-colocation.md); generated app-directory routing remains in place.
+
 ## Context
 
 The user requires frontend routes to start from the app folder with a Next.js-like file-based structure.

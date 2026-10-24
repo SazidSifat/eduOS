@@ -6,13 +6,25 @@ EduOS is a Bangladesh school SaaS for Classes 1–10. This repository currently 
 
 - Inspect existing code and Git status first. Preserve unrelated work; never overwrite or delete another person's changes. In this environment `.git` and `.agents` may be read-only mounts; do not bypass their permissions.
 - Prefer existing utilities and `@eduos/*` exports. Browser code may import `@eduos/auth/client`, contracts, permissions and UI; never database or auth server code.
-- Organize API capabilities under `apps/api/src/modules/<capability>` and frontend capabilities under `apps/admin/src/features/<capability>`. Add folders only with actual files. No worker until processing exists.
+- Organize API capabilities under `apps/api/src/modules/<capability>`. Follow the sastho-marketer frontend structure: thin `apps/admin/src/app/**/page.tsx` routes with colocated `_component/` presentation/hooks and `-api/` clients/queries. Shared layout/providers belong in `src/components/`, infrastructure in `src/lib/`, the router in `src/router.tsx`, and theme preference in `src/stores/`. Add folders only with actual files. No worker until processing exists.
 - Keep business rules in domain/application services, outside HTTP handlers and presentation components. Avoid cross-module writes; use explicit services. Avoid dependencies and abstractions without a concrete use.
 - Keep each manually maintained source file at a maximum of 400 lines, including comments and blank lines. When creating or modifying a file, split it into focused files before exceeding this limit; do not compress formatting or remove useful comments to fit.
 - Keep components focused on one responsibility. Extract cohesive child components, hooks, schemas, types and utilities as needed, colocated with their feature or capability. Use clear names and explicit interfaces; avoid arbitrary file splits, unrelated helpers and unnecessary abstractions.
 - Use strict TypeScript, narrow unknown values, type-only imports and explicit package exports. Do not use `any`, unchecked casts, or non-null assertions to hide errors. Use `.js` relative imports in compiled Node packages.
 - Validate every external input with Zod. Validate API responses with shared contracts. Update OpenAPI when adding routes.
 - TanStack Query owns server state. Use the central API client and feature queries. Zustand currently stores theme preference only. Routes originate in `apps/admin/src/app` using folder `page.tsx` files and the generated TanStack tree. Never maintain a manual route list or edit generated routing output. Forms use React Hook Form and Zod. Preserve keyboard access, labels, focus and semantic HTML.
+
+## Frontend visual design
+
+- Build deliberate, context-specific interfaces with structural clarity, high data density and practical utility. Avoid generic templates and decorative elements without a purpose.
+- Never use emojis or emoticons in the interface, including copy, buttons, alerts, notifications, icons or placeholders. Use clean, ultra-minimal vector SVG paths for icons.
+- Never use Inter, Geist, Roboto or Space Grotesk. Prefer a premium system font stack or professional geometric and neo-grotesque alternatives. Heading options include General Sans, Satoshi, Urbanist or Fraunces for a deliberate serif treatment. Body and control options include Switzer or heavily customized Plus Jakarta Sans; use a clean utilitarian monospace where useful for numbers.
+- Use a disciplined type scale with no more than three distinct font sizes per view. Establish hierarchy through weight, spacing and alignment as well as size.
+- Dashboard layouts use strict grids, persistent structural sidebars and crisp alignment. Avoid staggered, unaligned elements; preserve usable navigation and readable data on smaller screens.
+- Keep panel corner radii at or below 8px, preferring 4–8px. Separate sections with ultra-faint 1px solid dividers, such as neutral-100 in light mode or neutral-800 in dark mode. Avoid heavy shadows and glowing or neon gradient borders.
+- Give every interactive cell, button and row a polished, immediate state response, such as a subtle background shift with a precise 150ms ease-out transition. Preserve visible keyboard focus and respect reduced-motion preferences.
+- Use specific, realistic, synthetic school data and contextual copy when examples are needed. Never use Lorem Ipsum, Feature 1 or other generic filler.
+- Use chalk whites, organic light grays or deep matte charcoal tones. Never add random floating radial lights, background orbs or artificial purple dark-mode palettes.
 
 ## Identity, data and security
 

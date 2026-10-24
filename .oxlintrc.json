@@ -2,6 +2,7 @@
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "extends": ["./packages/oxlint-config/base.json"],
   "ignorePatterns": [
+    "agent-skills/impeccable/**",
     "**/node_modules/**",
     "**/dist/**",
     "**/.turbo/**",

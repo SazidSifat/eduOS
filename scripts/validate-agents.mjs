@@ -3,6 +3,7 @@ import { join, dirname, resolve } from 'node:path';
 import { parse } from 'yaml';
 const names = [
   'frontend-feature',
+  'impeccable',
   'backend-module',
   'backend-design',
   'api-contract-design',
@@ -38,10 +39,17 @@ function validate(base) {
     const data = parse(frontmatter[1]);
     if (data.name !== name || typeof data.description !== 'string' || data.description.length < 30)
       throw new Error(`Invalid metadata: ${file}`);
-    if (Object.keys(data).some((k) => !['name', 'description'].includes(k)))
+    const allowed =
+      name === 'impeccable' ? ['name', 'description', 'metadata'] : ['name', 'description'];
+    if (Object.keys(data).some((k) => !allowed.includes(k)))
       throw new Error(`Unverified metadata field: ${file}`);
-    for (const match of body.matchAll(/\]\((references\/[^)]+)\)/g)) {
-      const target = resolve(dirname(file), match[1]);
+    if (
+      name === 'impeccable' &&
+      (data.metadata?.version !== '4.7.1' || Object.keys(data.metadata).length !== 1)
+    )
+      throw new Error(`Unexpected upstream version metadata: ${file}`);
+    for (const match of body.matchAll(/\]\(((?:references?|agents)\/[^)]+)\)/g)) {
+      const target = resolve(dirname(file), match[1].split('#')[0]);
       if (!target.startsWith(resolve(dirname(file)) + '/') || !existsSync(target))
         throw new Error(`Missing or unsafe reference: ${file}`);
     }
