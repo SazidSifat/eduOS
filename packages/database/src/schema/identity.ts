@@ -12,8 +12,16 @@ import {
   foreignKey,
   integer,
   date,
+  pgSequence,
 } from 'drizzle-orm/pg-core';
 import { user } from './auth.js';
+export const institutionCodeSequence = pgSequence('institution_code_seq', {
+  startWith: 100000,
+  minValue: 100000,
+  maxValue: 999999,
+  increment: 1,
+  cycle: false,
+});
 export const institutionType = pgEnum('institution_type', [
   'kindergarten',
   'high_school',
@@ -38,6 +46,10 @@ export const institution = pgTable(
   'institution',
   {
     id: uuid('id').defaultRandom().primaryKey(),
+    code: text('code')
+      .notNull()
+      .unique()
+      .default(sql`nextval('institution_code_seq'::regclass)::text`),
     name: text('name').notNull(),
     slug: text('slug').notNull().unique(),
     timezone: text('timezone').default('Asia/Dhaka').notNull(),
@@ -47,7 +59,10 @@ export const institution = pgTable(
     statusUpdatedAt: timestamp('status_updated_at', { withTimezone: true }).defaultNow().notNull(),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   },
-  (t) => [check('institution_slug_format', sql`${t.slug} ~ '^[a-z0-9]+(-[a-z0-9]+)*$'`)],
+  (t) => [
+    check('institution_slug_format', sql`${t.slug} ~ '^[a-z0-9]+(-[a-z0-9]+)*$'`),
+    check('institution_code_format', sql`${t.code} ~ '^[1-9][0-9]{5}$'`),
+  ],
 );
 export const institutionRole = pgEnum('institution_role', [
   'admin',

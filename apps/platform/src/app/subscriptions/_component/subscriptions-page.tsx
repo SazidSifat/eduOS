@@ -35,7 +35,7 @@ export function SubscriptionsPage() {
   const records = useMemo(() => {
     const query = search.trim().toLowerCase();
     return (subscriptions.data?.items ?? []).filter(({ institution, subscription }) =>
-      `${institution.name} ${institution.slug} ${subscription?.planName ?? ''}`
+      `${institution.name} ${institution.code} ${institution.slug} ${subscription?.planName ?? ''}`
         .toLowerCase()
         .includes(query),
     );
@@ -65,7 +65,7 @@ export function SubscriptionsPage() {
               maxLength={200}
               onChange={(event) => setSearch(event.target.value)}
               className="h-9 w-full pl-9"
-              placeholder="Search institution or plan"
+              placeholder="Search institution, code or plan"
             />
           </div>
           <span className="text-xs text-muted-foreground">
@@ -117,6 +117,7 @@ export function SubscriptionsPage() {
                         {institution.name}
                       </Link>
                       <span className="mt-1 block text-xs text-muted-foreground">
+                        {institution.code} ·{' '}
                         {institution.type ? typeLabel[institution.type] : 'Type not set'}
                       </span>
                     </TableCell>

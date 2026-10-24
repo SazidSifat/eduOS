@@ -1,6 +1,7 @@
 import { queryOptions } from '@tanstack/react-query';
 import {
   identitySchema,
+  institutionCodeSchema,
   platformAccessSchema,
   platformInstitutionCreateSchema,
   platformInstitutionModulesSchema,
@@ -77,6 +78,18 @@ export const institutionsQuery = queryOptions({
   queryFn: ({ signal }) =>
     apiGet('/api/v1/platform/institutions?limit=100&offset=0', platformInstitutionsSchema, signal),
 });
+export function institutionCodeQuery(code: string) {
+  const value = institutionCodeSchema.parse(code);
+  return queryOptions({
+    queryKey: [...institutionsQuery.queryKey, 'code', value],
+    queryFn: ({ signal }) =>
+      apiGet(
+        `/api/v1/platform/institutions?code=${encodeURIComponent(value)}&limit=100&offset=0`,
+        platformInstitutionsSchema,
+        signal,
+      ),
+  });
+}
 
 export const operatorsQuery = queryOptions({
   queryKey: ['platform', 'operators'],

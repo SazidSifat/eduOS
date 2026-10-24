@@ -104,7 +104,12 @@ describe.sequential('real database and Better Auth sessions', () => {
   it('scopes membership lists and rejects another institution', async () => {
     const list = await app.request('/api/v1/memberships', { headers: { cookie } });
     expect(await list.json()).toEqual([
-      { institutionId: schoolA, name: 'Synthetic A', role: 'teacher' },
+      {
+        institutionId: schoolA,
+        code: expect.stringMatching(/^[1-9]\d{5}$/),
+        name: 'Synthetic A',
+        role: 'teacher',
+      },
     ]);
     expect(
       (await app.request(`/api/v1/institutions/${schoolA}/workspace`, { headers: { cookie } }))

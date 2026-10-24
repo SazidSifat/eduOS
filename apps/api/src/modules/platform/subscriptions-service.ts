@@ -19,6 +19,7 @@ export function createPlatformSubscriptionService(db: Database) {
         const schools = await tx
           .select({
             id: institution.id,
+            code: institution.code,
             name: institution.name,
             slug: institution.slug,
             type: institution.type,

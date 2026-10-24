@@ -2,7 +2,13 @@ import { useState } from 'react';
 import { Check, Copy } from 'lucide-react';
 import { Button } from '@eduos/ui';
 
-export function CopyId({ value }: { value: string }) {
+export function CopyId({
+  value,
+  label = 'Copy account or institution ID',
+}: {
+  value: string;
+  label?: string;
+}) {
   const [state, setState] = useState<'idle' | 'copied' | 'failed'>('idle');
   async function copy() {
     try {
@@ -18,7 +24,7 @@ export function CopyId({ value }: { value: string }) {
       <Button
         variant="outline"
         size="icon"
-        aria-label="Copy account or institution ID"
+        aria-label={label}
         onClick={() => {
           void copy();
         }}

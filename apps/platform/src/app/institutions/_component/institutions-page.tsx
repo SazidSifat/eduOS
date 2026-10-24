@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Eye, Search, Plus } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
+import { institutionCodeSchema } from '@eduos/contracts';
 import {
   Button,
   Badge,
@@ -18,18 +19,19 @@ import {
 } from '@eduos/ui';
 import { PageHeader } from '../../../components/page-header';
 import { EmptyState } from '../../../components/empty-state';
-import { institutionsQuery } from '../../_api/platform';
+import { institutionCodeQuery, institutionsQuery } from '../../_api/platform';
 import { usePlatformAccess } from '../../../components/providers/platform-access-provider';
 
 export function InstitutionsPage() {
   const { canCreateInstitutions } = usePlatformAccess();
-  const institutions = useQuery(institutionsQuery);
   const [search, setSearch] = useState('');
+  const code = institutionCodeSchema.safeParse(search.trim());
+  const institutions = useQuery(code.success ? institutionCodeQuery(code.data) : institutionsQuery);
   const records = useMemo(() => {
     const items = institutions.data?.items ?? [];
     const query = search.trim().toLowerCase();
     return items.filter((institution) =>
-      `${institution.name} ${institution.slug} ${institution.id} ${institution.type ?? ''} ${institution.status}`
+      `${institution.name} ${institution.code} ${institution.slug} ${institution.id} ${institution.type ?? ''} ${institution.status}`
         .toLowerCase()
         .includes(query),
     );
@@ -65,7 +67,7 @@ export function InstitutionsPage() {
               maxLength={200}
               onChange={(event) => setSearch(event.target.value)}
               className="h-9 w-full pl-9"
-              placeholder="Search name, slug or identifier"
+              placeholder="Search name, code or slug"
             />
           </div>
           <span className="text-xs text-muted-foreground">
@@ -99,7 +101,7 @@ export function InstitutionsPage() {
                   <TableHead scope="col">Modules</TableHead>
                   <TableHead scope="col">Slug</TableHead>
                   <TableHead scope="col">Timezone</TableHead>
-                  <TableHead scope="col">Institution ID</TableHead>
+                  <TableHead scope="col">Institution code</TableHead>
                   <TableHead scope="col" className="text-right">
                     Details
                   </TableHead>
@@ -140,7 +142,9 @@ export function InstitutionsPage() {
                     <TableCell>{institution.enabledModules.length} enabled</TableCell>
                     <TableCell className="font-mono text-xs">{institution.slug}</TableCell>
                     <TableCell>{institution.timezone}</TableCell>
-                    <TableCell className="font-mono text-xs">{institution.id}</TableCell>
+                    <TableCell className="font-mono text-xs tabular-nums">
+                      {institution.code}
+                    </TableCell>
                     <TableCell className="text-right">
                       <Button asChild variant="outline" size="icon">
                         <Link
@@ -159,9 +163,7 @@ export function InstitutionsPage() {
             </Table>
           </div>
         ) : (
-          <EmptyState title="No matching institutions">
-            Try another name, slug or identifier.
-          </EmptyState>
+          <EmptyState title="No matching institutions">Try another name, code or slug.</EmptyState>
         )}
         <div className="border-t border-border px-5 py-3 text-xs text-muted-foreground">
           Access state and module settings are managed from the institution profile.

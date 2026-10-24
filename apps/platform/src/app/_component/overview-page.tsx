@@ -86,7 +86,7 @@ export function OverviewPage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead scope="col">Institution</TableHead>
-                    <TableHead scope="col">Slug</TableHead>
+                    <TableHead scope="col">Institution code</TableHead>
                     <TableHead scope="col">Timezone</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -94,7 +94,9 @@ export function OverviewPage() {
                   {institutions.data.items.slice(0, 5).map((institution) => (
                     <TableRow key={institution.id}>
                       <TableCell className="font-medium">{institution.name}</TableCell>
-                      <TableCell className="font-mono text-xs">{institution.slug}</TableCell>
+                      <TableCell className="font-mono text-xs tabular-nums">
+                        {institution.code}
+                      </TableCell>
                       <TableCell>{institution.timezone}</TableCell>
                     </TableRow>
                   ))}

@@ -93,7 +93,7 @@ function WorkspaceContent({ userId, name }: { userId: string; name: string }) {
             <option value="">Select an institution</option>
             {memberships.data.map((m) => (
               <option key={m.institutionId} value={m.institutionId}>
-                {m.name}
+                {m.name} ({m.code})
               </option>
             ))}
           </select>
@@ -111,6 +111,7 @@ function WorkspaceContent({ userId, name }: { userId: string; name: string }) {
         ) : (
           <div className="rounded-lg border border-border p-6">
             <h2 className="text-xl font-semibold">{workspace.data.name}</h2>
+            <p className="mt-2 text-muted-foreground">Institution code: {workspace.data.code}</p>
             <p className="mt-2 text-muted-foreground">Time zone: {workspace.data.timezone}</p>
             <p className="mt-2 text-muted-foreground">
               Enabled modules:{' '}

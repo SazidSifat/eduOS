@@ -38,6 +38,7 @@ export async function institutionRecord(tx: DatabaseTransaction, institutionId: 
   const [record] = await tx
     .select({
       id: institution.id,
+      code: institution.code,
       name: institution.name,
       slug: institution.slug,
       timezone: institution.timezone,

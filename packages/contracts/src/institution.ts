@@ -10,3 +10,4 @@ export const institutionModuleKeys = [
 export const institutionTypeSchema = z.enum(['kindergarten', 'high_school', 'coaching_center']);
 export const institutionStatusSchema = z.enum(['active', 'frozen', 'inactive']);
 export const institutionModuleSchema = z.enum(institutionModuleKeys);
+export const institutionCodeSchema = z.string().regex(/^[1-9][0-9]{5}$/);

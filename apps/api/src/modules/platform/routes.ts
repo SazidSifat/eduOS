@@ -4,6 +4,7 @@ import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';
 import {
   memberListQuerySchema,
+  platformInstitutionListQuerySchema,
   platformAccessSchema,
   platformInstitutionsSchema,
   platformInstitutionCreateSchema,
@@ -34,6 +35,9 @@ export function createPlatformRoutes(auth: SessionAuth, platform: PlatformServic
   const app = new Hono<{ Variables: ApiVariables }>();
   const session = requireSession(auth);
   const query = validator('query', (value) => validated(memberListQuerySchema, value));
+  const institutionQuery = validator('query', (value) =>
+    validated(platformInstitutionListQuerySchema, value),
+  );
   app.get(
     '/access',
     session,
@@ -57,12 +61,12 @@ export function createPlatformRoutes(auth: SessionAuth, platform: PlatformServic
     '/institutions',
     session,
     requirePlatform(platform.resolver, 'platform.institutions.read'),
-    query,
+    institutionQuery,
     async (c) => {
-      const { limit, offset } = c.req.valid('query');
+      const { limit, offset, code } = c.req.valid('query');
       return c.json(
         platformInstitutionsSchema.parse(
-          await platform.listInstitutions(c.get('identity').id, limit, offset),
+          await platform.listInstitutions(c.get('identity').id, limit, offset, code),
         ),
       );
     },

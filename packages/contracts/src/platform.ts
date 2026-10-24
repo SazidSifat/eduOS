@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import {
   institutionModuleKeys,
+  institutionCodeSchema,
   institutionModuleSchema,
   institutionStatusSchema,
   institutionTypeSchema,
@@ -33,6 +34,7 @@ export const platformOperatorsSchema = z.object({
 });
 export const platformInstitutionSchema = z.object({
   id: z.uuid(),
+  code: institutionCodeSchema,
   name: z.string(),
   slug: z.string(),
   timezone: z.string(),
@@ -119,6 +121,7 @@ export const platformSubscriptionsSchema = z.object({
     z.object({
       institution: z.object({
         id: z.uuid(),
+        code: institutionCodeSchema,
         name: z.string(),
         slug: z.string(),
         type: institutionTypeSchema.nullable(),

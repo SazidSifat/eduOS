@@ -52,7 +52,12 @@ export function createIdentityService(db: Database) {
     },
     async listMemberships(userId: string) {
       return db
-        .select({ institutionId: institution.id, name: institution.name, role: membership.role })
+        .select({
+          institutionId: institution.id,
+          code: institution.code,
+          name: institution.name,
+          role: membership.role,
+        })
         .from(membership)
         .innerJoin(institution, eq(institution.id, membership.institutionId))
         .where(
@@ -68,6 +73,7 @@ export function createIdentityService(db: Database) {
       const [row] = await db
         .select({
           institutionId: institution.id,
+          code: institution.code,
           name: institution.name,
           timezone: institution.timezone,
           role: membership.role,
@@ -96,6 +102,7 @@ export function createIdentityService(db: Database) {
         );
       return {
         institutionId: row.institutionId,
+        code: row.code,
         name: row.name,
         timezone: row.timezone,
         modules: modules.map((item) => item.module),

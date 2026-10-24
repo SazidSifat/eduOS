@@ -61,6 +61,12 @@ export function InstitutionProfile({ institutionId }: { institutionId: string })
                   <dd className="font-medium">{institution.data.name}</dd>
                 </div>
                 <div className="grid gap-2 py-5 sm:grid-cols-[150px_1fr]">
+                  <dt className="text-muted-foreground">Institution code</dt>
+                  <dd>
+                    <CopyId value={institution.data.code} label="Copy institution code" />
+                  </dd>
+                </div>
+                <div className="grid gap-2 py-5 sm:grid-cols-[150px_1fr]">
                   <dt className="text-muted-foreground">Institution type</dt>
                   <dd>
                     {institution.data.type
@@ -97,7 +103,7 @@ export function InstitutionProfile({ institutionId }: { institutionId: string })
                   <dd>{institution.data.timezone}</dd>
                 </div>
                 <div className="grid gap-2 py-5 sm:grid-cols-[150px_1fr]">
-                  <dt className="text-muted-foreground">Institution ID</dt>
+                  <dt className="text-muted-foreground">Internal ID</dt>
                   <dd>
                     <CopyId value={institution.data.id} />
                   </dd>

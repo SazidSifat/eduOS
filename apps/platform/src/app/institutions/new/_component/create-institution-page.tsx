@@ -234,7 +234,8 @@ export function CreateInstitutionPage() {
         )}
         <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border px-5 py-4">
           <p className="max-w-xl text-xs text-muted-foreground">
-            Institution settings, the new Admin account and school membership are saved together.
+            A unique six-digit code is assigned automatically. The institution and Admin account are
+            saved together.
           </p>
           <div className="flex items-center gap-2">
             <Button asChild variant="outline">

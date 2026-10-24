@@ -115,7 +115,16 @@ export const accessPaths = {
   '/api/v1/platform/institutions': {
     get: {
       ...read('Institution metadata visible to platform staff', platformInstitutionsSchema),
-      parameters: pagination,
+      parameters: [
+        ...pagination,
+        {
+          in: 'query',
+          name: 'code',
+          required: false,
+          description: 'Exact six-digit institution code. Lookup is applied before pagination.',
+          schema: { type: 'string', pattern: '^[1-9][0-9]{5}$' },
+        },
+      ],
     },
     post: {
       security: [{ session: [] }],

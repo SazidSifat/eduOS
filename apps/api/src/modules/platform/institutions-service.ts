@@ -13,12 +13,13 @@ type InstitutionState = { status: 'active' | 'frozen' | 'inactive'; reason?: str
 
 export function createPlatformInstitutionService(db: Database) {
   return {
-    async listInstitutions(userId: string, limit: number, offset: number) {
+    async listInstitutions(userId: string, limit: number, offset: number, code?: string) {
       return db.transaction(async (tx) => {
         await authorizeInstitutionManagement(tx, userId, 'platform.institutions.read');
         const records = await tx
           .select({
             id: institution.id,
+            code: institution.code,
             name: institution.name,
             slug: institution.slug,
             timezone: institution.timezone,
@@ -27,6 +28,7 @@ export function createPlatformInstitutionService(db: Database) {
             statusReason: institution.statusReason,
           })
           .from(institution)
+          .where(code ? eq(institution.code, code) : undefined)
           .orderBy(asc(institution.id))
           .limit(limit)
           .offset(offset);
@@ -90,7 +92,7 @@ export function createPlatformInstitutionService(db: Database) {
             type: values.type,
           })
           .onConflictDoNothing({ target: institution.slug })
-          .returning({ id: institution.id });
+          .returning({ id: institution.id, code: institution.code });
         if (!record) throw new ProvisioningConflict('INSTITUTION_SLUG_TAKEN');
         const firstAdminUserId = await provisionInstitutionAdmin(tx, record.id, values.firstAdmin);
         await tx.insert(institutionModuleGrant).values(
@@ -105,7 +107,7 @@ export function createPlatformInstitutionService(db: Database) {
           actorUserId,
           changeType: 'created',
           previousValue: null,
-          value: { type: values.type, enabledModules: [], firstAdminUserId },
+          value: { code: record.code, type: values.type, enabledModules: [], firstAdminUserId },
         });
         return institutionRecord(tx, record.id);
       });

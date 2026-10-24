@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { institutionModuleSchema } from './institution.js';
+import { institutionCodeSchema, institutionModuleSchema } from './institution.js';
 export * from './platform.js';
 export * from './institution.js';
 export const errorSchema = z.object({
@@ -43,6 +43,9 @@ export const memberListQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(50),
   offset: z.coerce.number().int().min(0).max(100000).default(0),
 });
+export const platformInstitutionListQuerySchema = memberListQuerySchema.extend({
+  code: institutionCodeSchema.optional(),
+});
 export const membersSchema = z.object({
   items: z.array(memberSchema),
   limit: z.number().int(),
@@ -51,11 +54,13 @@ export const membersSchema = z.object({
 export const identitySchema = z.object({ id: z.string(), name: z.string(), email: z.email() });
 export const membershipSchema = z.object({
   institutionId: institutionIdSchema,
+  code: institutionCodeSchema,
   name: z.string(),
   role: roleSchema.nullable(),
 });
 export const workspaceSchema = z.object({
   institutionId: institutionIdSchema,
+  code: institutionCodeSchema,
   name: z.string(),
   timezone: z.string(),
   modules: z.array(institutionModuleSchema),

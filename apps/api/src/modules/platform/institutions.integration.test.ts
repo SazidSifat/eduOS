@@ -23,6 +23,7 @@ describe('platform institution provisioning', () => {
     const input = institutionInput();
     input.type = 'coaching_center';
     const school = await fixture.create(input);
+    expect(school.data.code).toMatch(/^[1-9]\d{5}$/);
     expect(school.data.type).toBe('coaching_center');
     expect(school.data.enabledModules).toEqual([]);
     expect(JSON.stringify(school.data)).not.toContain(input.firstAdmin.password);
@@ -54,6 +55,21 @@ describe('platform institution provisioning', () => {
       role: 'admin',
       modules: [],
     });
+    const workspace = await fixture.request(
+      `/api/v1/institutions/${school.data.id}/workspace`,
+      'GET',
+      undefined,
+      school.cookie,
+    );
+    expect(workspaceSchema.parse(await workspace.json()).code).toBe(school.data.code);
+    const directory = await fixture.request(
+      `/api/v1/platform/institutions?code=${school.data.code}`,
+    );
+    expect(directory.status).toBe(200);
+    expect(await directory.json()).toMatchObject({
+      items: [{ id: school.data.id, code: school.data.code }],
+    });
+    expect((await fixture.request('/api/v1/platform/institutions?code=12345')).status).toBe(400);
     expect((await fixture.request(`/api/v1/institutions/${school.data.id}/workspace`)).status).toBe(
       403,
     );
@@ -65,7 +81,10 @@ describe('platform institution provisioning', () => {
       .from(platformInstitutionChange)
       .where(eq(platformInstitutionChange.institutionId, school.data.id));
     expect(events).toHaveLength(1);
-    expect(events[0]?.value).toMatchObject({ firstAdminUserId: school.adminId });
+    expect(events[0]?.value).toMatchObject({
+      code: school.data.code,
+      firstAdminUserId: school.adminId,
+    });
   });
 
   it('rejects existing Admin emails and duplicate slugs without partial institutions or accounts', async () => {
@@ -117,6 +136,10 @@ describe('platform institution provisioning', () => {
           role: 'platform_owner',
         })
       ).status,
+    ).toBe(400);
+    expect(
+      (await fixture.request('/api/v1/platform/institutions', 'POST', { ...input, code: '123456' }))
+        .status,
     ).toBe(400);
     expect(
       (
@@ -243,7 +266,9 @@ describe('institution access and modules', () => {
       enabledModules: ['fees'],
     });
     expect(response.status).toBe(200);
-    expect(platformInstitutionSchema.parse(await response.json()).enabledModules).toEqual(['fees']);
+    const updated = platformInstitutionSchema.parse(await response.json());
+    expect(updated.enabledModules).toEqual(['fees']);
+    expect(updated.code).toBe(school.data.code);
     expect((await moduleRequest()).status).toBe(403);
     const workspace = await fixture.request(
       `/api/v1/institutions/${school.data.id}/workspace`,
