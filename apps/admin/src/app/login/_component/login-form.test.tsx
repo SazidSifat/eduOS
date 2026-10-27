@@ -64,7 +64,7 @@ it('locks credentials during sign-in and clears prior server state before naviga
   expect(navigate).not.toHaveBeenCalled();
   if (!finish) throw new Error('Expected a pending sign-in');
   finish({ error: null });
-  await waitFor(() => expect(navigate).toHaveBeenCalledWith({ to: '/workspace', replace: true }));
+  await waitFor(() => expect(navigate).toHaveBeenCalledWith({ to: '/app', replace: true }));
   expect(cancelQueries).toHaveBeenCalledOnce();
   expect(clear).toHaveBeenCalledOnce();
   const [cancelled] = cancelQueries.mock.invocationCallOrder;

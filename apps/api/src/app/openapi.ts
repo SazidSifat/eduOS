@@ -8,6 +8,7 @@ import {
 } from '@eduos/contracts';
 import { response, protectedErrors } from './openapi-helpers.js';
 import { accessPaths } from './access-openapi.js';
+import { admissionsPaths } from './admissions-openapi.js';
 export const openapi = {
   openapi: '3.1.0',
   info: {
@@ -28,6 +29,7 @@ export const openapi = {
   },
   paths: {
     ...accessPaths,
+    ...admissionsPaths,
     '/api/health': { get: { responses: { 200: response('Process is alive', healthSchema) } } },
     '/api/ready': {
       get: {

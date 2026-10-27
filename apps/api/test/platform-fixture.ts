@@ -19,6 +19,7 @@ import { createApp } from '../src/app/create-app.js';
 import { parseEnv } from '../src/config/env.js';
 import { createIdentityService } from '../src/modules/identity/service.js';
 import { createPlatformService } from '../src/modules/platform/service.js';
+import { createAdmissionsService } from '../src/modules/admissions/service.js';
 
 export function institutionInput(): z.input<typeof platformInstitutionCreateSchema> {
   const suffix = randomUUID();
@@ -35,21 +36,22 @@ export function institutionInput(): z.input<typeof platformInstitutionCreateSche
   };
 }
 
-export function createPlatformFixture() {
+export function createPlatformFixture(options: { adminUrl?: string; authBaseUrl?: string } = {}) {
   const testUrl = process.env.TEST_DATABASE_URL;
   if (!testUrl || !/^eduos_test(?:_[a-z0-9]+)?$/.test(new URL(testUrl).pathname.slice(1)))
     throw new Error('TEST_DATABASE_URL must reference a dedicated eduos_test database.');
   const connection = createDatabase(testUrl);
   const identity = createIdentityService(connection.db);
   const platform = createPlatformService(connection.db);
+  const admissions = createAdmissionsService(connection.db);
   const env = parseEnv({
     NODE_ENV: 'test',
     DATABASE_URL: testUrl,
     REDIS_URL: 'redis://localhost',
-    ADMIN_URL: 'http://localhost:5173',
-    AUTH_BASE_URL: 'http://localhost:3001',
+    ADMIN_URL: options.adminUrl ?? 'http://localhost:5173',
+    AUTH_BASE_URL: options.authBaseUrl ?? 'http://localhost:3001',
     AUTH_SECRET: randomBytes(48).toString('hex'),
-    CORS_TRUSTED_ORIGINS: 'http://localhost:5173',
+    CORS_TRUSTED_ORIGINS: options.adminUrl ?? 'http://localhost:5173',
   });
   const auth = createAuth(connection.db, {
     baseURL: env.AUTH_BASE_URL,
@@ -62,6 +64,7 @@ export function createPlatformFixture() {
     auth,
     identity,
     platform,
+    admissions,
     logger: { write() {} },
     checkDatabase: async () => {},
   });
@@ -73,7 +76,7 @@ export function createPlatformFixture() {
   const ipPrefix = `2001:db8:${randomBytes(2).toString('hex')}`;
 
   async function login(email: string, password: string) {
-    const response = await app.request('http://localhost:3001/api/auth/sign-in/email', {
+    const response = await app.request(`${env.AUTH_BASE_URL}/api/auth/sign-in/email`, {
       method: 'POST',
       headers: {
         origin: env.ADMIN_URL,
@@ -95,7 +98,7 @@ export function createPlatformFixture() {
     body?: unknown,
     cookie = cookies.get('owner'),
   ) {
-    return app.request(`http://localhost:3001${path}`, {
+    return app.request(`${env.AUTH_BASE_URL}${path}`, {
       method,
       headers: {
         ...(cookie ? { cookie } : {}),
@@ -109,6 +112,7 @@ export function createPlatformFixture() {
     ...connection,
     identity,
     platform,
+    admissions,
     auth,
     app,
     operatorIds,

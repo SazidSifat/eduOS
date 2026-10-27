@@ -7,7 +7,16 @@ export const roleKeys = [
 ] as const;
 export type Role = (typeof roleKeys)[number];
 // Only implemented capabilities receive grants. Future school policies need discovery.
-export const permissionKeys = ['workspace.read', 'memberships.read', 'memberships.manage'] as const;
+export const permissionKeys = [
+  'workspace.read',
+  'memberships.read',
+  'memberships.manage',
+  'admissions.read',
+  'admissions.write',
+  'admissions.manage',
+  'admissions.settings',
+  'fees.collect',
+] as const;
 export type Permission = (typeof permissionKeys)[number];
 export interface RoleDefinition {
   readonly key: Role;
@@ -17,7 +26,11 @@ export interface RoleDefinition {
 export const roleDefinitions: readonly RoleDefinition[] = [
   { key: 'admin', name: 'Admin', permissions: permissionKeys },
   { key: 'principal', name: 'Principal', permissions: permissionKeys },
-  { key: 'admission_officer', name: 'Admission Officer', permissions: ['workspace.read'] },
+  {
+    key: 'admission_officer',
+    name: 'Admission Officer',
+    permissions: ['workspace.read', 'admissions.read', 'admissions.write', 'fees.collect'],
+  },
   { key: 'accountant', name: 'Accountant', permissions: ['workspace.read'] },
   { key: 'teacher', name: 'Teacher', permissions: ['workspace.read'] },
 ];

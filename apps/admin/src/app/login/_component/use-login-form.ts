@@ -20,7 +20,7 @@ export function useLoginForm() {
       }
       await queryClient.cancelQueries();
       queryClient.clear();
-      await navigate({ to: '/workspace', replace: true });
+      await navigate({ to: '/app', replace: true });
     } catch {
       setFailure('Unable to connect. Please try again.');
     }

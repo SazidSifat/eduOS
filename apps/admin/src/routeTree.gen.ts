@@ -10,12 +10,70 @@
 
 import { Route as rootRouteImport } from './app/__root';
 import { Route as PageRouteImport } from './app/page';
+import { Route as SchoolRouteRouteImport } from './app/_school/route';
+import { Route as AppPageRouteImport } from './app/app/page';
 import { Route as LoginPageRouteImport } from './app/login/page';
 import { Route as WorkspacePageRouteImport } from './app/workspace/page';
+import { Route as SchoolAdmissionsPageRouteImport } from './app/_school/admissions/page';
+import { Route as SchoolAttendancePageRouteImport } from './app/_school/attendance/page';
+import { Route as SchoolExpensesPageRouteImport } from './app/_school/expenses/page';
+import { Route as SchoolFeesPageRouteImport } from './app/_school/fees/page';
+import { Route as SchoolRoutinePageRouteImport } from './app/_school/routine/page';
+import { Route as SchoolSettingsPageRouteImport } from './app/_school/settings/page';
+import { Route as InstitutionsInstitutionIdPageRouteImport } from './app/institutions/$institutionId/page';
+import { Route as InstitutionsInstitutionIdAdmissionsRouteRouteImport } from './app/institutions/$institutionId/admissions/route';
+import { Route as InstitutionsInstitutionIdSettingsRouteRouteImport } from './app/institutions/$institutionId/settings/route';
+import { Route as SchoolAdmissionsCandidateIdPageRouteImport } from './app/_school/admissions/$candidateId/page';
+import { Route as SchoolAdmissionsAdmittedPageRouteImport } from './app/_school/admissions/admitted/page';
+import { Route as SchoolAdmissionsClosedPageRouteImport } from './app/_school/admissions/closed/page';
+import { Route as SchoolAdmissionsNewPageRouteImport } from './app/_school/admissions/new/page';
+import { Route as SchoolAdmissionsWillingPageRouteImport } from './app/_school/admissions/willing/page';
+import { Route as SchoolAttendanceClassesPageRouteImport } from './app/_school/attendance/classes/page';
+import { Route as SchoolAttendanceCorrectionsPageRouteImport } from './app/_school/attendance/corrections/page';
+import { Route as SchoolAttendanceHistoryPageRouteImport } from './app/_school/attendance/history/page';
+import { Route as SchoolAttendanceMonthlyPageRouteImport } from './app/_school/attendance/monthly/page';
+import { Route as SchoolAttendanceOfflinePageRouteImport } from './app/_school/attendance/offline/page';
+import { Route as SchoolAttendanceReviewPageRouteImport } from './app/_school/attendance/review/page';
+import { Route as SchoolAttendanceSubmittedPageRouteImport } from './app/_school/attendance/submitted/page';
+import { Route as SchoolExpensesExpenseIdPageRouteImport } from './app/_school/expenses/$expenseId/page';
+import { Route as SchoolExpensesNewPageRouteImport } from './app/_school/expenses/new/page';
+import { Route as SchoolExpensesReportPageRouteImport } from './app/_school/expenses/report/page';
+import { Route as SchoolFeesStudentIdPageRouteImport } from './app/_school/fees/$studentId/page';
+import { Route as SchoolFeesDuesPageRouteImport } from './app/_school/fees/dues/page';
+import { Route as SchoolFeesReportPageRouteImport } from './app/_school/fees/report/page';
+import { Route as SchoolRoutineLessonPageRouteImport } from './app/_school/routine/lesson/page';
+import { Route as SchoolRoutineNewPageRouteImport } from './app/_school/routine/new/page';
+import { Route as SchoolRoutineReviewPageRouteImport } from './app/_school/routine/review/page';
+import { Route as SchoolRoutineTeacherPageRouteImport } from './app/_school/routine/teacher/page';
+import { Route as SchoolSettingsAcademicsPageRouteImport } from './app/_school/settings/academics/page';
+import { Route as SchoolSettingsAdmissionsPageRouteImport } from './app/_school/settings/admissions/page';
+import { Route as SchoolSettingsAttendancePageRouteImport } from './app/_school/settings/attendance/page';
+import { Route as SchoolSettingsExpensesPageRouteImport } from './app/_school/settings/expenses/page';
+import { Route as SchoolSettingsFeesPageRouteImport } from './app/_school/settings/fees/page';
+import { Route as SchoolSettingsPeoplePageRouteImport } from './app/_school/settings/people/page';
+import { Route as SchoolSettingsSchoolPageRouteImport } from './app/_school/settings/school/page';
+import { Route as InstitutionsInstitutionIdAdmissionsPageRouteImport } from './app/institutions/$institutionId/admissions/page';
+import { Route as InstitutionsInstitutionIdSettingsPageRouteImport } from './app/institutions/$institutionId/settings/page';
+import { Route as SchoolExpensesExpenseIdPaymentPageRouteImport } from './app/_school/expenses/$expenseId/payment/page';
+import { Route as SchoolFeesStudentIdReviewPageRouteImport } from './app/_school/fees/$studentId/review/page';
+import { Route as SchoolFeesReceiptsReceiptIdPageRouteImport } from './app/_school/fees/receipts/$receiptId/page';
+import { Route as InstitutionsInstitutionIdAdmissionsCandidateIdPageRouteImport } from './app/institutions/$institutionId/admissions/$candidateId/page';
+import { Route as InstitutionsInstitutionIdAdmissionsNewPageRouteImport } from './app/institutions/$institutionId/admissions/new/page';
+import { Route as InstitutionsInstitutionIdAdmissionsSettingsPageRouteImport } from './app/institutions/$institutionId/admissions/settings/page';
+import { Route as InstitutionsInstitutionIdSettingsAdmissionsPageRouteImport } from './app/institutions/$institutionId/settings/admissions/page';
 
 const PageRoute = PageRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any);
+const SchoolRouteRoute = SchoolRouteRouteImport.update({
+  id: '/_school',
+  getParentRoute: () => rootRouteImport,
+} as any);
+const AppPageRoute = AppPageRouteImport.update({
+  id: '/app/',
+  path: '/app/',
   getParentRoute: () => rootRouteImport,
 } as any);
 const LoginPageRoute = LoginPageRouteImport.update({
@@ -28,35 +86,603 @@ const WorkspacePageRoute = WorkspacePageRouteImport.update({
   path: '/workspace/',
   getParentRoute: () => rootRouteImport,
 } as any);
+const SchoolAdmissionsPageRoute = SchoolAdmissionsPageRouteImport.update({
+  id: '/admissions/',
+  path: '/admissions/',
+  getParentRoute: () => SchoolRouteRoute,
+} as any);
+const SchoolAttendancePageRoute = SchoolAttendancePageRouteImport.update({
+  id: '/attendance/',
+  path: '/attendance/',
+  getParentRoute: () => SchoolRouteRoute,
+} as any);
+const SchoolExpensesPageRoute = SchoolExpensesPageRouteImport.update({
+  id: '/expenses/',
+  path: '/expenses/',
+  getParentRoute: () => SchoolRouteRoute,
+} as any);
+const SchoolFeesPageRoute = SchoolFeesPageRouteImport.update({
+  id: '/fees/',
+  path: '/fees/',
+  getParentRoute: () => SchoolRouteRoute,
+} as any);
+const SchoolRoutinePageRoute = SchoolRoutinePageRouteImport.update({
+  id: '/routine/',
+  path: '/routine/',
+  getParentRoute: () => SchoolRouteRoute,
+} as any);
+const SchoolSettingsPageRoute = SchoolSettingsPageRouteImport.update({
+  id: '/settings/',
+  path: '/settings/',
+  getParentRoute: () => SchoolRouteRoute,
+} as any);
+const InstitutionsInstitutionIdPageRoute =
+  InstitutionsInstitutionIdPageRouteImport.update({
+    id: '/institutions/$institutionId/',
+    path: '/institutions/$institutionId/',
+    getParentRoute: () => rootRouteImport,
+  } as any);
+const InstitutionsInstitutionIdAdmissionsRouteRoute =
+  InstitutionsInstitutionIdAdmissionsRouteRouteImport.update({
+    id: '/institutions/$institutionId/admissions',
+    path: '/institutions/$institutionId/admissions',
+    getParentRoute: () => rootRouteImport,
+  } as any);
+const InstitutionsInstitutionIdSettingsRouteRoute =
+  InstitutionsInstitutionIdSettingsRouteRouteImport.update({
+    id: '/institutions/$institutionId/settings',
+    path: '/institutions/$institutionId/settings',
+    getParentRoute: () => rootRouteImport,
+  } as any);
+const SchoolAdmissionsCandidateIdPageRoute =
+  SchoolAdmissionsCandidateIdPageRouteImport.update({
+    id: '/admissions/$candidateId/',
+    path: '/admissions/$candidateId/',
+    getParentRoute: () => SchoolRouteRoute,
+  } as any);
+const SchoolAdmissionsAdmittedPageRoute =
+  SchoolAdmissionsAdmittedPageRouteImport.update({
+    id: '/admissions/admitted/',
+    path: '/admissions/admitted/',
+    getParentRoute: () => SchoolRouteRoute,
+  } as any);
+const SchoolAdmissionsClosedPageRoute =
+  SchoolAdmissionsClosedPageRouteImport.update({
+    id: '/admissions/closed/',
+    path: '/admissions/closed/',
+    getParentRoute: () => SchoolRouteRoute,
+  } as any);
+const SchoolAdmissionsNewPageRoute = SchoolAdmissionsNewPageRouteImport.update({
+  id: '/admissions/new/',
+  path: '/admissions/new/',
+  getParentRoute: () => SchoolRouteRoute,
+} as any);
+const SchoolAdmissionsWillingPageRoute =
+  SchoolAdmissionsWillingPageRouteImport.update({
+    id: '/admissions/willing/',
+    path: '/admissions/willing/',
+    getParentRoute: () => SchoolRouteRoute,
+  } as any);
+const SchoolAttendanceClassesPageRoute =
+  SchoolAttendanceClassesPageRouteImport.update({
+    id: '/attendance/classes/',
+    path: '/attendance/classes/',
+    getParentRoute: () => SchoolRouteRoute,
+  } as any);
+const SchoolAttendanceCorrectionsPageRoute =
+  SchoolAttendanceCorrectionsPageRouteImport.update({
+    id: '/attendance/corrections/',
+    path: '/attendance/corrections/',
+    getParentRoute: () => SchoolRouteRoute,
+  } as any);
+const SchoolAttendanceHistoryPageRoute =
+  SchoolAttendanceHistoryPageRouteImport.update({
+    id: '/attendance/history/',
+    path: '/attendance/history/',
+    getParentRoute: () => SchoolRouteRoute,
+  } as any);
+const SchoolAttendanceMonthlyPageRoute =
+  SchoolAttendanceMonthlyPageRouteImport.update({
+    id: '/attendance/monthly/',
+    path: '/attendance/monthly/',
+    getParentRoute: () => SchoolRouteRoute,
+  } as any);
+const SchoolAttendanceOfflinePageRoute =
+  SchoolAttendanceOfflinePageRouteImport.update({
+    id: '/attendance/offline/',
+    path: '/attendance/offline/',
+    getParentRoute: () => SchoolRouteRoute,
+  } as any);
+const SchoolAttendanceReviewPageRoute =
+  SchoolAttendanceReviewPageRouteImport.update({
+    id: '/attendance/review/',
+    path: '/attendance/review/',
+    getParentRoute: () => SchoolRouteRoute,
+  } as any);
+const SchoolAttendanceSubmittedPageRoute =
+  SchoolAttendanceSubmittedPageRouteImport.update({
+    id: '/attendance/submitted/',
+    path: '/attendance/submitted/',
+    getParentRoute: () => SchoolRouteRoute,
+  } as any);
+const SchoolExpensesExpenseIdPageRoute =
+  SchoolExpensesExpenseIdPageRouteImport.update({
+    id: '/expenses/$expenseId/',
+    path: '/expenses/$expenseId/',
+    getParentRoute: () => SchoolRouteRoute,
+  } as any);
+const SchoolExpensesNewPageRoute = SchoolExpensesNewPageRouteImport.update({
+  id: '/expenses/new/',
+  path: '/expenses/new/',
+  getParentRoute: () => SchoolRouteRoute,
+} as any);
+const SchoolExpensesReportPageRoute =
+  SchoolExpensesReportPageRouteImport.update({
+    id: '/expenses/report/',
+    path: '/expenses/report/',
+    getParentRoute: () => SchoolRouteRoute,
+  } as any);
+const SchoolFeesStudentIdPageRoute = SchoolFeesStudentIdPageRouteImport.update({
+  id: '/fees/$studentId/',
+  path: '/fees/$studentId/',
+  getParentRoute: () => SchoolRouteRoute,
+} as any);
+const SchoolFeesDuesPageRoute = SchoolFeesDuesPageRouteImport.update({
+  id: '/fees/dues/',
+  path: '/fees/dues/',
+  getParentRoute: () => SchoolRouteRoute,
+} as any);
+const SchoolFeesReportPageRoute = SchoolFeesReportPageRouteImport.update({
+  id: '/fees/report/',
+  path: '/fees/report/',
+  getParentRoute: () => SchoolRouteRoute,
+} as any);
+const SchoolRoutineLessonPageRoute = SchoolRoutineLessonPageRouteImport.update({
+  id: '/routine/lesson/',
+  path: '/routine/lesson/',
+  getParentRoute: () => SchoolRouteRoute,
+} as any);
+const SchoolRoutineNewPageRoute = SchoolRoutineNewPageRouteImport.update({
+  id: '/routine/new/',
+  path: '/routine/new/',
+  getParentRoute: () => SchoolRouteRoute,
+} as any);
+const SchoolRoutineReviewPageRoute = SchoolRoutineReviewPageRouteImport.update({
+  id: '/routine/review/',
+  path: '/routine/review/',
+  getParentRoute: () => SchoolRouteRoute,
+} as any);
+const SchoolRoutineTeacherPageRoute =
+  SchoolRoutineTeacherPageRouteImport.update({
+    id: '/routine/teacher/',
+    path: '/routine/teacher/',
+    getParentRoute: () => SchoolRouteRoute,
+  } as any);
+const SchoolSettingsAcademicsPageRoute =
+  SchoolSettingsAcademicsPageRouteImport.update({
+    id: '/settings/academics/',
+    path: '/settings/academics/',
+    getParentRoute: () => SchoolRouteRoute,
+  } as any);
+const SchoolSettingsAdmissionsPageRoute =
+  SchoolSettingsAdmissionsPageRouteImport.update({
+    id: '/settings/admissions/',
+    path: '/settings/admissions/',
+    getParentRoute: () => SchoolRouteRoute,
+  } as any);
+const SchoolSettingsAttendancePageRoute =
+  SchoolSettingsAttendancePageRouteImport.update({
+    id: '/settings/attendance/',
+    path: '/settings/attendance/',
+    getParentRoute: () => SchoolRouteRoute,
+  } as any);
+const SchoolSettingsExpensesPageRoute =
+  SchoolSettingsExpensesPageRouteImport.update({
+    id: '/settings/expenses/',
+    path: '/settings/expenses/',
+    getParentRoute: () => SchoolRouteRoute,
+  } as any);
+const SchoolSettingsFeesPageRoute = SchoolSettingsFeesPageRouteImport.update({
+  id: '/settings/fees/',
+  path: '/settings/fees/',
+  getParentRoute: () => SchoolRouteRoute,
+} as any);
+const SchoolSettingsPeoplePageRoute =
+  SchoolSettingsPeoplePageRouteImport.update({
+    id: '/settings/people/',
+    path: '/settings/people/',
+    getParentRoute: () => SchoolRouteRoute,
+  } as any);
+const SchoolSettingsSchoolPageRoute =
+  SchoolSettingsSchoolPageRouteImport.update({
+    id: '/settings/school/',
+    path: '/settings/school/',
+    getParentRoute: () => SchoolRouteRoute,
+  } as any);
+const InstitutionsInstitutionIdAdmissionsPageRoute =
+  InstitutionsInstitutionIdAdmissionsPageRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => InstitutionsInstitutionIdAdmissionsRouteRoute,
+  } as any);
+const InstitutionsInstitutionIdSettingsPageRoute =
+  InstitutionsInstitutionIdSettingsPageRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => InstitutionsInstitutionIdSettingsRouteRoute,
+  } as any);
+const SchoolExpensesExpenseIdPaymentPageRoute =
+  SchoolExpensesExpenseIdPaymentPageRouteImport.update({
+    id: '/expenses/$expenseId/payment/',
+    path: '/expenses/$expenseId/payment/',
+    getParentRoute: () => SchoolRouteRoute,
+  } as any);
+const SchoolFeesStudentIdReviewPageRoute =
+  SchoolFeesStudentIdReviewPageRouteImport.update({
+    id: '/fees/$studentId/review/',
+    path: '/fees/$studentId/review/',
+    getParentRoute: () => SchoolRouteRoute,
+  } as any);
+const SchoolFeesReceiptsReceiptIdPageRoute =
+  SchoolFeesReceiptsReceiptIdPageRouteImport.update({
+    id: '/fees/receipts/$receiptId/',
+    path: '/fees/receipts/$receiptId/',
+    getParentRoute: () => SchoolRouteRoute,
+  } as any);
+const InstitutionsInstitutionIdAdmissionsCandidateIdPageRoute =
+  InstitutionsInstitutionIdAdmissionsCandidateIdPageRouteImport.update({
+    id: '/$candidateId/',
+    path: '/$candidateId/',
+    getParentRoute: () => InstitutionsInstitutionIdAdmissionsRouteRoute,
+  } as any);
+const InstitutionsInstitutionIdAdmissionsNewPageRoute =
+  InstitutionsInstitutionIdAdmissionsNewPageRouteImport.update({
+    id: '/new/',
+    path: '/new/',
+    getParentRoute: () => InstitutionsInstitutionIdAdmissionsRouteRoute,
+  } as any);
+const InstitutionsInstitutionIdAdmissionsSettingsPageRoute =
+  InstitutionsInstitutionIdAdmissionsSettingsPageRouteImport.update({
+    id: '/settings/',
+    path: '/settings/',
+    getParentRoute: () => InstitutionsInstitutionIdAdmissionsRouteRoute,
+  } as any);
+const InstitutionsInstitutionIdSettingsAdmissionsPageRoute =
+  InstitutionsInstitutionIdSettingsAdmissionsPageRouteImport.update({
+    id: '/admissions/',
+    path: '/admissions/',
+    getParentRoute: () => InstitutionsInstitutionIdSettingsRouteRoute,
+  } as any);
 
 export interface FileRoutesByFullPath {
   '/': typeof PageRoute;
+  '/app/': typeof AppPageRoute;
   '/login/': typeof LoginPageRoute;
   '/workspace/': typeof WorkspacePageRoute;
+  '/institutions/$institutionId/admissions': typeof InstitutionsInstitutionIdAdmissionsRouteRouteWithChildren;
+  '/institutions/$institutionId/settings': typeof InstitutionsInstitutionIdSettingsRouteRouteWithChildren;
+  '/admissions/': typeof SchoolAdmissionsPageRoute;
+  '/attendance/': typeof SchoolAttendancePageRoute;
+  '/expenses/': typeof SchoolExpensesPageRoute;
+  '/fees/': typeof SchoolFeesPageRoute;
+  '/routine/': typeof SchoolRoutinePageRoute;
+  '/settings/': typeof SchoolSettingsPageRoute;
+  '/institutions/$institutionId/': typeof InstitutionsInstitutionIdPageRoute;
+  '/admissions/$candidateId/': typeof SchoolAdmissionsCandidateIdPageRoute;
+  '/admissions/admitted/': typeof SchoolAdmissionsAdmittedPageRoute;
+  '/admissions/closed/': typeof SchoolAdmissionsClosedPageRoute;
+  '/admissions/new/': typeof SchoolAdmissionsNewPageRoute;
+  '/admissions/willing/': typeof SchoolAdmissionsWillingPageRoute;
+  '/attendance/classes/': typeof SchoolAttendanceClassesPageRoute;
+  '/attendance/corrections/': typeof SchoolAttendanceCorrectionsPageRoute;
+  '/attendance/history/': typeof SchoolAttendanceHistoryPageRoute;
+  '/attendance/monthly/': typeof SchoolAttendanceMonthlyPageRoute;
+  '/attendance/offline/': typeof SchoolAttendanceOfflinePageRoute;
+  '/attendance/review/': typeof SchoolAttendanceReviewPageRoute;
+  '/attendance/submitted/': typeof SchoolAttendanceSubmittedPageRoute;
+  '/expenses/$expenseId/': typeof SchoolExpensesExpenseIdPageRoute;
+  '/expenses/new/': typeof SchoolExpensesNewPageRoute;
+  '/expenses/report/': typeof SchoolExpensesReportPageRoute;
+  '/fees/$studentId/': typeof SchoolFeesStudentIdPageRoute;
+  '/fees/dues/': typeof SchoolFeesDuesPageRoute;
+  '/fees/report/': typeof SchoolFeesReportPageRoute;
+  '/routine/lesson/': typeof SchoolRoutineLessonPageRoute;
+  '/routine/new/': typeof SchoolRoutineNewPageRoute;
+  '/routine/review/': typeof SchoolRoutineReviewPageRoute;
+  '/routine/teacher/': typeof SchoolRoutineTeacherPageRoute;
+  '/settings/academics/': typeof SchoolSettingsAcademicsPageRoute;
+  '/settings/admissions/': typeof SchoolSettingsAdmissionsPageRoute;
+  '/settings/attendance/': typeof SchoolSettingsAttendancePageRoute;
+  '/settings/expenses/': typeof SchoolSettingsExpensesPageRoute;
+  '/settings/fees/': typeof SchoolSettingsFeesPageRoute;
+  '/settings/people/': typeof SchoolSettingsPeoplePageRoute;
+  '/settings/school/': typeof SchoolSettingsSchoolPageRoute;
+  '/institutions/$institutionId/admissions/': typeof InstitutionsInstitutionIdAdmissionsPageRoute;
+  '/institutions/$institutionId/settings/': typeof InstitutionsInstitutionIdSettingsPageRoute;
+  '/expenses/$expenseId/payment/': typeof SchoolExpensesExpenseIdPaymentPageRoute;
+  '/fees/$studentId/review/': typeof SchoolFeesStudentIdReviewPageRoute;
+  '/fees/receipts/$receiptId/': typeof SchoolFeesReceiptsReceiptIdPageRoute;
+  '/institutions/$institutionId/admissions/$candidateId/': typeof InstitutionsInstitutionIdAdmissionsCandidateIdPageRoute;
+  '/institutions/$institutionId/admissions/new/': typeof InstitutionsInstitutionIdAdmissionsNewPageRoute;
+  '/institutions/$institutionId/admissions/settings/': typeof InstitutionsInstitutionIdAdmissionsSettingsPageRoute;
+  '/institutions/$institutionId/settings/admissions/': typeof InstitutionsInstitutionIdSettingsAdmissionsPageRoute;
 }
 export interface FileRoutesByTo {
   '/': typeof PageRoute;
+  '/app': typeof AppPageRoute;
   '/login': typeof LoginPageRoute;
   '/workspace': typeof WorkspacePageRoute;
+  '/admissions': typeof SchoolAdmissionsPageRoute;
+  '/attendance': typeof SchoolAttendancePageRoute;
+  '/expenses': typeof SchoolExpensesPageRoute;
+  '/fees': typeof SchoolFeesPageRoute;
+  '/routine': typeof SchoolRoutinePageRoute;
+  '/settings': typeof SchoolSettingsPageRoute;
+  '/institutions/$institutionId': typeof InstitutionsInstitutionIdPageRoute;
+  '/admissions/$candidateId': typeof SchoolAdmissionsCandidateIdPageRoute;
+  '/admissions/admitted': typeof SchoolAdmissionsAdmittedPageRoute;
+  '/admissions/closed': typeof SchoolAdmissionsClosedPageRoute;
+  '/admissions/new': typeof SchoolAdmissionsNewPageRoute;
+  '/admissions/willing': typeof SchoolAdmissionsWillingPageRoute;
+  '/attendance/classes': typeof SchoolAttendanceClassesPageRoute;
+  '/attendance/corrections': typeof SchoolAttendanceCorrectionsPageRoute;
+  '/attendance/history': typeof SchoolAttendanceHistoryPageRoute;
+  '/attendance/monthly': typeof SchoolAttendanceMonthlyPageRoute;
+  '/attendance/offline': typeof SchoolAttendanceOfflinePageRoute;
+  '/attendance/review': typeof SchoolAttendanceReviewPageRoute;
+  '/attendance/submitted': typeof SchoolAttendanceSubmittedPageRoute;
+  '/expenses/$expenseId': typeof SchoolExpensesExpenseIdPageRoute;
+  '/expenses/new': typeof SchoolExpensesNewPageRoute;
+  '/expenses/report': typeof SchoolExpensesReportPageRoute;
+  '/fees/$studentId': typeof SchoolFeesStudentIdPageRoute;
+  '/fees/dues': typeof SchoolFeesDuesPageRoute;
+  '/fees/report': typeof SchoolFeesReportPageRoute;
+  '/routine/lesson': typeof SchoolRoutineLessonPageRoute;
+  '/routine/new': typeof SchoolRoutineNewPageRoute;
+  '/routine/review': typeof SchoolRoutineReviewPageRoute;
+  '/routine/teacher': typeof SchoolRoutineTeacherPageRoute;
+  '/settings/academics': typeof SchoolSettingsAcademicsPageRoute;
+  '/settings/admissions': typeof SchoolSettingsAdmissionsPageRoute;
+  '/settings/attendance': typeof SchoolSettingsAttendancePageRoute;
+  '/settings/expenses': typeof SchoolSettingsExpensesPageRoute;
+  '/settings/fees': typeof SchoolSettingsFeesPageRoute;
+  '/settings/people': typeof SchoolSettingsPeoplePageRoute;
+  '/settings/school': typeof SchoolSettingsSchoolPageRoute;
+  '/institutions/$institutionId/admissions': typeof InstitutionsInstitutionIdAdmissionsPageRoute;
+  '/institutions/$institutionId/settings': typeof InstitutionsInstitutionIdSettingsPageRoute;
+  '/expenses/$expenseId/payment': typeof SchoolExpensesExpenseIdPaymentPageRoute;
+  '/fees/$studentId/review': typeof SchoolFeesStudentIdReviewPageRoute;
+  '/fees/receipts/$receiptId': typeof SchoolFeesReceiptsReceiptIdPageRoute;
+  '/institutions/$institutionId/admissions/$candidateId': typeof InstitutionsInstitutionIdAdmissionsCandidateIdPageRoute;
+  '/institutions/$institutionId/admissions/new': typeof InstitutionsInstitutionIdAdmissionsNewPageRoute;
+  '/institutions/$institutionId/admissions/settings': typeof InstitutionsInstitutionIdAdmissionsSettingsPageRoute;
+  '/institutions/$institutionId/settings/admissions': typeof InstitutionsInstitutionIdSettingsAdmissionsPageRoute;
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport;
   '/': typeof PageRoute;
+  '/_school': typeof SchoolRouteRouteWithChildren;
+  '/app/': typeof AppPageRoute;
   '/login/': typeof LoginPageRoute;
   '/workspace/': typeof WorkspacePageRoute;
+  '/institutions/$institutionId/admissions': typeof InstitutionsInstitutionIdAdmissionsRouteRouteWithChildren;
+  '/institutions/$institutionId/settings': typeof InstitutionsInstitutionIdSettingsRouteRouteWithChildren;
+  '/_school/admissions/': typeof SchoolAdmissionsPageRoute;
+  '/_school/attendance/': typeof SchoolAttendancePageRoute;
+  '/_school/expenses/': typeof SchoolExpensesPageRoute;
+  '/_school/fees/': typeof SchoolFeesPageRoute;
+  '/_school/routine/': typeof SchoolRoutinePageRoute;
+  '/_school/settings/': typeof SchoolSettingsPageRoute;
+  '/institutions/$institutionId/': typeof InstitutionsInstitutionIdPageRoute;
+  '/_school/admissions/$candidateId/': typeof SchoolAdmissionsCandidateIdPageRoute;
+  '/_school/admissions/admitted/': typeof SchoolAdmissionsAdmittedPageRoute;
+  '/_school/admissions/closed/': typeof SchoolAdmissionsClosedPageRoute;
+  '/_school/admissions/new/': typeof SchoolAdmissionsNewPageRoute;
+  '/_school/admissions/willing/': typeof SchoolAdmissionsWillingPageRoute;
+  '/_school/attendance/classes/': typeof SchoolAttendanceClassesPageRoute;
+  '/_school/attendance/corrections/': typeof SchoolAttendanceCorrectionsPageRoute;
+  '/_school/attendance/history/': typeof SchoolAttendanceHistoryPageRoute;
+  '/_school/attendance/monthly/': typeof SchoolAttendanceMonthlyPageRoute;
+  '/_school/attendance/offline/': typeof SchoolAttendanceOfflinePageRoute;
+  '/_school/attendance/review/': typeof SchoolAttendanceReviewPageRoute;
+  '/_school/attendance/submitted/': typeof SchoolAttendanceSubmittedPageRoute;
+  '/_school/expenses/$expenseId/': typeof SchoolExpensesExpenseIdPageRoute;
+  '/_school/expenses/new/': typeof SchoolExpensesNewPageRoute;
+  '/_school/expenses/report/': typeof SchoolExpensesReportPageRoute;
+  '/_school/fees/$studentId/': typeof SchoolFeesStudentIdPageRoute;
+  '/_school/fees/dues/': typeof SchoolFeesDuesPageRoute;
+  '/_school/fees/report/': typeof SchoolFeesReportPageRoute;
+  '/_school/routine/lesson/': typeof SchoolRoutineLessonPageRoute;
+  '/_school/routine/new/': typeof SchoolRoutineNewPageRoute;
+  '/_school/routine/review/': typeof SchoolRoutineReviewPageRoute;
+  '/_school/routine/teacher/': typeof SchoolRoutineTeacherPageRoute;
+  '/_school/settings/academics/': typeof SchoolSettingsAcademicsPageRoute;
+  '/_school/settings/admissions/': typeof SchoolSettingsAdmissionsPageRoute;
+  '/_school/settings/attendance/': typeof SchoolSettingsAttendancePageRoute;
+  '/_school/settings/expenses/': typeof SchoolSettingsExpensesPageRoute;
+  '/_school/settings/fees/': typeof SchoolSettingsFeesPageRoute;
+  '/_school/settings/people/': typeof SchoolSettingsPeoplePageRoute;
+  '/_school/settings/school/': typeof SchoolSettingsSchoolPageRoute;
+  '/institutions/$institutionId/admissions/': typeof InstitutionsInstitutionIdAdmissionsPageRoute;
+  '/institutions/$institutionId/settings/': typeof InstitutionsInstitutionIdSettingsPageRoute;
+  '/_school/expenses/$expenseId/payment/': typeof SchoolExpensesExpenseIdPaymentPageRoute;
+  '/_school/fees/$studentId/review/': typeof SchoolFeesStudentIdReviewPageRoute;
+  '/_school/fees/receipts/$receiptId/': typeof SchoolFeesReceiptsReceiptIdPageRoute;
+  '/institutions/$institutionId/admissions/$candidateId/': typeof InstitutionsInstitutionIdAdmissionsCandidateIdPageRoute;
+  '/institutions/$institutionId/admissions/new/': typeof InstitutionsInstitutionIdAdmissionsNewPageRoute;
+  '/institutions/$institutionId/admissions/settings/': typeof InstitutionsInstitutionIdAdmissionsSettingsPageRoute;
+  '/institutions/$institutionId/settings/admissions/': typeof InstitutionsInstitutionIdSettingsAdmissionsPageRoute;
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: '/' | '/login/' | '/workspace/';
+  fullPaths:
+    | '/'
+    | '/app/'
+    | '/login/'
+    | '/workspace/'
+    | '/institutions/$institutionId/admissions'
+    | '/institutions/$institutionId/settings'
+    | '/admissions/'
+    | '/attendance/'
+    | '/expenses/'
+    | '/fees/'
+    | '/routine/'
+    | '/settings/'
+    | '/institutions/$institutionId/'
+    | '/admissions/$candidateId/'
+    | '/admissions/admitted/'
+    | '/admissions/closed/'
+    | '/admissions/new/'
+    | '/admissions/willing/'
+    | '/attendance/classes/'
+    | '/attendance/corrections/'
+    | '/attendance/history/'
+    | '/attendance/monthly/'
+    | '/attendance/offline/'
+    | '/attendance/review/'
+    | '/attendance/submitted/'
+    | '/expenses/$expenseId/'
+    | '/expenses/new/'
+    | '/expenses/report/'
+    | '/fees/$studentId/'
+    | '/fees/dues/'
+    | '/fees/report/'
+    | '/routine/lesson/'
+    | '/routine/new/'
+    | '/routine/review/'
+    | '/routine/teacher/'
+    | '/settings/academics/'
+    | '/settings/admissions/'
+    | '/settings/attendance/'
+    | '/settings/expenses/'
+    | '/settings/fees/'
+    | '/settings/people/'
+    | '/settings/school/'
+    | '/institutions/$institutionId/admissions/'
+    | '/institutions/$institutionId/settings/'
+    | '/expenses/$expenseId/payment/'
+    | '/fees/$studentId/review/'
+    | '/fees/receipts/$receiptId/'
+    | '/institutions/$institutionId/admissions/$candidateId/'
+    | '/institutions/$institutionId/admissions/new/'
+    | '/institutions/$institutionId/admissions/settings/'
+    | '/institutions/$institutionId/settings/admissions/';
   fileRoutesByTo: FileRoutesByTo;
-  to: '/' | '/login' | '/workspace';
-  id: '__root__' | '/' | '/login/' | '/workspace/';
+  to:
+    | '/'
+    | '/app'
+    | '/login'
+    | '/workspace'
+    | '/admissions'
+    | '/attendance'
+    | '/expenses'
+    | '/fees'
+    | '/routine'
+    | '/settings'
+    | '/institutions/$institutionId'
+    | '/admissions/$candidateId'
+    | '/admissions/admitted'
+    | '/admissions/closed'
+    | '/admissions/new'
+    | '/admissions/willing'
+    | '/attendance/classes'
+    | '/attendance/corrections'
+    | '/attendance/history'
+    | '/attendance/monthly'
+    | '/attendance/offline'
+    | '/attendance/review'
+    | '/attendance/submitted'
+    | '/expenses/$expenseId'
+    | '/expenses/new'
+    | '/expenses/report'
+    | '/fees/$studentId'
+    | '/fees/dues'
+    | '/fees/report'
+    | '/routine/lesson'
+    | '/routine/new'
+    | '/routine/review'
+    | '/routine/teacher'
+    | '/settings/academics'
+    | '/settings/admissions'
+    | '/settings/attendance'
+    | '/settings/expenses'
+    | '/settings/fees'
+    | '/settings/people'
+    | '/settings/school'
+    | '/institutions/$institutionId/admissions'
+    | '/institutions/$institutionId/settings'
+    | '/expenses/$expenseId/payment'
+    | '/fees/$studentId/review'
+    | '/fees/receipts/$receiptId'
+    | '/institutions/$institutionId/admissions/$candidateId'
+    | '/institutions/$institutionId/admissions/new'
+    | '/institutions/$institutionId/admissions/settings'
+    | '/institutions/$institutionId/settings/admissions';
+  id:
+    | '__root__'
+    | '/'
+    | '/_school'
+    | '/app/'
+    | '/login/'
+    | '/workspace/'
+    | '/institutions/$institutionId/admissions'
+    | '/institutions/$institutionId/settings'
+    | '/_school/admissions/'
+    | '/_school/attendance/'
+    | '/_school/expenses/'
+    | '/_school/fees/'
+    | '/_school/routine/'
+    | '/_school/settings/'
+    | '/institutions/$institutionId/'
+    | '/_school/admissions/$candidateId/'
+    | '/_school/admissions/admitted/'
+    | '/_school/admissions/closed/'
+    | '/_school/admissions/new/'
+    | '/_school/admissions/willing/'
+    | '/_school/attendance/classes/'
+    | '/_school/attendance/corrections/'
+    | '/_school/attendance/history/'
+    | '/_school/attendance/monthly/'
+    | '/_school/attendance/offline/'
+    | '/_school/attendance/review/'
+    | '/_school/attendance/submitted/'
+    | '/_school/expenses/$expenseId/'
+    | '/_school/expenses/new/'
+    | '/_school/expenses/report/'
+    | '/_school/fees/$studentId/'
+    | '/_school/fees/dues/'
+    | '/_school/fees/report/'
+    | '/_school/routine/lesson/'
+    | '/_school/routine/new/'
+    | '/_school/routine/review/'
+    | '/_school/routine/teacher/'
+    | '/_school/settings/academics/'
+    | '/_school/settings/admissions/'
+    | '/_school/settings/attendance/'
+    | '/_school/settings/expenses/'
+    | '/_school/settings/fees/'
+    | '/_school/settings/people/'
+    | '/_school/settings/school/'
+    | '/institutions/$institutionId/admissions/'
+    | '/institutions/$institutionId/settings/'
+    | '/_school/expenses/$expenseId/payment/'
+    | '/_school/fees/$studentId/review/'
+    | '/_school/fees/receipts/$receiptId/'
+    | '/institutions/$institutionId/admissions/$candidateId/'
+    | '/institutions/$institutionId/admissions/new/'
+    | '/institutions/$institutionId/admissions/settings/'
+    | '/institutions/$institutionId/settings/admissions/';
   fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
   PageRoute: typeof PageRoute;
+  SchoolRouteRoute: typeof SchoolRouteRouteWithChildren;
+  AppPageRoute: typeof AppPageRoute;
   LoginPageRoute: typeof LoginPageRoute;
   WorkspacePageRoute: typeof WorkspacePageRoute;
+  InstitutionsInstitutionIdAdmissionsRouteRoute: typeof InstitutionsInstitutionIdAdmissionsRouteRouteWithChildren;
+  InstitutionsInstitutionIdSettingsRouteRoute: typeof InstitutionsInstitutionIdSettingsRouteRouteWithChildren;
+  InstitutionsInstitutionIdPageRoute: typeof InstitutionsInstitutionIdPageRoute;
 }
 
 declare module '@tanstack/react-router' {
@@ -66,6 +692,20 @@ declare module '@tanstack/react-router' {
       path: '/';
       fullPath: '/';
       preLoaderRoute: typeof PageRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    '/_school': {
+      id: '/_school';
+      path: '';
+      fullPath: '/';
+      preLoaderRoute: typeof SchoolRouteRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    '/app/': {
+      id: '/app/';
+      path: '/app';
+      fullPath: '/app/';
+      preLoaderRoute: typeof AppPageRouteImport;
       parentRoute: typeof rootRouteImport;
     };
     '/login/': {
@@ -82,13 +722,478 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkspacePageRouteImport;
       parentRoute: typeof rootRouteImport;
     };
+    '/_school/admissions/': {
+      id: '/_school/admissions/';
+      path: '/admissions';
+      fullPath: '/admissions/';
+      preLoaderRoute: typeof SchoolAdmissionsPageRouteImport;
+      parentRoute: typeof SchoolRouteRoute;
+    };
+    '/_school/attendance/': {
+      id: '/_school/attendance/';
+      path: '/attendance';
+      fullPath: '/attendance/';
+      preLoaderRoute: typeof SchoolAttendancePageRouteImport;
+      parentRoute: typeof SchoolRouteRoute;
+    };
+    '/_school/expenses/': {
+      id: '/_school/expenses/';
+      path: '/expenses';
+      fullPath: '/expenses/';
+      preLoaderRoute: typeof SchoolExpensesPageRouteImport;
+      parentRoute: typeof SchoolRouteRoute;
+    };
+    '/_school/fees/': {
+      id: '/_school/fees/';
+      path: '/fees';
+      fullPath: '/fees/';
+      preLoaderRoute: typeof SchoolFeesPageRouteImport;
+      parentRoute: typeof SchoolRouteRoute;
+    };
+    '/_school/routine/': {
+      id: '/_school/routine/';
+      path: '/routine';
+      fullPath: '/routine/';
+      preLoaderRoute: typeof SchoolRoutinePageRouteImport;
+      parentRoute: typeof SchoolRouteRoute;
+    };
+    '/_school/settings/': {
+      id: '/_school/settings/';
+      path: '/settings';
+      fullPath: '/settings/';
+      preLoaderRoute: typeof SchoolSettingsPageRouteImport;
+      parentRoute: typeof SchoolRouteRoute;
+    };
+    '/institutions/$institutionId/': {
+      id: '/institutions/$institutionId/';
+      path: '/institutions/$institutionId';
+      fullPath: '/institutions/$institutionId/';
+      preLoaderRoute: typeof InstitutionsInstitutionIdPageRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    '/institutions/$institutionId/admissions': {
+      id: '/institutions/$institutionId/admissions';
+      path: '/institutions/$institutionId/admissions';
+      fullPath: '/institutions/$institutionId/admissions';
+      preLoaderRoute: typeof InstitutionsInstitutionIdAdmissionsRouteRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    '/institutions/$institutionId/settings': {
+      id: '/institutions/$institutionId/settings';
+      path: '/institutions/$institutionId/settings';
+      fullPath: '/institutions/$institutionId/settings';
+      preLoaderRoute: typeof InstitutionsInstitutionIdSettingsRouteRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    '/_school/admissions/$candidateId/': {
+      id: '/_school/admissions/$candidateId/';
+      path: '/admissions/$candidateId';
+      fullPath: '/admissions/$candidateId/';
+      preLoaderRoute: typeof SchoolAdmissionsCandidateIdPageRouteImport;
+      parentRoute: typeof SchoolRouteRoute;
+    };
+    '/_school/admissions/admitted/': {
+      id: '/_school/admissions/admitted/';
+      path: '/admissions/admitted';
+      fullPath: '/admissions/admitted/';
+      preLoaderRoute: typeof SchoolAdmissionsAdmittedPageRouteImport;
+      parentRoute: typeof SchoolRouteRoute;
+    };
+    '/_school/admissions/closed/': {
+      id: '/_school/admissions/closed/';
+      path: '/admissions/closed';
+      fullPath: '/admissions/closed/';
+      preLoaderRoute: typeof SchoolAdmissionsClosedPageRouteImport;
+      parentRoute: typeof SchoolRouteRoute;
+    };
+    '/_school/admissions/new/': {
+      id: '/_school/admissions/new/';
+      path: '/admissions/new';
+      fullPath: '/admissions/new/';
+      preLoaderRoute: typeof SchoolAdmissionsNewPageRouteImport;
+      parentRoute: typeof SchoolRouteRoute;
+    };
+    '/_school/admissions/willing/': {
+      id: '/_school/admissions/willing/';
+      path: '/admissions/willing';
+      fullPath: '/admissions/willing/';
+      preLoaderRoute: typeof SchoolAdmissionsWillingPageRouteImport;
+      parentRoute: typeof SchoolRouteRoute;
+    };
+    '/_school/attendance/classes/': {
+      id: '/_school/attendance/classes/';
+      path: '/attendance/classes';
+      fullPath: '/attendance/classes/';
+      preLoaderRoute: typeof SchoolAttendanceClassesPageRouteImport;
+      parentRoute: typeof SchoolRouteRoute;
+    };
+    '/_school/attendance/corrections/': {
+      id: '/_school/attendance/corrections/';
+      path: '/attendance/corrections';
+      fullPath: '/attendance/corrections/';
+      preLoaderRoute: typeof SchoolAttendanceCorrectionsPageRouteImport;
+      parentRoute: typeof SchoolRouteRoute;
+    };
+    '/_school/attendance/history/': {
+      id: '/_school/attendance/history/';
+      path: '/attendance/history';
+      fullPath: '/attendance/history/';
+      preLoaderRoute: typeof SchoolAttendanceHistoryPageRouteImport;
+      parentRoute: typeof SchoolRouteRoute;
+    };
+    '/_school/attendance/monthly/': {
+      id: '/_school/attendance/monthly/';
+      path: '/attendance/monthly';
+      fullPath: '/attendance/monthly/';
+      preLoaderRoute: typeof SchoolAttendanceMonthlyPageRouteImport;
+      parentRoute: typeof SchoolRouteRoute;
+    };
+    '/_school/attendance/offline/': {
+      id: '/_school/attendance/offline/';
+      path: '/attendance/offline';
+      fullPath: '/attendance/offline/';
+      preLoaderRoute: typeof SchoolAttendanceOfflinePageRouteImport;
+      parentRoute: typeof SchoolRouteRoute;
+    };
+    '/_school/attendance/review/': {
+      id: '/_school/attendance/review/';
+      path: '/attendance/review';
+      fullPath: '/attendance/review/';
+      preLoaderRoute: typeof SchoolAttendanceReviewPageRouteImport;
+      parentRoute: typeof SchoolRouteRoute;
+    };
+    '/_school/attendance/submitted/': {
+      id: '/_school/attendance/submitted/';
+      path: '/attendance/submitted';
+      fullPath: '/attendance/submitted/';
+      preLoaderRoute: typeof SchoolAttendanceSubmittedPageRouteImport;
+      parentRoute: typeof SchoolRouteRoute;
+    };
+    '/_school/expenses/$expenseId/': {
+      id: '/_school/expenses/$expenseId/';
+      path: '/expenses/$expenseId';
+      fullPath: '/expenses/$expenseId/';
+      preLoaderRoute: typeof SchoolExpensesExpenseIdPageRouteImport;
+      parentRoute: typeof SchoolRouteRoute;
+    };
+    '/_school/expenses/new/': {
+      id: '/_school/expenses/new/';
+      path: '/expenses/new';
+      fullPath: '/expenses/new/';
+      preLoaderRoute: typeof SchoolExpensesNewPageRouteImport;
+      parentRoute: typeof SchoolRouteRoute;
+    };
+    '/_school/expenses/report/': {
+      id: '/_school/expenses/report/';
+      path: '/expenses/report';
+      fullPath: '/expenses/report/';
+      preLoaderRoute: typeof SchoolExpensesReportPageRouteImport;
+      parentRoute: typeof SchoolRouteRoute;
+    };
+    '/_school/fees/$studentId/': {
+      id: '/_school/fees/$studentId/';
+      path: '/fees/$studentId';
+      fullPath: '/fees/$studentId/';
+      preLoaderRoute: typeof SchoolFeesStudentIdPageRouteImport;
+      parentRoute: typeof SchoolRouteRoute;
+    };
+    '/_school/fees/dues/': {
+      id: '/_school/fees/dues/';
+      path: '/fees/dues';
+      fullPath: '/fees/dues/';
+      preLoaderRoute: typeof SchoolFeesDuesPageRouteImport;
+      parentRoute: typeof SchoolRouteRoute;
+    };
+    '/_school/fees/report/': {
+      id: '/_school/fees/report/';
+      path: '/fees/report';
+      fullPath: '/fees/report/';
+      preLoaderRoute: typeof SchoolFeesReportPageRouteImport;
+      parentRoute: typeof SchoolRouteRoute;
+    };
+    '/_school/routine/lesson/': {
+      id: '/_school/routine/lesson/';
+      path: '/routine/lesson';
+      fullPath: '/routine/lesson/';
+      preLoaderRoute: typeof SchoolRoutineLessonPageRouteImport;
+      parentRoute: typeof SchoolRouteRoute;
+    };
+    '/_school/routine/new/': {
+      id: '/_school/routine/new/';
+      path: '/routine/new';
+      fullPath: '/routine/new/';
+      preLoaderRoute: typeof SchoolRoutineNewPageRouteImport;
+      parentRoute: typeof SchoolRouteRoute;
+    };
+    '/_school/routine/review/': {
+      id: '/_school/routine/review/';
+      path: '/routine/review';
+      fullPath: '/routine/review/';
+      preLoaderRoute: typeof SchoolRoutineReviewPageRouteImport;
+      parentRoute: typeof SchoolRouteRoute;
+    };
+    '/_school/routine/teacher/': {
+      id: '/_school/routine/teacher/';
+      path: '/routine/teacher';
+      fullPath: '/routine/teacher/';
+      preLoaderRoute: typeof SchoolRoutineTeacherPageRouteImport;
+      parentRoute: typeof SchoolRouteRoute;
+    };
+    '/_school/settings/academics/': {
+      id: '/_school/settings/academics/';
+      path: '/settings/academics';
+      fullPath: '/settings/academics/';
+      preLoaderRoute: typeof SchoolSettingsAcademicsPageRouteImport;
+      parentRoute: typeof SchoolRouteRoute;
+    };
+    '/_school/settings/admissions/': {
+      id: '/_school/settings/admissions/';
+      path: '/settings/admissions';
+      fullPath: '/settings/admissions/';
+      preLoaderRoute: typeof SchoolSettingsAdmissionsPageRouteImport;
+      parentRoute: typeof SchoolRouteRoute;
+    };
+    '/_school/settings/attendance/': {
+      id: '/_school/settings/attendance/';
+      path: '/settings/attendance';
+      fullPath: '/settings/attendance/';
+      preLoaderRoute: typeof SchoolSettingsAttendancePageRouteImport;
+      parentRoute: typeof SchoolRouteRoute;
+    };
+    '/_school/settings/expenses/': {
+      id: '/_school/settings/expenses/';
+      path: '/settings/expenses';
+      fullPath: '/settings/expenses/';
+      preLoaderRoute: typeof SchoolSettingsExpensesPageRouteImport;
+      parentRoute: typeof SchoolRouteRoute;
+    };
+    '/_school/settings/fees/': {
+      id: '/_school/settings/fees/';
+      path: '/settings/fees';
+      fullPath: '/settings/fees/';
+      preLoaderRoute: typeof SchoolSettingsFeesPageRouteImport;
+      parentRoute: typeof SchoolRouteRoute;
+    };
+    '/_school/settings/people/': {
+      id: '/_school/settings/people/';
+      path: '/settings/people';
+      fullPath: '/settings/people/';
+      preLoaderRoute: typeof SchoolSettingsPeoplePageRouteImport;
+      parentRoute: typeof SchoolRouteRoute;
+    };
+    '/_school/settings/school/': {
+      id: '/_school/settings/school/';
+      path: '/settings/school';
+      fullPath: '/settings/school/';
+      preLoaderRoute: typeof SchoolSettingsSchoolPageRouteImport;
+      parentRoute: typeof SchoolRouteRoute;
+    };
+    '/institutions/$institutionId/admissions/': {
+      id: '/institutions/$institutionId/admissions/';
+      path: '/';
+      fullPath: '/institutions/$institutionId/admissions/';
+      preLoaderRoute: typeof InstitutionsInstitutionIdAdmissionsPageRouteImport;
+      parentRoute: typeof InstitutionsInstitutionIdAdmissionsRouteRoute;
+    };
+    '/institutions/$institutionId/settings/': {
+      id: '/institutions/$institutionId/settings/';
+      path: '/';
+      fullPath: '/institutions/$institutionId/settings/';
+      preLoaderRoute: typeof InstitutionsInstitutionIdSettingsPageRouteImport;
+      parentRoute: typeof InstitutionsInstitutionIdSettingsRouteRoute;
+    };
+    '/_school/expenses/$expenseId/payment/': {
+      id: '/_school/expenses/$expenseId/payment/';
+      path: '/expenses/$expenseId/payment';
+      fullPath: '/expenses/$expenseId/payment/';
+      preLoaderRoute: typeof SchoolExpensesExpenseIdPaymentPageRouteImport;
+      parentRoute: typeof SchoolRouteRoute;
+    };
+    '/_school/fees/$studentId/review/': {
+      id: '/_school/fees/$studentId/review/';
+      path: '/fees/$studentId/review';
+      fullPath: '/fees/$studentId/review/';
+      preLoaderRoute: typeof SchoolFeesStudentIdReviewPageRouteImport;
+      parentRoute: typeof SchoolRouteRoute;
+    };
+    '/_school/fees/receipts/$receiptId/': {
+      id: '/_school/fees/receipts/$receiptId/';
+      path: '/fees/receipts/$receiptId';
+      fullPath: '/fees/receipts/$receiptId/';
+      preLoaderRoute: typeof SchoolFeesReceiptsReceiptIdPageRouteImport;
+      parentRoute: typeof SchoolRouteRoute;
+    };
+    '/institutions/$institutionId/admissions/$candidateId/': {
+      id: '/institutions/$institutionId/admissions/$candidateId/';
+      path: '/$candidateId';
+      fullPath: '/institutions/$institutionId/admissions/$candidateId/';
+      preLoaderRoute: typeof InstitutionsInstitutionIdAdmissionsCandidateIdPageRouteImport;
+      parentRoute: typeof InstitutionsInstitutionIdAdmissionsRouteRoute;
+    };
+    '/institutions/$institutionId/admissions/new/': {
+      id: '/institutions/$institutionId/admissions/new/';
+      path: '/new';
+      fullPath: '/institutions/$institutionId/admissions/new/';
+      preLoaderRoute: typeof InstitutionsInstitutionIdAdmissionsNewPageRouteImport;
+      parentRoute: typeof InstitutionsInstitutionIdAdmissionsRouteRoute;
+    };
+    '/institutions/$institutionId/admissions/settings/': {
+      id: '/institutions/$institutionId/admissions/settings/';
+      path: '/settings';
+      fullPath: '/institutions/$institutionId/admissions/settings/';
+      preLoaderRoute: typeof InstitutionsInstitutionIdAdmissionsSettingsPageRouteImport;
+      parentRoute: typeof InstitutionsInstitutionIdAdmissionsRouteRoute;
+    };
+    '/institutions/$institutionId/settings/admissions/': {
+      id: '/institutions/$institutionId/settings/admissions/';
+      path: '/admissions';
+      fullPath: '/institutions/$institutionId/settings/admissions/';
+      preLoaderRoute: typeof InstitutionsInstitutionIdSettingsAdmissionsPageRouteImport;
+      parentRoute: typeof InstitutionsInstitutionIdSettingsRouteRoute;
+    };
   }
 }
 
+interface SchoolRouteRouteChildren {
+  SchoolAdmissionsPageRoute: typeof SchoolAdmissionsPageRoute;
+  SchoolAttendancePageRoute: typeof SchoolAttendancePageRoute;
+  SchoolExpensesPageRoute: typeof SchoolExpensesPageRoute;
+  SchoolFeesPageRoute: typeof SchoolFeesPageRoute;
+  SchoolRoutinePageRoute: typeof SchoolRoutinePageRoute;
+  SchoolSettingsPageRoute: typeof SchoolSettingsPageRoute;
+  SchoolAdmissionsCandidateIdPageRoute: typeof SchoolAdmissionsCandidateIdPageRoute;
+  SchoolAdmissionsAdmittedPageRoute: typeof SchoolAdmissionsAdmittedPageRoute;
+  SchoolAdmissionsClosedPageRoute: typeof SchoolAdmissionsClosedPageRoute;
+  SchoolAdmissionsNewPageRoute: typeof SchoolAdmissionsNewPageRoute;
+  SchoolAdmissionsWillingPageRoute: typeof SchoolAdmissionsWillingPageRoute;
+  SchoolAttendanceClassesPageRoute: typeof SchoolAttendanceClassesPageRoute;
+  SchoolAttendanceCorrectionsPageRoute: typeof SchoolAttendanceCorrectionsPageRoute;
+  SchoolAttendanceHistoryPageRoute: typeof SchoolAttendanceHistoryPageRoute;
+  SchoolAttendanceMonthlyPageRoute: typeof SchoolAttendanceMonthlyPageRoute;
+  SchoolAttendanceOfflinePageRoute: typeof SchoolAttendanceOfflinePageRoute;
+  SchoolAttendanceReviewPageRoute: typeof SchoolAttendanceReviewPageRoute;
+  SchoolAttendanceSubmittedPageRoute: typeof SchoolAttendanceSubmittedPageRoute;
+  SchoolExpensesExpenseIdPageRoute: typeof SchoolExpensesExpenseIdPageRoute;
+  SchoolExpensesNewPageRoute: typeof SchoolExpensesNewPageRoute;
+  SchoolExpensesReportPageRoute: typeof SchoolExpensesReportPageRoute;
+  SchoolFeesStudentIdPageRoute: typeof SchoolFeesStudentIdPageRoute;
+  SchoolFeesDuesPageRoute: typeof SchoolFeesDuesPageRoute;
+  SchoolFeesReportPageRoute: typeof SchoolFeesReportPageRoute;
+  SchoolRoutineLessonPageRoute: typeof SchoolRoutineLessonPageRoute;
+  SchoolRoutineNewPageRoute: typeof SchoolRoutineNewPageRoute;
+  SchoolRoutineReviewPageRoute: typeof SchoolRoutineReviewPageRoute;
+  SchoolRoutineTeacherPageRoute: typeof SchoolRoutineTeacherPageRoute;
+  SchoolSettingsAcademicsPageRoute: typeof SchoolSettingsAcademicsPageRoute;
+  SchoolSettingsAdmissionsPageRoute: typeof SchoolSettingsAdmissionsPageRoute;
+  SchoolSettingsAttendancePageRoute: typeof SchoolSettingsAttendancePageRoute;
+  SchoolSettingsExpensesPageRoute: typeof SchoolSettingsExpensesPageRoute;
+  SchoolSettingsFeesPageRoute: typeof SchoolSettingsFeesPageRoute;
+  SchoolSettingsPeoplePageRoute: typeof SchoolSettingsPeoplePageRoute;
+  SchoolSettingsSchoolPageRoute: typeof SchoolSettingsSchoolPageRoute;
+  SchoolExpensesExpenseIdPaymentPageRoute: typeof SchoolExpensesExpenseIdPaymentPageRoute;
+  SchoolFeesStudentIdReviewPageRoute: typeof SchoolFeesStudentIdReviewPageRoute;
+  SchoolFeesReceiptsReceiptIdPageRoute: typeof SchoolFeesReceiptsReceiptIdPageRoute;
+}
+
+const SchoolRouteRouteChildren: SchoolRouteRouteChildren = {
+  SchoolAdmissionsPageRoute: SchoolAdmissionsPageRoute,
+  SchoolAttendancePageRoute: SchoolAttendancePageRoute,
+  SchoolExpensesPageRoute: SchoolExpensesPageRoute,
+  SchoolFeesPageRoute: SchoolFeesPageRoute,
+  SchoolRoutinePageRoute: SchoolRoutinePageRoute,
+  SchoolSettingsPageRoute: SchoolSettingsPageRoute,
+  SchoolAdmissionsCandidateIdPageRoute: SchoolAdmissionsCandidateIdPageRoute,
+  SchoolAdmissionsAdmittedPageRoute: SchoolAdmissionsAdmittedPageRoute,
+  SchoolAdmissionsClosedPageRoute: SchoolAdmissionsClosedPageRoute,
+  SchoolAdmissionsNewPageRoute: SchoolAdmissionsNewPageRoute,
+  SchoolAdmissionsWillingPageRoute: SchoolAdmissionsWillingPageRoute,
+  SchoolAttendanceClassesPageRoute: SchoolAttendanceClassesPageRoute,
+  SchoolAttendanceCorrectionsPageRoute: SchoolAttendanceCorrectionsPageRoute,
+  SchoolAttendanceHistoryPageRoute: SchoolAttendanceHistoryPageRoute,
+  SchoolAttendanceMonthlyPageRoute: SchoolAttendanceMonthlyPageRoute,
+  SchoolAttendanceOfflinePageRoute: SchoolAttendanceOfflinePageRoute,
+  SchoolAttendanceReviewPageRoute: SchoolAttendanceReviewPageRoute,
+  SchoolAttendanceSubmittedPageRoute: SchoolAttendanceSubmittedPageRoute,
+  SchoolExpensesExpenseIdPageRoute: SchoolExpensesExpenseIdPageRoute,
+  SchoolExpensesNewPageRoute: SchoolExpensesNewPageRoute,
+  SchoolExpensesReportPageRoute: SchoolExpensesReportPageRoute,
+  SchoolFeesStudentIdPageRoute: SchoolFeesStudentIdPageRoute,
+  SchoolFeesDuesPageRoute: SchoolFeesDuesPageRoute,
+  SchoolFeesReportPageRoute: SchoolFeesReportPageRoute,
+  SchoolRoutineLessonPageRoute: SchoolRoutineLessonPageRoute,
+  SchoolRoutineNewPageRoute: SchoolRoutineNewPageRoute,
+  SchoolRoutineReviewPageRoute: SchoolRoutineReviewPageRoute,
+  SchoolRoutineTeacherPageRoute: SchoolRoutineTeacherPageRoute,
+  SchoolSettingsAcademicsPageRoute: SchoolSettingsAcademicsPageRoute,
+  SchoolSettingsAdmissionsPageRoute: SchoolSettingsAdmissionsPageRoute,
+  SchoolSettingsAttendancePageRoute: SchoolSettingsAttendancePageRoute,
+  SchoolSettingsExpensesPageRoute: SchoolSettingsExpensesPageRoute,
+  SchoolSettingsFeesPageRoute: SchoolSettingsFeesPageRoute,
+  SchoolSettingsPeoplePageRoute: SchoolSettingsPeoplePageRoute,
+  SchoolSettingsSchoolPageRoute: SchoolSettingsSchoolPageRoute,
+  SchoolExpensesExpenseIdPaymentPageRoute:
+    SchoolExpensesExpenseIdPaymentPageRoute,
+  SchoolFeesStudentIdReviewPageRoute: SchoolFeesStudentIdReviewPageRoute,
+  SchoolFeesReceiptsReceiptIdPageRoute: SchoolFeesReceiptsReceiptIdPageRoute,
+};
+
+const SchoolRouteRouteWithChildren = SchoolRouteRoute._addFileChildren(
+  SchoolRouteRouteChildren,
+);
+
+interface InstitutionsInstitutionIdAdmissionsRouteRouteChildren {
+  InstitutionsInstitutionIdAdmissionsPageRoute: typeof InstitutionsInstitutionIdAdmissionsPageRoute;
+  InstitutionsInstitutionIdAdmissionsCandidateIdPageRoute: typeof InstitutionsInstitutionIdAdmissionsCandidateIdPageRoute;
+  InstitutionsInstitutionIdAdmissionsNewPageRoute: typeof InstitutionsInstitutionIdAdmissionsNewPageRoute;
+  InstitutionsInstitutionIdAdmissionsSettingsPageRoute: typeof InstitutionsInstitutionIdAdmissionsSettingsPageRoute;
+}
+
+const InstitutionsInstitutionIdAdmissionsRouteRouteChildren: InstitutionsInstitutionIdAdmissionsRouteRouteChildren =
+  {
+    InstitutionsInstitutionIdAdmissionsPageRoute:
+      InstitutionsInstitutionIdAdmissionsPageRoute,
+    InstitutionsInstitutionIdAdmissionsCandidateIdPageRoute:
+      InstitutionsInstitutionIdAdmissionsCandidateIdPageRoute,
+    InstitutionsInstitutionIdAdmissionsNewPageRoute:
+      InstitutionsInstitutionIdAdmissionsNewPageRoute,
+    InstitutionsInstitutionIdAdmissionsSettingsPageRoute:
+      InstitutionsInstitutionIdAdmissionsSettingsPageRoute,
+  };
+
+const InstitutionsInstitutionIdAdmissionsRouteRouteWithChildren =
+  InstitutionsInstitutionIdAdmissionsRouteRoute._addFileChildren(
+    InstitutionsInstitutionIdAdmissionsRouteRouteChildren,
+  );
+
+interface InstitutionsInstitutionIdSettingsRouteRouteChildren {
+  InstitutionsInstitutionIdSettingsPageRoute: typeof InstitutionsInstitutionIdSettingsPageRoute;
+  InstitutionsInstitutionIdSettingsAdmissionsPageRoute: typeof InstitutionsInstitutionIdSettingsAdmissionsPageRoute;
+}
+
+const InstitutionsInstitutionIdSettingsRouteRouteChildren: InstitutionsInstitutionIdSettingsRouteRouteChildren =
+  {
+    InstitutionsInstitutionIdSettingsPageRoute:
+      InstitutionsInstitutionIdSettingsPageRoute,
+    InstitutionsInstitutionIdSettingsAdmissionsPageRoute:
+      InstitutionsInstitutionIdSettingsAdmissionsPageRoute,
+  };
+
+const InstitutionsInstitutionIdSettingsRouteRouteWithChildren =
+  InstitutionsInstitutionIdSettingsRouteRoute._addFileChildren(
+    InstitutionsInstitutionIdSettingsRouteRouteChildren,
+  );
+
 const rootRouteChildren: RootRouteChildren = {
   PageRoute: PageRoute,
+  SchoolRouteRoute: SchoolRouteRouteWithChildren,
+  AppPageRoute: AppPageRoute,
   LoginPageRoute: LoginPageRoute,
   WorkspacePageRoute: WorkspacePageRoute,
+  InstitutionsInstitutionIdAdmissionsRouteRoute:
+    InstitutionsInstitutionIdAdmissionsRouteRouteWithChildren,
+  InstitutionsInstitutionIdSettingsRouteRoute:
+    InstitutionsInstitutionIdSettingsRouteRouteWithChildren,
+  InstitutionsInstitutionIdPageRoute: InstitutionsInstitutionIdPageRoute,
 };
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

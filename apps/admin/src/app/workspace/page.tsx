@@ -1,12 +1,7 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { requireIdentity } from '../login/_api/session';
-import { WorkspacePage } from './_component/workspace-page';
-
-function Page() {
-  return <WorkspacePage />;
-}
+import { createFileRoute, redirect } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/workspace/')({
-  beforeLoad: requireIdentity,
-  component: Page,
+  beforeLoad: () => {
+    throw redirect({ to: '/app', replace: true });
+  },
 });

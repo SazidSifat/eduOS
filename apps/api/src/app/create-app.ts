@@ -14,12 +14,16 @@ import { createIdentityRoutes } from '../modules/identity/routes.js';
 import { createPlatformRoutes } from '../modules/platform/routes.js';
 import type { PlatformService } from '../modules/platform/service.js';
 import { openapi } from './openapi.js';
+import type { AdmissionsService } from '../modules/admissions/service.js';
+import { createAdmissionsRoutes } from '../modules/admissions/routes.js';
+import { AdmissionError } from '../modules/admissions/errors.js';
 export interface AppDependencies {
   env: ApiEnv;
   auth: HttpAuth;
   logger: Logger;
   identity: IdentityService;
   platform: PlatformService;
+  admissions?: AdmissionsService;
   checkDatabase: () => Promise<void>;
 }
 export function createApp({
@@ -28,6 +32,7 @@ export function createApp({
   logger,
   identity,
   platform,
+  admissions,
   checkDatabase,
 }: AppDependencies) {
   const app = new Hono<{ Variables: ApiVariables }>();
@@ -112,6 +117,11 @@ export function createApp({
   app.on(['GET', 'POST'], '/api/auth/*', (c) => auth.handler(c.req.raw));
   app.route('/api/v1', createIdentityRoutes(auth, identity));
   app.route('/api/v1/platform', createPlatformRoutes(auth, platform));
+  if (admissions)
+    app.route(
+      '/api/v1/institutions/:institutionId/admissions',
+      createAdmissionsRoutes(auth, admissions),
+    );
   app.get('/api/openapi.json', (c) => c.json(openapi));
   app.notFound((c) =>
     c.json(
@@ -139,10 +149,15 @@ export function createApp({
       {
         error: {
           code:
-            error instanceof ProvisioningConflict
+            error instanceof ProvisioningConflict || error instanceof AdmissionError
               ? error.code
               : (codes[status] ?? 'INTERNAL_ERROR'),
-          message: status >= 500 ? 'Unexpected server error' : 'Request rejected',
+          message:
+            status >= 500
+              ? 'Unexpected server error'
+              : error instanceof AdmissionError
+                ? error.message
+                : 'Request rejected',
           requestId: c.get('requestId'),
         },
       },

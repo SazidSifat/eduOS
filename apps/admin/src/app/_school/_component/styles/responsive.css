@@ -1,0 +1,189 @@
+@media (max-width: 1200px) {
+  .demo-main {
+    padding: 28px;
+  }
+  .demo-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .demo-columns-wide {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 900px) {
+  .demo-app {
+    display: block;
+  }
+  .demo-mobile-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--background);
+  }
+  .demo-sidebar {
+    display: none;
+    position: static;
+    height: auto;
+    max-height: 70dvh;
+    border-bottom: 1px solid var(--border);
+    border-right: 0;
+  }
+  .demo-sidebar-open {
+    display: flex;
+  }
+  .demo-school {
+    display: none;
+  }
+  .demo-account {
+    display: none;
+  }
+  .demo-navigation {
+    padding: 12px 20px;
+  }
+  .demo-main {
+    padding: 24px 20px 40px;
+  }
+  .demo-context > span {
+    display: none;
+  }
+  .demo-preview-banner {
+    align-items: flex-start;
+    gap: 6px;
+    flex-direction: column;
+    margin-bottom: 24px;
+  }
+  .demo-context {
+    margin-bottom: 12px;
+  }
+  .demo-columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .demo-heading {
+    gap: 16px;
+  }
+  .demo-heading > button,
+  .demo-heading > a {
+    min-height: 44px;
+  }
+}
+@media (max-width: 600px) {
+  .demo-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .demo-panel {
+    padding: 20px;
+  }
+  .demo-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .demo-metrics > div {
+    padding: 14px;
+  }
+  .demo-metrics dd {
+    font-size: 24px;
+  }
+  .demo-setting-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .demo-setting-grid > a:nth-child(odd) {
+    border-right: 0;
+  }
+  .demo-setting-grid > a {
+    padding: 20px;
+  }
+  .demo-actions > button,
+  .demo-actions > a {
+    min-height: 44px;
+    flex: 1;
+  }
+  .demo-heading h1 {
+    font-size: 24px;
+  }
+  .demo-roster-table {
+    display: none;
+  }
+  .demo-roster-cards {
+    display: grid;
+    gap: 16px;
+  }
+  .demo-attendance-controls > button {
+    min-height: 44px;
+    flex: 1;
+    min-width: 0;
+    padding-inline: 10px;
+  }
+  .demo-filters > div {
+    flex: 1 1 100%;
+  }
+  .demo-details > div {
+    gap: 16px;
+  }
+  .demo-details dd {
+    max-width: 60%;
+  }
+  .demo-table td,
+  .demo-table th {
+    padding: 12px;
+  }
+  .demo-tabs a {
+    padding: 10px 12px;
+  }
+  .demo-stack,
+  .demo-page {
+    gap: 20px;
+  }
+  .demo-inline-link {
+    min-height: 30px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .demo-app * {
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+@media print {
+  .demo-app {
+    display: block;
+  }
+  .demo-print-hide,
+  .demo-sidebar,
+  .demo-mobile-header {
+    display: none !important;
+  }
+  .demo-main {
+    padding: 0;
+  }
+  .demo-panel {
+    border-color: #ddd;
+    background: white !important;
+    break-inside: avoid;
+  }
+  .demo-routine-table {
+    min-width: 0;
+  }
+  .demo-app {
+    color: #172a27;
+    background: white;
+  }
+  .demo-table-wrap {
+    overflow: visible;
+  }
+  .demo-preview-banner {
+    display: none;
+  }
+  .demo-page {
+    gap: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .demo-period-form {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .demo-period-form > p {
+    grid-column: 1/-1;
+  }
+}

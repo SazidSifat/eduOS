@@ -8,10 +8,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="min-h-dvh">
       <header className="border-b border-border">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-6 py-5">
-          <Link
-            to="/workspace"
-            className="rounded focus-visible:outline-2 focus-visible:outline-ring"
-          >
+          <Link to="/app" className="rounded focus-visible:outline-2 focus-visible:outline-ring">
             <AppBrand />
           </Link>
           <ThemeToggle />

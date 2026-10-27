@@ -28,5 +28,5 @@ export async function redirectAuthenticatedUser() {
     if (error instanceof ApiError && error.status === 401) return;
     throw error;
   }
-  throw redirect({ to: '/workspace', replace: true });
+  throw redirect({ to: '/app', replace: true });
 }

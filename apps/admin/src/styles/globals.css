@@ -1,6 +1,61 @@
 @import '@eduos/ui/styles.css';
 @source '../';
 
+.admissions-app {
+  font-family: 'Avenir Next', Avenir, 'Segoe UI Variable', 'Segoe UI', sans-serif;
+  font-size: 14px;
+  --border: #e0e5de;
+}
+.dark .admissions-app {
+  --border: #34463c;
+}
+.admissions-app input,
+.admissions-app textarea,
+.admissions-app button {
+  font-size: 14px;
+}
+.admissions-app input,
+.admissions-app textarea {
+  caret-color: var(--primary);
+}
+.admissions-app a,
+.admissions-app button,
+.admissions-app input,
+.admissions-app summary,
+.admissions-app tr {
+  transition:
+    background-color 150ms ease-out,
+    color 150ms ease-out,
+    border-color 150ms ease-out;
+}
+.admissions-app .admission-nav:hover,
+.admissions-app .admission-nav[data-current='true'] {
+  background: var(--muted);
+}
+.admissions-app .admission-nav[data-current='true'] {
+  font-weight: 600;
+  color: var(--primary);
+}
+.admissions-app ::selection {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+.admissions-app a:focus-visible,
+.admissions-app summary:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+}
+.admissions-app fieldset {
+  min-width: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .admissions-app *,
+  .admissions-app *::before,
+  .admissions-app *::after {
+    transition: none !important;
+  }
+}
+
 /* Keep the sign-in surface neutral without changing the workspace palette. */
 .auth-page {
   --background: #fafaf9;

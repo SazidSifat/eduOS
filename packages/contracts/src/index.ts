@@ -2,6 +2,8 @@ import { z } from 'zod';
 import { institutionCodeSchema, institutionModuleSchema } from './institution.js';
 export * from './platform.js';
 export * from './institution.js';
+export * from './admissions.js';
+export * from './admission-fees.js';
 export const errorSchema = z.object({
   error: z.object({ code: z.string(), message: z.string(), requestId: z.string() }),
 });
@@ -20,6 +22,11 @@ export const permissionSchema = z.enum([
   'workspace.read',
   'memberships.read',
   'memberships.manage',
+  'admissions.read',
+  'admissions.write',
+  'admissions.manage',
+  'admissions.settings',
+  'fees.collect',
 ]);
 export const roleDefinitionSchema = z.object({
   key: roleSchema,

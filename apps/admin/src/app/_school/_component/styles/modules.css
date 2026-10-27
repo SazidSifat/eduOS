@@ -1,0 +1,200 @@
+.demo-history {
+  display: grid;
+  gap: 20px;
+}
+.demo-history li + li {
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+.demo-history time {
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+.demo-history p {
+  margin-top: 4px;
+}
+.demo-setting-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.demo-setting-grid > a {
+  padding: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  border-bottom: 1px solid var(--border);
+}
+.demo-setting-grid > a:nth-child(odd) {
+  border-right: 1px solid var(--border);
+}
+.demo-setting-grid > a:hover {
+  background: var(--muted);
+}
+.demo-setting-grid h2 {
+  font-size: 14px;
+  font-weight: 600;
+}
+.demo-setting-grid p {
+  color: var(--muted-foreground);
+  margin-top: 6px;
+  max-width: 55ch;
+}
+.demo-row-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.demo-check {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+.demo-check input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary);
+}
+.demo-roster-cards {
+  display: none;
+}
+.demo-attendance-controls {
+  display: flex;
+  gap: 8px;
+}
+.demo-attendance-controls > button {
+  min-width: 78px;
+}
+.demo-student-card {
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.demo-student-card h2 {
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.demo-student-card .demo-attendance-controls {
+  margin-top: 16px;
+}
+.demo-routine-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.demo-routine-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  text-align: left;
+}
+.demo-routine-table td,
+.demo-routine-table th {
+  padding: 14px;
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  height: 98px;
+}
+.demo-routine-table .demo-routine-table-head {
+  height: 46px;
+  background: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted-foreground);
+}
+.demo-routine-table .demo-period {
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+.demo-routine-table p {
+  font-weight: 600;
+}
+.demo-routine-table small {
+  display: block;
+  font-size: 12px;
+  color: var(--muted-foreground);
+  margin-top: 5px;
+}
+.demo-routine-table .demo-break {
+  height: 36px;
+  padding: 8px;
+  text-align: center;
+  background: var(--muted);
+  font-size: 12px;
+}
+.demo-routine-table a {
+  display: grid;
+  align-content: center;
+  gap: 8px;
+  color: var(--primary);
+  height: 100%;
+  border-radius: 4px;
+}
+.demo-routine-table a:hover {
+  background: var(--muted);
+}
+.demo-receipt {
+  max-width: 900px;
+  margin-inline: auto;
+  width: 100%;
+}
+.demo-mobile-header {
+  display: none;
+}
+.demo-width-phone {
+  max-width: 480px;
+  width: 100%;
+  margin-inline: auto;
+}
+.demo-file {
+  padding: 18px;
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+}
+.demo-file input {
+  max-width: 100%;
+}
+.demo-app input:focus-visible,
+.demo-app select:focus-visible,
+.demo-app textarea:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+}
+.demo-app input[type='checkbox']:focus-visible {
+  outline-offset: 4px;
+}
+.demo-app * {
+  scrollbar-color: var(--border) transparent;
+  scrollbar-width: thin;
+}
+
+.demo-routine-table th:first-child {
+  width: 100px;
+}
+.demo-period-form {
+  display: grid;
+  grid-template-columns: 100px minmax(0, 1fr) minmax(0, 1fr) 40px;
+  gap: 20px;
+  align-items: end;
+}
+.demo-columns-wide > .demo-stack:last-child .demo-fields {
+  grid-template-columns: minmax(0, 1fr);
+}
+.demo-monthly .demo-table th:first-child,
+.demo-monthly .demo-table td:first-child {
+  position: sticky;
+  left: 0;
+  background: var(--background);
+  z-index: 1;
+}
+.demo-monthly .demo-table th:first-child {
+  background: var(--muted);
+}
+.demo-monthly .demo-table td:not(:first-child) {
+  min-width: 44px;
+  text-align: center;
+}

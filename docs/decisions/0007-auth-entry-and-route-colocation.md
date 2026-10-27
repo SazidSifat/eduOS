@@ -17,3 +17,7 @@ The root route redirects to /login. The login guard checks the server identity a
 Routes remain thin and generated; moving a helper cannot accidentally add a URL. Authentication gets its own full-height screen without the landing navigation/footer. There is no public signup, password-reset delivery, new institution provisioning or platform UI. Authentication UI and folder organization change; API authorization, schema and migrations do not.
 
 Tests cover invalid input, password visibility, pending and failed submissions, cache clearing, signed-in redirects, revoked sessions and non-session failures. Browser checks cover entry navigation, direct workspace protection, themes, keyboard focus and narrow-screen layout. Test execution and environmental limits are reported separately from this decision.
+
+## Application entry update
+
+The user subsequently requested removal of the workspace screen. Authenticated sign-in now enters `/app`, which resolves active assigned school memberships. One assigned school opens its application directly; multiple assigned schools show a chooser. A school with admission permission and the enabled Admissions module opens its follow-up directory. Other accounts see an access explanation instead of entering a module they cannot use. `/workspace` remains only as a compatibility redirect to `/app`, with no page UI. Generated routing, server-side authorization and query-cache clearing remain in place.

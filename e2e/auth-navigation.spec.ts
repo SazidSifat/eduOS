@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test('redirects a stubbed signed-in identity from login and root to the workspace', async ({
+test('redirects a stubbed signed-in identity from login and root to the application access screen', async ({
   page,
 }) => {
   await page.route('**/api/v1/me', (route) =>
@@ -10,11 +10,11 @@ test('redirects a stubbed signed-in identity from login and root to the workspac
   );
   await page.route('**/api/v1/memberships', (route) => route.fulfill({ json: [] }));
   await page.goto('/login');
-  await expect(page).toHaveURL(/\/workspace\/?$/);
-  await expect(page.getByRole('heading', { name: 'Your workspace' })).toBeVisible();
-  await expect(page.getByText(/You have no active institution memberships/)).toBeVisible();
+  await expect(page).toHaveURL(/\/app\/?$/);
+  await expect(page.getByRole('heading', { name: 'No school access' })).toBeVisible();
+  await expect(page.getByText(/Your account has no active school role/)).toBeVisible();
   await page.goto('/');
-  await expect(page).toHaveURL(/\/workspace\/?$/);
+  await expect(page).toHaveURL(/\/app\/?$/);
 });
 
 test('keeps the auth shell visible while the session request is pending', async ({ page }) => {

@@ -15,7 +15,7 @@ it('allows signed-out users to see login', async () => {
   await expect(redirectAuthenticatedUser()).resolves.toBeUndefined();
 });
 
-it('redirects an authenticated user from login to the workspace', async () => {
+it('redirects an authenticated user from login to the application', async () => {
   fetchQuery.mockResolvedValue({ id: 'synthetic-user' });
   try {
     await redirectAuthenticatedUser();
@@ -23,7 +23,7 @@ it('redirects an authenticated user from login to the workspace', async () => {
   } catch (error) {
     expect(isRedirect(error)).toBe(true);
     if (!isRedirect(error)) throw error;
-    expect(error.options.to).toBe('/workspace');
+    expect(error.options.to).toBe('/app');
     expect(error.options.replace).toBe(true);
   }
 });

@@ -6,6 +6,9 @@ import { createLogger } from './lib/logger.js';
 import { createIdentityService } from './modules/identity/service.js';
 import { createPlatformService } from './modules/platform/service.js';
 import { createApp } from './app/create-app.js';
+import { createAdmissionsService } from './modules/admissions/service.js';
+import { postMonthlyFees } from './modules/fees/monthly-processor.js';
+import { deliverFollowUps } from './modules/communication/follow-ups.js';
 const env = parseEnv(process.env);
 const logger = createLogger(env.LOG_LEVEL);
 const connection = createDatabase(env.DATABASE_URL);
@@ -22,6 +25,7 @@ const app = createApp({
   auth,
   identity: createIdentityService(connection.db),
   platform: createPlatformService(connection.db),
+  admissions: createAdmissionsService(connection.db),
   checkDatabase: async () => {
     await connection.db.execute(sql`select 1`);
   },
@@ -35,9 +39,32 @@ server.on('error', () => {
   void connection.close().finally(() => process.exit(1));
 });
 let stopping = false;
+let processingReminders = false;
+async function processReminders() {
+  if (processingReminders || stopping) return;
+  processingReminders = true;
+  try {
+    try {
+      await postMonthlyFees(connection.db);
+    } catch {
+      logger.write('error', { event: 'monthly_fee_posting_failed' });
+    }
+    await deliverFollowUps(connection.db);
+  } catch {
+    logger.write('error', { event: 'follow_up_delivery_failed' });
+  } finally {
+    processingReminders = false;
+  }
+}
+const reminderTimer = setInterval(() => {
+  void processReminders();
+}, 30000);
+reminderTimer.unref();
+void processReminders();
 async function shutdown() {
   if (stopping) return;
   stopping = true;
+  clearInterval(reminderTimer);
   const timeout = setTimeout(() => process.exit(1), 10000);
   timeout.unref();
   server.close(async () => {
