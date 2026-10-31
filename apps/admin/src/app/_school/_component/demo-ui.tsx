@@ -172,7 +172,14 @@ export function Tabs({ items }: { items: { label: string; to: DemoPath; active: 
   return (
     <nav className="demo-tabs" aria-label="Module views">
       {items.map((item) => (
-        <Link key={item.to} to={item.to} aria-current={item.active ? 'page' : undefined}>
+        <Link
+          key={item.to}
+          to={item.to}
+          activeOptions={{ exact: true }}
+          aria-current={item.active ? 'page' : undefined}
+          data-active={item.active ? 'true' : undefined}
+          className={item.active ? 'demo-tab-active' : ''}
+        >
           {item.label}
         </Link>
       ))}
@@ -192,12 +199,14 @@ export function Choice({
   label,
   value,
   options,
+  optionLabels,
   onChange,
 }: {
   id: string;
   label: string;
   value: string;
   options: string[];
+  optionLabels?: Record<string, string>;
   onChange: (value: string) => void;
 }) {
   return (
@@ -210,7 +219,7 @@ export function Choice({
         <SelectContent>
           {options.map((option) => (
             <SelectItem key={option} value={option}>
-              {option}
+              {optionLabels?.[option] ?? option}
             </SelectItem>
           ))}
         </SelectContent>

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { DatePicker, Label } from '@eduos/ui';
 import { useDemo } from '../../_component/demo-provider';
-import { DEMO_TODAY, money } from '../../_component/demo-data';
+import { DEMO_TODAY, money } from '../../_component/school-format';
 import {
   Choice,
   ExportButton,
@@ -40,7 +40,7 @@ export function ExpenseReport() {
         description="Review school expenditure by category and reconcile actual payments."
         action={
           <ExportButton
-            filename="school-expense-report-demo"
+            filename="school-expense-report"
             headers={['Category', 'Amount BDT']}
             rows={groups.map((g) => [g.label, g.amount / 100])}
           />
@@ -49,7 +49,13 @@ export function ExpenseReport() {
       <div className="demo-filters">
         <div>
           <Label htmlFor="expense-report-date">Month containing</Label>
-          <DatePicker id="expense-report-date" value={date} onValueChange={setDate} />
+          <DatePicker
+            id="expense-report-date"
+            value={date}
+            onValueChange={(value) => {
+              if (value) setDate(value);
+            }}
+          />
         </div>
         <Choice
           id="report-category"

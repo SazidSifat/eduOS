@@ -3,12 +3,12 @@ import { Link } from '@tanstack/react-router';
 import { Plus } from 'lucide-react';
 import { useDemo } from '../../_component/demo-provider';
 import { DemoLink, Notice, PageHeading, Status } from '../../_component/demo-ui';
-import { routineConflicts, unassignedSlots } from './routine-model';
+import { unassignedSlots } from './routine-validation';
 
 export function RoutineBuilder() {
-  const { state } = useDemo();
+  const { state, snapshot } = useDemo();
   const routine = state.routine;
-  const conflicts = routineConflicts(routine);
+  const conflicts = snapshot.routineConflicts;
   const missing = unassignedSlots(routine);
   return (
     <>
@@ -79,7 +79,10 @@ export function RoutineBuilder() {
                           {lesson ? (
                             <>
                               <p>{lesson.subject}</p>
-                              <small>{lesson.teacher}</small>
+                              <small>
+                                {state.members.find((m) => m.id === lesson.teacher)?.name ??
+                                  'Unassigned'}
+                              </small>
                               <small>
                                 {lesson.room}
                                 {conflict ? ' · Conflict' : ''}

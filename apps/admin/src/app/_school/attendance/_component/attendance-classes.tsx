@@ -2,44 +2,49 @@ import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { Button, DatePicker, Label } from '@eduos/ui';
 import { useDemo } from '../../_component/demo-provider';
-import { classes, DEMO_TODAY, roster } from '../../_component/demo-data';
+import { DEMO_TODAY } from '../../_component/school-format';
 import { DemoLink, PageHeading, Panel, Status } from '../../_component/demo-ui';
 import { markCounts } from './attendance-model';
 
 export function AttendanceClasses() {
-  const { state, dispatch } = useDemo();
+  const { state, dispatch, classes, roster, snapshot } = useDemo();
   const navigate = useNavigate();
   const [date, setDate] = useState(DEMO_TODAY);
   return (
     <div className="demo-stack demo-width-phone">
-      <PageHeading title="My classes" description={`Farhana Akter · ${date} · Session 2026`} />
+      <PageHeading title="My classes" description={`${snapshot.identity.name} · ${date}`} />
       <div className="demo-field">
         <Label htmlFor="my-class-date">Attendance date</Label>
-        <DatePicker id="my-class-date" value={date} onValueChange={setDate} />
+        <DatePicker
+          id="my-class-date"
+          value={date}
+          onValueChange={(value) => {
+            if (value) setDate(value);
+          }}
+        />
       </div>
       {classes.map((c) => {
         const register = state.registers.find((r) => r.classId === c.id && r.date === date);
-        const marked = register ? c.count - markCounts(register).Unmarked : 0;
+        const count = roster(c.id, date).length;
+        const marked = register
+          ? Object.keys(register.marks).length - markCounts(register).Unmarked
+          : 0;
         return (
-          <Panel
-            key={c.id}
-            title={c.label}
-            description={`${roster(c.id).length} enrolled students`}
-          >
+          <Panel key={c.id} title={c.label} description={`${count} enrolled students`}>
             <div className="mb-5">
               <Status tone={register?.submitted ? 'success' : marked ? 'warning' : 'neutral'}>
                 {register?.submitted
                   ? 'Submitted'
                   : marked
-                    ? `Draft · ${marked} of ${c.count} marked`
+                    ? `Draft · ${marked} of ${count} marked`
                     : 'Not started'}
               </Status>
             </div>
             <Button
               className="w-full"
-              variant={c.id === '3-a' ? 'default' : 'outline'}
-              onClick={() => {
-                dispatch({ type: 'register-select', date, classId: c.id });
+              variant={c.id === '' ? 'default' : 'outline'}
+              onClick={async () => {
+                if (!(await dispatch({ type: 'register-select', date, classId: c.id }))) return;
                 void navigate({
                   to: register?.submitted ? '/attendance/submitted' : '/attendance',
                 });

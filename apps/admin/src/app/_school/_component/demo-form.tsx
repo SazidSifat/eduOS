@@ -23,6 +23,7 @@ export interface DemoField {
   required?: boolean;
   kind?: 'text' | 'date' | 'money' | 'textarea' | 'time' | 'switch';
   options?: string[];
+  optionLabels?: Record<string, string>;
   helper?: string;
   wide?: boolean;
   readOnly?: boolean;
@@ -66,7 +67,7 @@ export function DemoForm({
   busy = false,
 }: {
   sections: FormSection[];
-  onSubmit: (values: Record<string, string>) => void;
+  onSubmit: (values: Record<string, string>) => void | Promise<void>;
   submitLabel?: string;
   children?: ReactNode;
   footer?: ReactNode;
@@ -129,7 +130,7 @@ export function DemoForm({
                             <SelectContent>
                               {field.options?.map((option) => (
                                 <SelectItem key={option} value={option}>
-                                  {option}
+                                  {field.optionLabels?.[option] ?? option}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -206,7 +207,7 @@ export function DemoForm({
         {children}
         <div className="demo-actions">
           {footer}
-          <Button type="submit" disabled={busy}>
+          <Button type="submit" disabled={busy || form.formState.isSubmitting}>
             {submitLabel}
           </Button>
         </div>

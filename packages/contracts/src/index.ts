@@ -27,6 +27,19 @@ export const permissionSchema = z.enum([
   'admissions.manage',
   'admissions.settings',
   'fees.collect',
+  'school.settings',
+  'academics.manage',
+  'attendance.read',
+  'attendance.write',
+  'attendance.review',
+  'fees.read',
+  'fees.reverse',
+  'expenses.read',
+  'expenses.write',
+  'expenses.review',
+  'expenses.pay',
+  'routine.read',
+  'routine.manage',
 ]);
 export const roleDefinitionSchema = z.object({
   key: roleSchema,
@@ -76,3 +89,7 @@ export const membershipsSchema = z.array(membershipSchema);
 export type Identity = z.infer<typeof identitySchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type Membership = z.infer<typeof membershipSchema>;
+
+export * from './school-model.js';
+export * from './school-commands.js';
+export * from './enrollment-history.js';

@@ -2,7 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { Button } from '@eduos/ui';
 import { Printer } from 'lucide-react';
 import { useDemo } from '../../_component/demo-provider';
-import { money } from '../../_component/demo-data';
+import { money } from '../../_component/school-format';
 import {
   DataTable,
   DemoLink,
@@ -23,7 +23,7 @@ export function ReceiptPage({ id }: { id: string }) {
         title="Receipt unavailable"
         action={<DemoLink to="/fees">Collect a payment</DemoLink>}
       >
-        Create a cash collection to view its receipt. Demo receipts reset when the page reloads.
+        Create a cash collection to view its receipt. Receipts remain available after reloading.
       </EmptyState>
     );
   const balance = state.charges
@@ -54,8 +54,8 @@ export function ReceiptPage({ id }: { id: string }) {
         {payment.reversed || `${payment.id} · ${payment.date} · Cash`}
       </Notice>
       <Panel
-        title={state.settings.name ?? 'Shapla Model School'}
-        description={`${state.settings.address ?? 'Dhaka'} · Institution SCH-042`}
+        title={state.settings.name ?? 'School'}
+        description={`${state.settings.address ?? ''} · Institution ${state.settings.code}`}
         className="demo-receipt"
       >
         <p className="mb-6 font-semibold text-primary">CASH RECEIPT · {payment.id}</p>
@@ -90,8 +90,8 @@ export function ReceiptPage({ id }: { id: string }) {
           ]}
         />
         <p className="demo-help mt-6">
-          Synthetic demonstration receipt. Keep the receipt number for future enquiries. Posted
-          entries remain in history after authorized reversal.
+          Keep the receipt number for future enquiries. Posted entries remain in history after
+          authorized reversal.
         </p>
       </Panel>
       <div className="demo-actions demo-print-hide">

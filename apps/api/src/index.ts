@@ -3,12 +3,13 @@ import { createAuth } from '@eduos/auth/server';
 import { createDatabase, sql } from '@eduos/database';
 import { parseEnv } from './config/env.js';
 import { createLogger } from './lib/logger.js';
-import { createIdentityService } from './modules/identity/service.js';
-import { createPlatformService } from './modules/platform/service.js';
-import { createApp } from './app/create-app.js';
-import { createAdmissionsService } from './modules/admissions/service.js';
-import { postMonthlyFees } from './modules/fees/monthly-processor.js';
-import { deliverFollowUps } from './modules/communication/follow-ups.js';
+import { createIdentityService } from './services/identity/identity.service.js';
+import { createPlatformService } from './services/platform/platform.service.js';
+import { createApp } from './app.js';
+import { createAdmissionsService } from './services/admissions/admissions.service.js';
+import { postMonthlyFees } from './services/fees/monthly-processor.js';
+import { deliverFollowUps } from './services/communication/follow-ups.js';
+import { createSchoolService } from './services/school/school.service.js';
 const env = parseEnv(process.env);
 const logger = createLogger(env.LOG_LEVEL);
 const connection = createDatabase(env.DATABASE_URL);
@@ -26,6 +27,7 @@ const app = createApp({
   identity: createIdentityService(connection.db),
   platform: createPlatformService(connection.db),
   admissions: createAdmissionsService(connection.db),
+  school: createSchoolService(connection.db),
   checkDatabase: async () => {
     await connection.db.execute(sql`select 1`);
   },

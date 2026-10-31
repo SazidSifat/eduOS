@@ -9,13 +9,13 @@ Read root and scoped `AGENTS.md` instructions. Read `docs/domain/overview.md`, t
 
 ## Establish the workflow
 
-Trace the closest existing capability from HTTP entry to SQL. Start with `apps/api/src/app/create-app.ts`, `apps/api/src/modules/identity/service.ts` and the public exports of affected packages. Distinguish implemented behavior, confirmed requirements and proposed school policy. Use the domain-modeling skill when introducing academic concepts or resolving business invariants.
+Trace the closest existing capability from HTTP entry to SQL. Start with `apps/api/src/app.ts`, `apps/api/src/services/identity/identity.service.ts` and the public exports of affected packages. Distinguish implemented behavior, confirmed requirements and proposed school policy. Use the domain-modeling skill when introducing academic concepts or resolving business invariants.
 
 Describe the requested actor, trigger, current state, permitted transition, outcome and important failure cases. Identify which institution owns each resource and which permission and resource relationship authorize the action. Do not infer future business grants from role names or the existing `workspace.read` permission.
 
 ## Choose the smallest useful boundary
 
-- Put the use case in its owning capability under `apps/api/src/modules/<capability>`. Keep HTTP parsing and response mapping at the edge and business decisions in the service.
+- Put the use case in its owning capability under `apps/api/src/services/<capability>`. Keep HTTP parsing and response mapping at the edge and business decisions in the service.
 - Prefer an explicit service function and existing database utilities. Introduce repository interfaces, domain objects or additional layers only when a concrete invariant or dependency boundary needs them. Dependency injection through `createApp` already supports HTTP testing.
 - Name the owner of every write and the transaction that makes related writes atomic. Cross-context changes must use the owning service; decide transaction coordination explicitly rather than hiding separate commits behind service calls.
 - For concurrent actions, identify the database constraint, conditional update, lock or isolation choice that enforces the invariant. A read followed by an unconditional write is insufficient for contested state.

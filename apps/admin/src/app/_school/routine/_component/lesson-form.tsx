@@ -5,12 +5,11 @@ import { useDemo } from '../../_component/demo-provider';
 import { DemoForm, valueOf } from '../../_component/demo-form';
 import { DemoLink, Notice, PageHeading } from '../../_component/demo-ui';
 import type { Lesson } from '../../_component/demo-model';
-import { routineConflicts, subjects } from './routine-model';
 
 export function LessonForm({ day, period }: { day: string; period: string }) {
   const { state, dispatch, notify } = useDemo();
   const navigate = useNavigate();
-  const [error, setError] = useState('');
+  const [error] = useState('');
   const lesson = state.routine.lessons.find((l) => l.day === day && l.period === period);
   return (
     <>
@@ -45,28 +44,26 @@ export function LessonForm({ day, period }: { day: string; period: string }) {
               {
                 name: 'subject',
                 label: 'Subject',
-                value: lesson?.subject ?? 'Mathematics',
-                options: subjects.map((s) => s.name),
+                value: lesson?.subject ?? '',
                 required: true,
               },
               {
                 name: 'teacher',
                 label: 'Assigned teacher',
-                value: lesson?.teacher ?? 'Farhana Akter',
-                options: subjects.map((s) => s.teacher),
+                value:
+                  lesson?.teacher ??
+                  state.members.find((m) => m.role === 'Teacher' && m.active)?.id ??
+                  '',
+                options: state.members
+                  .filter((m) => m.role === 'Teacher' && m.active)
+                  .map((m) => m.id),
+                optionLabels: Object.fromEntries(state.members.map((m) => [m.id, m.name])),
                 required: true,
               },
               {
                 name: 'room',
                 label: 'Room',
-                value: lesson?.room ?? 'Classroom 3-A',
-                options: [
-                  'Classroom 3-A',
-                  'Classroom 4-A',
-                  'Classroom 5-B',
-                  'Science room',
-                  'ICT room',
-                ],
+                value: lesson?.room ?? '',
                 required: true,
               },
             ],
@@ -74,16 +71,7 @@ export function LessonForm({ day, period }: { day: string; period: string }) {
         ]}
         submitLabel="Save lesson & review"
         footer={<DemoLink to="/routine">Cancel</DemoLink>}
-        onSubmit={(values) => {
-          if (
-            subjects.find((s) => s.name === valueOf(values, 'subject'))?.teacher !==
-            valueOf(values, 'teacher')
-          ) {
-            setError(
-              'Choose the teacher assigned to this subject. The subject assignments are shown below.',
-            );
-            return;
-          }
+        onSubmit={async (values) => {
           const day = valueOf(values, 'day');
           const period = valueOf(values, 'period');
           const value: Lesson = {
@@ -94,39 +82,33 @@ export function LessonForm({ day, period }: { day: string; period: string }) {
             teacher: valueOf(values, 'teacher'),
             room: valueOf(values, 'room'),
           };
-          dispatch({ type: 'lesson-save', lesson: value });
+          if (!(await dispatch({ type: 'lesson-save', lesson: value }))) return;
           notify('Lesson saved to the draft. Conflicts must be resolved before publication.');
           void navigate({ to: '/routine/review' });
         }}
       >
         <LessonFeedback />
         <Notice title="Subject teaching assignments">
-          {subjects.map((s) => `${s.name}: ${s.teacher}`).join(' · ')}
+          Select an active school Teacher. The API checks published class routines for overlapping
+          teacher and room assignments.
         </Notice>
       </DemoForm>
     </>
   );
 }
 function LessonFeedback() {
-  const { state } = useDemo();
+  const { snapshot } = useDemo();
   const { control } = useFormContext<Record<string, string>>();
   const values = useWatch({ control });
-  const lesson: Lesson = {
-    id: `${values.day}-${values.period}`,
-    day: values.day ?? '',
-    period: values.period ?? '',
-    teacher: values.teacher ?? '',
-    subject: values.subject ?? '',
-    room: values.room ?? '',
-  };
-  const issues = routineConflicts({ ...state.routine, lessons: [lesson] });
   return (
     <>
-      {issues.map((issue) => (
-        <Notice key={issue.kind} title={issue.title} tone="warning">
-          {issue.detail} You can retain this draft and resolve it on review.
-        </Notice>
-      ))}
+      {snapshot.routineConflicts
+        .filter((i) => i.lessonId === `${values.day}-${values.period}`)
+        .map((issue) => (
+          <Notice key={`${issue.lessonId}-${issue.kind}`} title={issue.title} tone="warning">
+            {issue.detail}
+          </Notice>
+        ))}
     </>
   );
 }

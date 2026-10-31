@@ -16,8 +16,8 @@ export function ExpenseSettings() {
         description="Define categories, evidence requirements and school review policy."
       />
       <Notice title="Proposed school policy" tone="warning">
-        Approval thresholds, reviewer roles and evidence rules are synthetic examples for school
-        confirmation.
+        Every submitted request requires approval. The configured reviewer and evidence rules are
+        enforced by the school API.
       </Notice>
       <DemoForm
         sections={[
@@ -29,7 +29,7 @@ export function ExpenseSettings() {
                 label: 'Approval threshold (BDT)',
                 kind: 'money',
                 required: true,
-                value: state.settings.expenseThreshold ?? '5000',
+                value: state.settings.expenseThreshold ?? '0',
               },
               {
                 name: 'expenseReviewer',
@@ -47,9 +47,9 @@ export function ExpenseSettings() {
           },
         ]}
         submitLabel="Save expense policy"
-        onSubmit={(values) => {
-          dispatch({ type: 'settings-save', values });
-          notify('Expense policy saved in demo data.');
+        onSubmit={async (values) => {
+          if (!(await dispatch({ type: 'settings-save', values }))) return;
+          notify('Expense policy saved.');
         }}
       />
       <Panel title="Expense categories">
@@ -66,14 +66,14 @@ export function ExpenseSettings() {
         </DataTable>
         <form
           className="demo-filters mt-5"
-          onSubmit={(e) => {
+          onSubmit={async (e) => {
             e.preventDefault();
             const parsed = z.string().trim().min(2).max(60).safeParse(category);
             if (!parsed.success || state.categories.includes(category.trim())) {
               setError('Enter a unique category name of 2–60 characters.');
               return;
             }
-            dispatch({ type: 'category-add', category: parsed.data });
+            if (!(await dispatch({ type: 'category-add', category: parsed.data }))) return;
             setCategory('');
             setError('');
             notify('Expense category added.');

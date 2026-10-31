@@ -1,8 +1,7 @@
-import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import { Input, Label } from '@eduos/ui';
 import { useDemo } from '../../_component/demo-provider';
-import { money } from '../../_component/demo-data';
+import { money } from '../../_component/school-format';
 import {
   Choice,
   DataTable,
@@ -14,22 +13,26 @@ import {
   PageHeading,
   Status,
 } from '../../_component/demo-ui';
+import { useSchoolUiStore } from '../../../../stores/school-ui-store';
 
 export function ExpenseDirectory() {
   const { state } = useDemo();
-  const [search, setSearch] = useState('');
-  const [category, setCategory] = useState('All categories');
-  const [status, setStatus] = useState('All states');
-  const [payment, setPayment] = useState('All payments');
+  const { expenseFilter, setExpenseFilter } = useSchoolUiStore();
+
   const items = state.expenses.filter(
     (e) =>
-      `${e.id} ${e.description} ${e.payee}`.toLowerCase().includes(search.toLowerCase()) &&
-      (category === 'All categories' || e.category === category) &&
-      (status === 'All states' || e.status === status) &&
-      (payment === 'All payments' || (payment === 'Paid' ? e.paid : !e.paid)),
+      `${e.id} ${e.description} ${e.payee}`
+        .toLowerCase()
+        .includes(expenseFilter.search.toLowerCase()) &&
+      (expenseFilter.category === 'All categories' || e.category === expenseFilter.category) &&
+      (expenseFilter.status === 'All states' || e.status === expenseFilter.status) &&
+      (expenseFilter.payment === 'All payments' ||
+        (expenseFilter.payment === 'Paid' ? e.paid : !e.paid)),
   );
+
   const sum = (predicate: (expense: (typeof state.expenses)[number]) => boolean) =>
     state.expenses.filter(predicate).reduce((total, expense) => total + expense.amount, 0);
+
   return (
     <>
       <PageHeading
@@ -63,34 +66,34 @@ export function ExpenseDirectory() {
       />
       <div className="demo-filters">
         <div>
-          <Label htmlFor="expense-search">Find an expense</Label>
+          <Label htmlFor="expense-search">Search expenses</Label>
           <Input
             id="expense-search"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            value={expenseFilter.search}
+            onChange={(e) => setExpenseFilter({ search: e.target.value })}
             placeholder="Reference, description or payee"
           />
         </div>
         <Choice
           id="expense-category"
           label="Category"
-          value={category}
+          value={expenseFilter.category}
           options={['All categories', ...state.categories]}
-          onChange={setCategory}
+          onChange={(category) => setExpenseFilter({ category })}
         />
         <Choice
           id="expense-state"
           label="Approval"
-          value={status}
+          value={expenseFilter.status}
           options={['All states', 'draft', 'pending', 'approved', 'returned']}
-          onChange={setStatus}
+          onChange={(status) => setExpenseFilter({ status })}
         />
         <Choice
           id="expense-payment"
-          label="Payment"
-          value={payment}
+          label="Payment status"
+          value={expenseFilter.payment}
           options={['All payments', 'Paid', 'Unpaid']}
-          onChange={setPayment}
+          onChange={(payment) => setExpenseFilter({ payment })}
         />
       </div>
       {!items.length ? (
@@ -100,18 +103,18 @@ export function ExpenseDirectory() {
       ) : (
         <DataTable
           caption="School expense register"
-          headers={['Expense / payee', 'Category', 'Amount', 'Approval', 'Payment', 'Action']}
+          headers={['Expense / payee', 'Category', 'Amount (BDT)', 'Approval', 'Payment', 'Action']}
         >
           {items.map((e) => (
             <tr key={e.id}>
               <td>
-                <strong>{e.id}</strong>
-                <small>
+                <p className="font-semibold">{e.id}</p>
+                <small className="text-muted-foreground">
                   {e.description} · {e.payee}
                 </small>
               </td>
               <td>{e.category}</td>
-              <td>{money(e.amount)}</td>
+              <td className="font-medium">{money(e.amount)}</td>
               <td>
                 <Status
                   tone={
@@ -119,25 +122,45 @@ export function ExpenseDirectory() {
                       ? 'success'
                       : e.status === 'pending'
                         ? 'warning'
-                        : 'neutral'
+                        : e.status === 'returned'
+                          ? 'danger'
+                          : 'neutral'
                   }
                 >
                   {e.status}
                 </Status>
               </td>
               <td>
-                <Status tone={e.paid ? 'success' : 'neutral'}>
-                  {e.paid ? 'Paid' : 'Not paid'}
+                <Status tone={e.paid ? 'success' : e.status === 'approved' ? 'warning' : 'neutral'}>
+                  {e.paid ? 'Paid' : 'Unpaid'}
                 </Status>
               </td>
               <td>
-                <Link
-                  className="demo-inline-link"
-                  to="/expenses/$expenseId"
-                  params={{ expenseId: e.id }}
-                >
-                  Open expense
-                </Link>
+                {e.paid ? (
+                  <Link
+                    className="demo-inline-link"
+                    to="/expenses/$expenseId/payment"
+                    params={{ expenseId: e.id }}
+                  >
+                    Voucher
+                  </Link>
+                ) : e.status === 'pending' ? (
+                  <Link
+                    className="demo-inline-link"
+                    to="/expenses/$expenseId"
+                    params={{ expenseId: e.id }}
+                  >
+                    Review
+                  </Link>
+                ) : (
+                  <Link
+                    className="demo-inline-link"
+                    to="/expenses/$expenseId"
+                    params={{ expenseId: e.id }}
+                  >
+                    Open
+                  </Link>
+                )}
               </td>
             </tr>
           ))}
@@ -145,7 +168,7 @@ export function ExpenseDirectory() {
       )}
       <div className="demo-actions">
         <ExportButton
-          filename="school-expenses-demo"
+          filename="school-expenses"
           headers={['Reference', 'Description', 'Category', 'Amount BDT', 'Approval', 'Paid']}
           rows={items.map((e) => [
             e.id,
@@ -158,9 +181,9 @@ export function ExpenseDirectory() {
         />
         <DemoLink to="/expenses/report">Expense report</DemoLink>
       </div>
-      <Notice title="Approval and payment are separate">
-        Approval authorizes the expense. A voucher records the actual cash paid, with the original
-        request and history retained.
+      <Notice title="Every posted payment has a voucher" tone="info">
+        Approval authorizes spending. Payment records the actual money paid; these are separate
+        actions.
       </Notice>
     </>
   );

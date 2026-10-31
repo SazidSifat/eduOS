@@ -11,6 +11,7 @@ export {
   lt,
   lte,
   gt,
+  gte,
   desc,
   count,
   isNull,

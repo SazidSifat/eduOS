@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import { Button, DatePicker, Input, Label } from '@eduos/ui';
 import { useDemo } from '../../_component/demo-provider';
-import { classes, roster } from '../../_component/demo-data';
+
 import type { AttendanceMark } from '../../_component/demo-model';
 import {
   Choice,
+  EmptyState,
   DataTable,
   DemoLink,
   Metrics,
@@ -16,19 +17,24 @@ import {
 import { currentRegister, markCounts, markOptions } from './attendance-model';
 
 export function DailyAttendance() {
-  const { state, dispatch, notify } = useDemo();
+  const { state, dispatch, notify, classes, roster } = useDemo();
   const [search, setSearch] = useState('');
   const register = currentRegister(state);
-  if (!register) return null;
+  if (!register)
+    return (
+      <EmptyState title="No class register available">
+        Configure an academic offering and class teacher, then enroll students to start attendance.
+      </EmptyState>
+    );
   const counts = markCounts(register);
-  const students = roster(register.classId).filter((s) =>
+  const students = roster(register.classId, register.date).filter((s) =>
     `${s.name} ${s.roll}`.toLowerCase().includes(search.toLowerCase()),
   );
   function controls(id: string, mark: AttendanceMark) {
     return (
       <fieldset
         className="demo-attendance-controls"
-        aria-label={`Attendance for ${roster(register?.classId ?? '3-a').find((s) => s.id === id)?.name ?? 'student'}`}
+        aria-label={`Attendance for ${roster(register?.classId ?? '', register?.date).find((s) => s.id === id)?.name ?? 'student'}`}
       >
         {markOptions.map((value) => (
           <Button
@@ -49,8 +55,7 @@ export function DailyAttendance() {
     <>
       <PageHeading
         title="Daily attendance"
-        description={`${classes.find((c) => c.id === register.classId)?.label} · ${register.date} · Class teacher: Farhana Akter`}
-        action={<DemoLink to="/attendance/monthly">Monthly report</DemoLink>}
+        description={`${classes.find((c) => c.id === register.classId)?.label} · ${register.date} · Class teacher: ${state.members.find((m) => m.id === classes.find((c) => c.id === register.classId)?.teacherId)?.name ?? 'Unassigned'}`}
       />
       <div className="demo-filters">
         <div>
@@ -68,9 +73,13 @@ export function DailyAttendance() {
           label="Class / section"
           value={classes.find((c) => c.id === register.classId)?.label ?? 'Class 3 · A'}
           options={classes.map((c) => c.label)}
-          onChange={(label) => {
+          onChange={async (label) => {
             const c = classes.find((c) => c.label === label);
-            if (c) dispatch({ type: 'register-select', date: register.date, classId: c.id });
+            if (c)
+              if (
+                !(await dispatch({ type: 'register-select', date: register.date, classId: c.id }))
+              )
+                return;
           }}
         />
       </div>
@@ -78,7 +87,9 @@ export function DailyAttendance() {
         <Status tone={register.submitted ? 'success' : 'warning'}>
           {register.submitted ? 'Submitted' : register.saved ? 'Saved draft' : 'Unsaved draft'}
         </Status>
-        <span className="demo-help">{roster(register.classId).length} active enrollments</span>
+        <span className="demo-help">
+          {roster(register.classId, register.date).length} active enrollments
+        </span>
       </div>
       <Metrics
         items={[
@@ -146,7 +157,11 @@ export function DailyAttendance() {
         ))}
       </div>
       {!students.length && (
-        <p className="text-muted-foreground">No students match this name or roll.</p>
+        <p className="text-muted-foreground">
+          {Object.keys(register.marks).length
+            ? 'No students match this name or roll.'
+            : 'No students are enrolled for this date.'}
+        </p>
       )}
       {counts.Unmarked > 0 && (
         <Notice title={`${counts.Unmarked} students still need a status`} tone="warning">
@@ -165,14 +180,15 @@ export function DailyAttendance() {
         <div className="demo-actions">
           <Button
             variant="outline"
-            onClick={() => {
-              dispatch({ type: 'attendance-save' });
-              notify('Attendance draft saved in memory. It is not yet submitted.');
+            disabled={Object.keys(register.marks).length === 0}
+            onClick={async () => {
+              if (!(await dispatch({ type: 'attendance-save' }))) return;
+              notify('Attendance draft saved to the school record. It is not yet submitted.');
             }}
           >
             Save draft
           </Button>
-          {counts.Unmarked > 0 ? (
+          {counts.Unmarked > 0 || Object.keys(register.marks).length === 0 ? (
             <Button disabled>Review register</Button>
           ) : (
             <Button asChild>

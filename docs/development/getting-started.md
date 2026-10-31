@@ -41,3 +41,5 @@ pnpm infra:down
 `infra:down` preserves named data volumes. Never add `--volumes` as a routine reset. Redis is reserved and not used by apps. PostgreSQL 18's volume is mounted at `/var/lib/postgresql` per its image convention. Configure backups/restore separately.
 
 Before editing schema: `pnpm db:generate`, inspect SQL, then `pnpm db:migrate`. Studio: `pnpm db:studio`. Do not run migration generation instead of applying committed migrations on first setup. To use alternate ports, update Compose port variables, DATABASE_URL and app origins together. Do not use URL credentials that need escaping without percent-encoding them.
+
+For the live school routes, apply migrations 0007/0008, restart the API and follow [school workspace setup](school-workspace.md). The former demo routes now require a real assigned school account and enabled modules; they no longer load synthetic records.

@@ -50,6 +50,27 @@
       "when": 1792947406988,
       "tag": "0006_illegal_felicia_hardy",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1793079881331,
+      "tag": "0007_damp_meteorite",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1793080347648,
+      "tag": "0008_modern_celestials",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1793389735772,
+      "tag": "0009_enrollment_dates",
+      "breakpoints": true
     }
   ]
 }

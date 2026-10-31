@@ -73,6 +73,7 @@ export const monthlyFeeChargeSchema = z.object({
   label: z.string(),
   dueDate: z.iso.date(),
   amountMinor: z.number().int(),
+  paidMinor: z.number().int().min(0),
   receiptNumber: z.string().nullable(),
   paidAt: z.iso.datetime().nullable(),
 });

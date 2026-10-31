@@ -12,7 +12,7 @@ import {
 } from '@eduos/ui';
 import { Plus } from 'lucide-react';
 import { useDemo } from '../../_component/demo-provider';
-import { DEMO_TODAY } from '../../_component/demo-data';
+import { DEMO_TODAY } from '../../_component/school-format';
 import type { CandidateState } from '../../_component/demo-model';
 import {
   DataTable,
@@ -21,7 +21,6 @@ import {
   Notice,
   PageHeading,
   Status,
-  Tabs,
 } from '../../_component/demo-ui';
 
 const headings = {
@@ -31,7 +30,7 @@ const headings = {
   closed: 'Closed records',
 };
 export function CandidateDirectory({ state: view = 'follow_up' }: { state?: CandidateState }) {
-  const { state } = useDemo();
+  const { state, snapshot } = useDemo();
   const [search, setSearch] = useState('');
   const [schedule, setSchedule] = useState('All dates');
   const [className, setClassName] = useState('All classes');
@@ -80,14 +79,19 @@ export function CandidateDirectory({ state: view = 'follow_up' }: { state?: Cand
           {
             label: 'Follow-up records',
             value: state.candidates.filter((c) => c.state === 'follow_up').length,
-            detail: 'Session 2026',
+            detail: 'All assigned records',
           },
           {
             label: 'Calls due today',
             value: state.candidates.filter(
               (c) => c.state === 'follow_up' && c.nextCall === DEMO_TODAY,
             ).length,
-            detail: '26 October 2026',
+            detail: new Intl.DateTimeFormat('en-GB', {
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric',
+              timeZone: state.settings.timezone,
+            }).format(new Date(`${snapshot.today}T12:00:00+06:00`)),
           },
           {
             label: 'Willing students',
@@ -107,14 +111,6 @@ export function CandidateDirectory({ state: view = 'follow_up' }: { state?: Cand
           calls.
         </Notice>
       )}
-      <Tabs
-        items={[
-          { label: 'Follow-ups', to: '/admissions', active: view === 'follow_up' },
-          { label: 'Willing students', to: '/admissions/willing', active: view === 'willing' },
-          { label: 'Admitted students', to: '/admissions/admitted', active: view === 'admitted' },
-          { label: 'Closed records', to: '/admissions/closed', active: view === 'closed' },
-        ]}
-      />
       <div className="demo-filters">
         <div>
           <Label htmlFor="candidate-search">Find a student</Label>
@@ -140,7 +136,7 @@ export function CandidateDirectory({ state: view = 'follow_up' }: { state?: Cand
             id: 'officer',
             label: 'Admission Officer',
             value: officer,
-            options: ['All officers', 'Nusrat Ahmed', 'Sadia Karim'],
+            options: ['All officers', ...new Set(state.candidates.map((c) => c.officer))],
             update: setOfficer,
           },
           ...(view === 'follow_up'
@@ -170,7 +166,9 @@ export function CandidateDirectory({ state: view = 'follow_up' }: { state?: Cand
               <SelectContent>
                 {filter.options.map((option) => (
                   <SelectItem key={option} value={option}>
-                    {option}
+                    {filter.id === 'officer'
+                      ? (state.members.find((m) => m.id === option)?.name ?? option)
+                      : option}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -227,7 +225,7 @@ export function CandidateDirectory({ state: view = 'follow_up' }: { state?: Cand
                   {c.className}
                   <small>{c.session}</small>
                 </td>
-                <td>{c.officer}</td>
+                <td>{state.members.find((m) => m.id === c.officer)?.name ?? 'Unassigned'}</td>
                 <td>
                   {view === 'admitted' ? (
                     c.admittedOn

@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { createDatabase } from '@eduos/database';
 import { parseEnv } from '../config/env.js';
-import { bootstrapInstitutionAdmin } from '../modules/identity/bootstrap.js';
-import { bootstrapPlatformOwner } from '../modules/platform/bootstrap.js';
+import { bootstrapInstitutionAdmin } from '../services/identity/bootstrap.js';
+import { bootstrapPlatformOwner } from '../services/platform/bootstrap.js';
 
 const env = parseEnv(process.env);
 if (env.NODE_ENV !== 'development') throw new Error('Access bootstrap is development-only.');

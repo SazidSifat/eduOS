@@ -3,7 +3,7 @@ import { Link, useNavigate } from '@tanstack/react-router';
 import { z } from 'zod';
 import { Input } from '@eduos/ui';
 import { useDemo } from '../../_component/demo-provider';
-import { DEMO_TODAY, money } from '../../_component/demo-data';
+import { DEMO_TODAY, money } from '../../_component/school-format';
 import { DemoForm, valueOf } from '../../_component/demo-form';
 import {
   DataTable,
@@ -31,7 +31,7 @@ export function StudentAccount({ studentId }: { studentId: string }) {
         title="Student account unavailable"
         action={<DemoLink to="/fees">Find a student</DemoLink>}
       >
-        Only admitted students have a school fee account in this demo.
+        Only admitted students have a school fee account in this school.
       </EmptyState>
     );
   const balance = charges.reduce((sum, c) => sum + c.amount - c.paid, 0);

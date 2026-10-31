@@ -1,12 +1,12 @@
 import { useNavigate } from '@tanstack/react-router';
 import { Button } from '@eduos/ui';
 import { useDemo } from '../../_component/demo-provider';
-import { classes } from '../../_component/demo-data';
+
 import { DemoLink, Details, PageHeading, Panel, Status } from '../../_component/demo-ui';
 import { markCounts } from './attendance-model';
 
 export function AttendanceHistory() {
-  const { state, dispatch } = useDemo();
+  const { state, dispatch, classes } = useDemo();
   const navigate = useNavigate();
   const registers = state.registers
     .filter((r) => r.submitted)
@@ -15,7 +15,7 @@ export function AttendanceHistory() {
     <div className="demo-stack demo-width-phone">
       <PageHeading
         title="Attendance history"
-        description="Submitted registers and correction requests for the sample class assignments."
+        description="Submitted registers and correction requests for your assigned classes."
       />
       {registers.map((r) => {
         const counts = markCounts(r);
@@ -28,15 +28,18 @@ export function AttendanceHistory() {
                   ['Present', counts.Present],
                   ['Absent', counts.Absent],
                   ['Late', counts.Late],
-                  ['Submitted by', 'Farhana Akter'],
+                  ['Submitted by', 'See submission history'],
                 ]}
               />
             </div>
             <Button
               variant="outline"
               className="w-full"
-              onClick={() => {
-                dispatch({ type: 'register-select', date: r.date, classId: r.classId });
+              onClick={async () => {
+                if (
+                  !(await dispatch({ type: 'register-select', date: r.date, classId: r.classId }))
+                )
+                  return;
                 void navigate({ to: '/attendance/submitted' });
               }}
             >

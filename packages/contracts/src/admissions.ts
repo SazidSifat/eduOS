@@ -6,6 +6,7 @@ const optionalText = z.string().trim().max(160);
 export const admissionStateSchema = z.enum(['follow_up', 'willing', 'admitted', 'closed']);
 export const candidateProfileSchema = z.strictObject({
   studentName: shortText,
+  section: z.string().trim().min(1).max(40).optional(),
   guardianName: shortText,
   relationship: shortText,
   phone: z

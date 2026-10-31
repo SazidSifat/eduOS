@@ -1,3 +1,4 @@
+import { DEMO_TODAY } from '../../_component/school-format';
 import { z } from 'zod';
 import {
   Button,
@@ -12,8 +13,8 @@ import {
 } from '@eduos/ui';
 import { Plus, Trash2 } from 'lucide-react';
 import type { FeeItem } from '../../_component/demo-model';
-import { money } from '../../_component/demo-data';
-import { admissionTotal } from '../../_component/demo-finance';
+import { money } from '../../_component/school-format';
+import { admissionTotal } from '../../_component/school-finance';
 import { Details, Panel } from '../../_component/demo-ui';
 
 export const demoFeeSchema = z
@@ -77,7 +78,7 @@ export function AdmissionFees({
                     if (type.success)
                       update(fee.id, {
                         type: type.data,
-                        start: type.data === 'monthly' ? '2026-10-26' : '',
+                        start: type.data === 'monthly' ? DEMO_TODAY : '',
                       });
                   }}
                 >

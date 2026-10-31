@@ -12,6 +12,7 @@
     "test": "turbo run build --filter=\"./packages/*\" && vitest run --config vitest.config.ts",
     "test:integration": "turbo run build --filter=\"./packages/*\" && vitest run --config vitest.integration.config.ts",
     "test:e2e": "turbo run build --filter=\"./packages/*\" && playwright test",
+    "test:e2e:school": "turbo run build --filter=\"./packages/*\" && playwright test --config e2e/school.config.ts",
     "test:e2e:admissions": "turbo run build --filter=\"./packages/*\" && playwright test --config e2e/admissions.config.ts",
     "format": "oxfmt --write .",
     "format:check": "oxfmt --check .",

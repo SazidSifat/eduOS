@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { createDatabase } from '@eduos/database';
 import { parseEnv } from '../config/env.js';
-import { replacePlatformOwner } from '../modules/platform/replace-owner.js';
+import { replacePlatformOwner } from '../services/platform/replace-owner.js';
 
 const env = parseEnv(process.env);
 if (env.NODE_ENV !== 'development')

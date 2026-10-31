@@ -3,8 +3,8 @@ import { Link, useNavigate } from '@tanstack/react-router';
 import { z } from 'zod';
 import { Button, Switch, Textarea, Label } from '@eduos/ui';
 import { useDemo } from '../../_component/demo-provider';
-import { DEMO_TODAY, money } from '../../_component/demo-data';
-import { admissionTotal } from '../../_component/demo-finance';
+import { DEMO_TODAY, money } from '../../_component/school-format';
+import { admissionTotal } from '../../_component/school-finance';
 import type { Candidate, CandidateState, FeeItem } from '../../_component/demo-model';
 import { DemoForm, valueOf, type FormSection } from '../../_component/demo-form';
 import { Notice, PageHeading, Panel } from '../../_component/demo-ui';
@@ -17,8 +17,9 @@ export function CandidateForm({
   mode: Exclude<CandidateState, 'closed'>;
   candidateId: string;
 }) {
-  const { state, dispatch, notify } = useDemo();
+  const { state, snapshot, dispatch, notify } = useDemo();
   const navigate = useNavigate();
+  const [newId] = useState(() => crypto.randomUUID());
   const candidate = state.candidates.find((c) => c.id === candidateId);
   const [fees, setFees] = useState<FeeItem[]>(() =>
     (candidate?.fees ?? state.feeDefaults).map((f) => ({ ...f })),
@@ -31,18 +32,22 @@ export function CandidateForm({
   const full = mode !== 'follow_up';
   const credit = state.settings.creditWilling === 'yes' ? (candidate?.willingPaid ?? 0) : 0;
   const due = admissionTotal(fees) - Math.min(admissionTotal(fees), credit);
-  const willingAmount = Math.round(Number(state.settings.willingFee ?? '500') * 100);
+  const willingAmount = Math.round(Number(state.settings.willingFee ?? '0') * 100);
   const sections: FormSection[] = [
     {
       title: full ? 'Student information' : 'Student and guardian',
-      description: 'All examples in this workspace are synthetic. Fields marked * are required.',
+      description: 'Fields marked * are required.',
       fields: [
         { name: 'name', label: 'Student name', required: true, value: candidate?.name ?? '' },
         {
           name: 'className',
           label: 'Class / section',
           required: true,
-          value: candidate?.className ?? 'Class 3 · A',
+          value:
+            candidate?.className ??
+            (state.offerings[0]
+              ? `${state.offerings[0].className} · ${state.offerings[0].sections.split(',')[0]?.trim()}`
+              : ''),
           options: [
             ...new Set([
               ...state.offerings
@@ -58,8 +63,8 @@ export function CandidateForm({
           name: 'session',
           label: 'Academic session',
           required: true,
-          value: candidate?.session ?? '2026',
-          options: ['2026', '2027'],
+          value: candidate?.session || state.settings.session || state.offerings[0]?.session || '',
+          options: [...new Set(state.offerings.map((o) => o.session))],
         },
         {
           name: 'dob',
@@ -79,7 +84,7 @@ export function CandidateForm({
           label: 'Guardian phone',
           required: true,
           value: candidate?.phone ?? '',
-          helper: 'Use a synthetic example such as 01XXX XXX 201.',
+          helper: 'Enter a valid guardian contact number.',
         },
         {
           name: 'relationship',
@@ -90,7 +95,7 @@ export function CandidateForm({
         {
           name: 'address',
           label: 'Residential address',
-          required: full,
+          required: true,
           value: candidate?.address ?? '',
         },
         {
@@ -119,14 +124,14 @@ export function CandidateForm({
           label: 'Birth certificate reference',
           required: !exception,
           value: candidate?.certificate ?? '',
-          helper: 'Use a synthetic reference only.',
+          helper: 'Enter the document number, or request an authorized exception.',
         },
         {
           name: 'nid',
           label: 'Guardian NID reference',
           required: !exception,
           value: candidate?.nid ?? '',
-          helper: 'Use a synthetic reference only.',
+          helper: 'Enter the document number, or request an authorized exception.',
         },
         {
           name: 'previousSchool',
@@ -142,8 +147,16 @@ export function CandidateForm({
         name: 'officer',
         label: 'Admission Officer',
         required: true,
-        value: candidate?.officer ?? 'Nusrat Ahmed',
-        options: ['Nusrat Ahmed', 'Sadia Karim'],
+        value: candidate?.officer ?? snapshot.identity.id,
+        options: state.members
+          .filter(
+            (m) =>
+              m.active &&
+              ['Admin', 'Principal', 'Admission Officer'].includes(m.role) &&
+              (snapshot.permissions.includes('admissions.manage') || m.id === snapshot.identity.id),
+          )
+          .map((m) => m.id),
+        optionLabels: Object.fromEntries(state.members.map((m) => [m.id, m.name])),
       },
       ...(mode === 'follow_up'
         ? [
@@ -152,7 +165,7 @@ export function CandidateForm({
               label: 'Next follow-up date',
               required: true,
               kind: 'date' as const,
-              value: candidate?.nextCall ?? '2026-10-28',
+              value: candidate?.nextCall ?? snapshot.today,
             },
           ]
         : []),
@@ -165,7 +178,7 @@ export function CandidateForm({
       },
     ],
   });
-  function submit(values: Record<string, string>) {
+  async function submit(values: Record<string, string>) {
     setError('');
     if (candidate?.state === 'admitted') {
       setError('This candidate is already admitted. Open the existing student record.');
@@ -190,7 +203,8 @@ export function CandidateForm({
     }
     const read = (key: string) => valueOf(values, key).trim();
     const record: Candidate = {
-      id: candidate?.id ?? `ADM-2026-${128 + state.candidates.length}`,
+      id: candidate?.id ?? newId,
+      ...(candidate?.version ? { version: candidate.version } : {}),
       name: read('name'),
       guardian: read('guardian'),
       phone: read('phone'),
@@ -213,22 +227,25 @@ export function CandidateForm({
       exceptionReason: exception ? exceptionReason : '',
       willingPaid: candidate?.willingPaid ?? 0,
       admittedOn: '',
-      calls: candidate?.calls ?? [
-        { date: DEMO_TODAY, outcome: 'Record created', note: 'Created in the frontend demo.' },
-      ],
+      calls: candidate?.calls ?? [{ date: DEMO_TODAY, outcome: 'Record created', note: '' }],
       fees,
     };
-    dispatch({ type: 'candidate-save', candidate: record });
-    if (mode === 'admitted')
-      dispatch({ type: 'admit', candidateId: record.id, fees, cashConfirmed: cash });
-    if (mode === 'willing' && collectWilling)
-      dispatch({ type: 'willing-payment', candidateId: record.id, amount: willingAmount });
+    const saved = await dispatch({
+      type: 'candidate-save',
+      candidate: record,
+      ...(mode === 'admitted' ? { admission: { fees, cashConfirmed: cash } } : {}),
+      collectWillingFee: mode === 'willing' && collectWilling,
+    });
+    if (!saved) return;
     notify(
       mode === 'admitted'
-        ? 'Admission and selected cash payment recorded in demo data.'
-        : 'Admission record saved in demo data.',
+        ? 'Admission and selected cash payment recorded.'
+        : 'Admission record saved.',
     );
-    void navigate({ to: '/admissions/$candidateId', params: { candidateId: record.id } });
+    void navigate({
+      to: '/admissions/$candidateId',
+      params: { candidateId: saved.id ?? record.id },
+    });
   }
   return (
     <>

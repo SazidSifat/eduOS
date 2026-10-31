@@ -16,6 +16,19 @@ export const permissionKeys = [
   'admissions.manage',
   'admissions.settings',
   'fees.collect',
+  'school.settings',
+  'academics.manage',
+  'attendance.read',
+  'attendance.write',
+  'attendance.review',
+  'fees.read',
+  'fees.reverse',
+  'expenses.read',
+  'expenses.write',
+  'expenses.review',
+  'expenses.pay',
+  'routine.read',
+  'routine.manage',
 ] as const;
 export type Permission = (typeof permissionKeys)[number];
 export interface RoleDefinition {
@@ -31,8 +44,23 @@ export const roleDefinitions: readonly RoleDefinition[] = [
     name: 'Admission Officer',
     permissions: ['workspace.read', 'admissions.read', 'admissions.write', 'fees.collect'],
   },
-  { key: 'accountant', name: 'Accountant', permissions: ['workspace.read'] },
-  { key: 'teacher', name: 'Teacher', permissions: ['workspace.read'] },
+  {
+    key: 'accountant',
+    name: 'Accountant',
+    permissions: [
+      'workspace.read',
+      'fees.read',
+      'fees.collect',
+      'expenses.read',
+      'expenses.write',
+      'expenses.pay',
+    ],
+  },
+  {
+    key: 'teacher',
+    name: 'Teacher',
+    permissions: ['workspace.read', 'attendance.read', 'attendance.write', 'routine.read'],
+  },
 ];
 export function isRole(value: unknown): value is Role {
   return roleKeys.some((role) => role === value);

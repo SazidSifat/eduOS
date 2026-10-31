@@ -1,19 +1,25 @@
+import { uploadEvidence } from '../../_api/queries';
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useNavigate } from '@tanstack/react-router';
 import { z } from 'zod';
 import { Button, Input, Label } from '@eduos/ui';
 import { useDemo } from '../../_component/demo-provider';
-import { DEMO_TODAY, money } from '../../_component/demo-data';
+import { DEMO_TODAY, money } from '../../_component/school-format';
 import { amountOf, DemoForm, valueOf } from '../../_component/demo-form';
 import { DemoLink, EmptyState, Notice, PageHeading, Panel } from '../../_component/demo-ui';
 import type { Expense } from '../../_component/demo-model';
 
 export function ExpenseForm({ expenseId }: { expenseId: string }) {
-  const { state, dispatch, notify } = useDemo();
+  const { state, snapshot, dispatch, notify } = useDemo();
   const navigate = useNavigate();
+  const [newId] = useState(() => crypto.randomUUID());
   const expense = state.expenses.find((e) => e.id === expenseId);
   const [attachment, setAttachment] = useState(expense?.attachment ?? '');
+  const [uploading, setUploading] = useState(false);
+  const [evidenceName, setEvidenceName] = useState(
+    expense?.attachment ? 'Uploaded supporting document' : '',
+  );
   const [error, setError] = useState('');
   if (expense?.paid || expense?.status === 'approved')
     return (
@@ -25,18 +31,22 @@ export function ExpenseForm({ expenseId }: { expenseId: string }) {
         voucher.
       </EmptyState>
     );
-  function submit(values: Record<string, string>, draft = false) {
+  async function submit(values: Record<string, string>, draft = false) {
+    if (uploading) {
+      setError('Wait for the document upload to finish.');
+      return;
+    }
     const amount = amountOf(valueOf(values, 'amount'));
     if (!Number.isSafeInteger(amount) || amount <= 0) {
       setError('Enter a positive expense amount.');
       return;
     }
     if (!draft && state.settings.evidence === 'Required' && !attachment) {
-      setError('Attach supporting evidence or use the synthetic sample bill.');
+      setError('Upload supporting evidence before submitting.');
       return;
     }
     const item: Expense = {
-      id: expense?.id ?? `EXP-2026-${String(43 + state.expenses.length).padStart(4, '0')}`,
+      id: expense?.id ?? newId,
       description: valueOf(values, 'description'),
       category: valueOf(values, 'category'),
       payee: valueOf(values, 'payee'),
@@ -51,12 +61,12 @@ export function ExpenseForm({ expenseId }: { expenseId: string }) {
       history: [
         ...(expense?.history ?? []),
         draft
-          ? 'Rashed Islam saved a draft request.'
-          : 'Rashed Islam submitted the expense for review.',
+          ? `${snapshot.identity.name} saved a draft request.`
+          : `${snapshot.identity.name} submitted the expense for review.`,
       ],
       voucher: '',
     };
-    dispatch({ type: 'expense-save', expense: item });
+    if (!(await dispatch({ type: 'expense-save', expense: item }))) return;
     notify(
       draft ? 'Expense draft saved.' : 'Expense sent for approval. No payment has been recorded.',
     );
@@ -125,6 +135,7 @@ export function ExpenseForm({ expenseId }: { expenseId: string }) {
         ]}
         onSubmit={(values) => submit(values)}
         submitLabel="Submit for approval"
+        busy={uploading}
         footer={
           <>
             <DemoLink to="/expenses">Cancel</DemoLink>
@@ -134,7 +145,7 @@ export function ExpenseForm({ expenseId }: { expenseId: string }) {
       >
         <Panel
           title="Supporting evidence"
-          description="Use a synthetic bill. Only the file name is held in memory; nothing is uploaded."
+          description="Upload supporting documents to the school record. Only authorized school staff can download them."
         >
           <div className="demo-file demo-field">
             <Label htmlFor="expense-evidence">
@@ -144,7 +155,7 @@ export function ExpenseForm({ expenseId }: { expenseId: string }) {
               id="expense-evidence"
               type="file"
               accept=".pdf,.png,.jpg,.jpeg"
-              onChange={(e) => {
+              onChange={async (e) => {
                 const file = e.target.files?.item(0);
                 if (!file) return;
                 const parsed = z
@@ -158,26 +169,30 @@ export function ExpenseForm({ expenseId }: { expenseId: string }) {
                   setError('Choose a PDF, PNG or JPEG no larger than 5 MB.');
                   return;
                 }
-                setAttachment(file.name);
-                setError('');
+                setUploading(true);
+                try {
+                  const uploaded = await uploadEvidence(snapshot.institutionId, file);
+                  setAttachment(uploaded.id);
+                  setEvidenceName(uploaded.name);
+                  setError('');
+                } catch {
+                  setError('The document could not be uploaded. Retry before submitting.');
+                } finally {
+                  setUploading(false);
+                }
               }}
             />
             <div className="flex flex-wrap items-center justify-between gap-4">
-              <p>{attachment || 'No supporting document selected.'}</p>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setAttachment('synthetic-school-bill.pdf');
-                  setError('');
-                }}
-              >
-                Use sample bill
-              </Button>
+              <p>
+                {uploading
+                  ? 'Uploading document…'
+                  : evidenceName || 'No supporting document uploaded.'}
+              </p>
             </div>
           </div>
         </Panel>
         <Notice
-          title={`Approval threshold · ${money(Math.round(Number(state.settings.expenseThreshold ?? '5000') * 100))}`}
+          title={`Approval threshold · ${money(Math.round(Number(state.settings.expenseThreshold ?? '0') * 100))}`}
           tone="warning"
         >
           Requests are reviewed by {state.settings.expenseReviewer ?? 'Admin / Principal'}.

@@ -11,8 +11,13 @@ export async function requireApplicationEntry() {
     const school = schools[0];
     if (school)
       throw redirect({
-        to: '/institutions/$institutionId',
-        params: { institutionId: school.institutionId },
+        to:
+          school.role === 'teacher'
+            ? '/attendance'
+            : school.role === 'accountant'
+              ? '/fees'
+              : '/admissions',
+        search: { institutionId: school.institutionId },
         replace: true,
       });
   }

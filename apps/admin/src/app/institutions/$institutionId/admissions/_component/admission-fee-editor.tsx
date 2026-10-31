@@ -64,7 +64,7 @@ export function AdmissionFeeEditor({
     [initialFees, defaultAmount],
   );
   useEffect(() => {
-    if (!getValues('admissionFees')) replace(defaults);
+    if (!getValues('admissionFees')?.length) replace(defaults);
   }, [getValues, replace, defaults]);
   const total = (fees ?? []).reduce(
     (sum, item) => sum + (Number.isFinite(item.amountMinor) ? item.amountMinor : 0),

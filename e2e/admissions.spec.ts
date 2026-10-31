@@ -82,12 +82,13 @@ test('real school admission: follow-up, optional willing collection, conversion 
   await page.getByLabel('Email', { exact: true }).fill(school.input.firstAdmin.email);
   await page.getByLabel('Password', { exact: true }).fill(school.input.firstAdmin.password);
   await page.getByRole('button', { name: 'Sign in', exact: true }).click();
-  await expect(page).toHaveURL(new RegExp(`/institutions/${school.data.id}/admissions`));
+  await expect(page).toHaveURL(new RegExp(`/admissions(?:\\?|$)`));
   await expect(page.getByText('Your workspace', { exact: true })).toHaveCount(0);
   for (const entry of ['/login', '/', '/workspace']) {
     await page.goto(entry);
-    await expect(page).toHaveURL(new RegExp(`/institutions/${school.data.id}/admissions`));
+    await expect(page).toHaveURL(new RegExp(`/admissions(?:\\?|$)`));
   }
+  await page.goto(`/institutions/${school.data.id}/admissions`);
   await expect(page.getByRole('heading', { name: 'Follow-ups', exact: true })).toBeVisible();
   const navigation = page.getByRole('navigation', { name: 'School navigation' });
   await expect(
@@ -251,7 +252,8 @@ test('opens the full form without a setup screen and saves missing setup inline'
   await page.getByLabel('Email', { exact: true }).fill(unconfigured.input.firstAdmin.email);
   await page.getByLabel('Password', { exact: true }).fill(unconfigured.input.firstAdmin.password);
   await page.getByRole('button', { name: 'Sign in', exact: true }).click();
-  await expect(page).toHaveURL(new RegExp(`/institutions/${unconfigured.data.id}/admissions`));
+  await expect(page).toHaveURL(/\/admissions/);
+  await page.goto(`/institutions/${unconfigured.data.id}/admissions`);
   await page.getByRole('link', { name: 'New record', exact: true }).click();
   await expect(
     page.getByRole('heading', { name: 'New admission record', exact: true }),

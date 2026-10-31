@@ -5,7 +5,7 @@ description: Design or evolve EduOS HTTP contracts, including Zod schemas, error
 
 # API Contract Design
 
-Read root and API `AGENTS.md` instructions and `docs/architecture/backend.md`. Inspect `packages/contracts/src/index.ts`, `apps/api/src/app/openapi.ts`, `apps/api/src/app/create-app.ts`, `apps/api/src/lib/errors.ts` and the affected frontend API client before choosing a new convention. Paths are relative to the repository root.
+Read root and API `AGENTS.md` instructions and `docs/architecture/backend.md`. Inspect `packages/contracts/src/index.ts`, `apps/api/src/lib/openapi/openapi.ts`, `apps/api/src/app.ts`, `apps/api/src/lib/errors.ts` and the affected frontend API client before choosing a new convention. Paths are relative to the repository root.
 
 ## Define observable behavior
 
@@ -25,6 +25,6 @@ Return only fields needed by the consumer. Match successful runtime responses an
 
 ## Implementation and verification
 
-Keep route handling focused on validated inputs and service delegation. Update `apps/api/src/app/openapi.ts` for parameters, bodies, security and all implemented responses. Follow backend-module for implementation and auth-security when access rules change.
+Keep route handling focused on validated inputs and service delegation. Update `apps/api/src/lib/openapi/openapi.ts` for parameters, bodies, security and all implemented responses. Follow backend-module for implementation and auth-security when access rules change.
 
 Use [references/checks.md](references/checks.md) to choose contract tests. Report actual commands and outcomes under the root definition of done; a schema or OpenAPI document alone does not verify HTTP behavior.

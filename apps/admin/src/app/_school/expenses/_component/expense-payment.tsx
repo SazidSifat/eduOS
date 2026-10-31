@@ -3,7 +3,7 @@ import { Link } from '@tanstack/react-router';
 import { Button } from '@eduos/ui';
 import { Printer } from 'lucide-react';
 import { useDemo } from '../../_component/demo-provider';
-import { DEMO_TODAY, money } from '../../_component/demo-data';
+import { DEMO_TODAY, money } from '../../_component/school-format';
 import {
   DemoLink,
   Details,
@@ -56,11 +56,11 @@ export function ExpensePayment({ id }: { id: string }) {
         tone={expense.paid ? 'success' : 'warning'}
       >
         {expense.paid
-          ? 'The actual cash payment has been recorded in the synthetic ledger.'
+          ? 'The actual cash payment has been recorded in the school ledger.'
           : 'Record payment only after the approved cash amount has actually been paid.'}
       </Notice>
       <Panel
-        title={state.settings.name ?? 'Shapla Model School'}
+        title={state.settings.name ?? 'School'}
         description="School expense payment voucher"
         className="demo-receipt"
       >
@@ -71,8 +71,8 @@ export function ExpensePayment({ id }: { id: string }) {
             ['Description', expense.description],
             ['Approved amount', money(expense.amount)],
             ['Payment method', 'Cash'],
-            ['Payment date', DEMO_TODAY],
-            ['Recorded by', 'Nusrat Ahmed'],
+            ['Payment date', expense.paid ? (expense.paidOn ?? 'See audit history') : DEMO_TODAY],
+            ['Recorded by', expense.paidBy || 'Assigned cashier'],
             ['Voucher', expense.voucher || 'Created after payment confirmation'],
           ]}
         />
@@ -101,12 +101,12 @@ export function ExpensePayment({ id }: { id: string }) {
               </Link>
             </Button>
             <Button
-              onClick={() => {
+              onClick={async () => {
                 if (!confirmed) {
                   setError('Confirm the actual cash paid before recording this voucher.');
                   return;
                 }
-                dispatch({ type: 'expense-pay', id });
+                if (!(await dispatch({ type: 'expense-pay', id }))) return;
                 setError('');
                 notify(
                   'Cash payment recorded. The original expense and voucher remain in history.',

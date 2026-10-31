@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { DatePicker, Label } from '@eduos/ui';
 import { useDemo } from '../../_component/demo-provider';
-import { classes, DEMO_TODAY, roster } from '../../_component/demo-data';
+import { DEMO_TODAY } from '../../_component/school-format';
 import {
   Choice,
   DataTable,
@@ -12,18 +12,24 @@ import {
 } from '../../_component/demo-ui';
 
 export function AttendanceMonthly() {
-  const { state } = useDemo();
+  const { state, classes, roster } = useDemo();
   const [date, setDate] = useState(DEMO_TODAY);
-  const [classId, setClassId] = useState('3-a');
-  const [year, month] = date.split('-').map(Number);
+  const [classId, setClassId] = useState(classes[0]?.id ?? '');
+  const year = Number(date.slice(0, 4));
+  const month = Number(date.slice(5, 7));
   const days = Array.from(
-    { length: new Date(Date.UTC(year ?? 2026, month ?? 10, 0)).getUTCDate() },
+    { length: new Date(Date.UTC(year, month, 0)).getUTCDate() },
     (_, i) => `${date.slice(0, 7)}-${String(i + 1).padStart(2, '0')}`,
   );
   const registers = state.registers.filter(
     (r) => r.classId === classId && r.date.startsWith(date.slice(0, 7)) && r.submitted,
   );
-  const students = roster(classId);
+  const students = roster(classId).filter(
+    (student) =>
+      registers.some((register) => Object.hasOwn(register.marks, student.id)) ||
+      ((student.startsOn === null || student.startsOn <= (days.at(-1) ?? date)) &&
+        (student.endsOn === null || student.endsOn >= (days[0] ?? date))),
+  );
   const includeLate = state.settings.lateIncluded !== 'no';
   function counts(id: string) {
     const present = registers.filter((r) => r.marks[id] === 'Present').length;
@@ -47,7 +53,7 @@ export function AttendanceMonthly() {
         description="Review daily statuses, repeated absence and missing registers."
         action={
           <ExportButton
-            filename="class-attendance-demo"
+            filename="class-attendance"
             headers={['Student', 'Present', 'Absent', 'Late', 'Attendance rate']}
             rows={students.map((s) => {
               const c = counts(s.id);
@@ -65,7 +71,13 @@ export function AttendanceMonthly() {
       <div className="demo-filters">
         <div>
           <Label htmlFor="monthly-date">Month containing</Label>
-          <DatePicker id="monthly-date" value={date} onValueChange={setDate} />
+          <DatePicker
+            id="monthly-date"
+            value={date}
+            onValueChange={(value) => {
+              if (value) setDate(value);
+            }}
+          />
         </div>
         <Choice
           id="monthly-class"
@@ -97,7 +109,11 @@ export function AttendanceMonthly() {
             value: rates.filter((rate) => rate < 80).length,
             detail: 'Review absence history',
           },
-          { label: 'Active roster', value: students.length, detail: 'Current class enrollments' },
+          {
+            label: 'Month roster',
+            value: students.length,
+            detail: 'Enrollment during selected month',
+          },
         ]}
       />
       <p className="demo-help">
@@ -117,11 +133,19 @@ export function AttendanceMonthly() {
                   <strong>{s.name}</strong>
                 </td>
                 {days.map((day) => {
-                  const weekday = new Date(`${day}T12:00:00+06:00`).getUTCDay();
+                  const weekday = new Intl.DateTimeFormat('en-GB', {
+                    timeZone: state.settings.timezone ?? 'Asia/Dhaka',
+                    weekday: 'long',
+                  }).format(new Date(`${day}T12:00:00+06:00`));
+                  const closed =
+                    (state.settings.weeklyClosure ?? '')
+                      .split(',')
+                      .map((s) => s.trim())
+                      .includes(weekday) || state.settings.holidayDate === day;
                   const mark = registers.find((r) => r.date === day)?.marks[s.id];
                   return (
                     <td key={day} className={mark === 'Absent' ? 'text-destructive' : ''}>
-                      {mark ? mark.slice(0, 1) : [5, 6].includes(weekday) ? 'H' : '—'}
+                      {mark ? mark.slice(0, 1) : closed ? 'H' : '—'}
                     </td>
                   );
                 })}

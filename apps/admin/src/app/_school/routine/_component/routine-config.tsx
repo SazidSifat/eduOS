@@ -5,10 +5,10 @@ import { Plus, Trash2 } from 'lucide-react';
 import { useDemo } from '../../_component/demo-provider';
 import { DemoForm, valueOf } from '../../_component/demo-form';
 import { DemoLink, Notice, PageHeading, Panel } from '../../_component/demo-ui';
-import { validPeriods } from './routine-model';
+import { validPeriods } from './routine-validation';
 
 export function RoutineConfig() {
-  const { state, dispatch, notify } = useDemo();
+  const { state, snapshot, dispatch, notify } = useDemo();
   const navigate = useNavigate();
   const [days, setDays] = useState(state.routine.days);
   const [periods, setPeriods] = useState(state.routine.periods.map((p) => ({ ...p })));
@@ -32,14 +32,15 @@ export function RoutineConfig() {
               {
                 name: 'className',
                 label: 'Class / section',
-                value: state.routine.className,
-                options: ['Class 3 · A', 'Class 4 · A', 'Class 5 · B'],
+                value: state.routine.classId ?? snapshot.classes[0]?.id ?? '',
+                options: snapshot.classes.map((c) => c.id),
+                optionLabels: Object.fromEntries(snapshot.classes.map((c) => [c.id, c.label])),
                 required: true,
               },
               {
                 name: 'session',
                 label: 'Academic session',
-                value: state.settings.session ?? '2026',
+                value: state.settings.session ?? '',
                 readOnly: true,
               },
               {
@@ -54,20 +55,27 @@ export function RoutineConfig() {
         ]}
         submitLabel="Continue to lesson builder"
         footer={<DemoLink to="/routine">Cancel</DemoLink>}
-        onSubmit={(values) => {
+        onSubmit={async (values) => {
           if (!days.length || !validPeriods(periods)) {
             setError(
               'Choose at least one teaching day. Every period needs valid, non-overlapping start and end times.',
             );
             return;
           }
-          dispatch({
-            type: 'routine-configure',
-            days,
-            periods,
-            effective: valueOf(values, 'effective'),
-            className: valueOf(values, 'className'),
-          });
+          if (
+            !(await dispatch({
+              type: 'routine-configure',
+              days,
+              periods,
+              effective: valueOf(values, 'effective'),
+              classId: valueOf(values, 'className'),
+              className:
+                snapshot.classes
+                  .find((c) => c.id === valueOf(values, 'className'))
+                  ?.label.replace(/ \(.*\)$/, '') ?? '',
+            }))
+          )
+            return;
           notify('Routine structure saved as a draft.');
           void navigate({ to: '/routine' });
         }}
@@ -153,7 +161,7 @@ export function RoutineConfig() {
                   setPeriods((current) => [
                     ...current,
                     {
-                      id: String(Math.max(...current.map((p) => Number(p.id))) + 1),
+                      id: String(Math.max(0, ...current.map((p) => Number(p.id))) + 1),
                       start: last?.end ?? '08:00',
                       end: `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`,
                     },

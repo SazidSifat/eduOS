@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { Link, Outlet, useLocation } from '@tanstack/react-router';
-import { Menu, RotateCcw, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { Button } from '@eduos/ui';
 import { ThemeToggle } from '../../../components/layout/theme-toggle';
 import { DemoProvider, useDemo } from './demo-provider';
+import { SignOutButton } from '../../../components/layout/sign-out-button';
 import { DemoNavigation } from './demo-navigation';
+import { canOpenSchoolPath } from './school-access';
 import './demo.css';
 
 export function DemoLayout() {
@@ -15,7 +17,7 @@ export function DemoLayout() {
   );
 }
 function DemoShell() {
-  const { state, dispatch, message, notify } = useDemo();
+  const { state, snapshot, busy, message } = useDemo();
   const [open, setOpen] = useState(false);
   const path = useLocation().pathname;
   const module = path.split('/')[1] ?? 'admissions';
@@ -47,25 +49,15 @@ function DemoShell() {
             eduOS
           </Link>
           <p className="font-semibold">{state.settings.name}</p>
-          <p className="demo-help">Institution SCH-042 · Dhaka</p>
+          <p className="demo-help">Institution {state.settings.code}</p>
         </div>
         <DemoNavigation close={() => setOpen(false)} />
         <div className="demo-account">
-          <p className="font-semibold">Nusrat Ahmed</p>
-          <p className="demo-help">Institution Admin · Demo</p>
+          <p className="font-semibold">{snapshot.identity.name}</p>
+          <p className="demo-help">{snapshot.identity.role}</p>
           <div className="mt-4 flex items-center justify-between">
             <ThemeToggle />
-            <Button
-              variant="ghost"
-              aria-label="Reset demo data"
-              onClick={() => {
-                dispatch({ type: 'reset' });
-                notify('Demo data reset. The original synthetic examples are restored.');
-              }}
-            >
-              <RotateCcw size={16} aria-hidden="true" />
-              Reset demo
-            </Button>
+            <SignOutButton />
           </div>
           <Link
             to="/login"
@@ -82,11 +74,9 @@ function DemoShell() {
             School workspace /{' '}
             <span className="capitalize">{module === 'fees' ? 'Fee collection' : module}</span>
           </p>
-          <span>Session {state.settings.session} · Asia/Dhaka</span>
-        </div>
-        <div className="demo-preview-banner demo-print-hide">
-          <strong>Demo data</strong>
-          <span>Synthetic school records. Changes stay in this tab and reset on reload.</span>
+          <span>
+            Session {state.settings.session || 'Not configured'} · {state.settings.timezone}
+          </span>
         </div>
         <output
           aria-live="polite"
@@ -94,9 +84,31 @@ function DemoShell() {
         >
           {message}
         </output>
-        <div className="demo-page">
-          <Outlet />
-        </div>
+        <fieldset
+          disabled={busy}
+          aria-busy={busy}
+          className="demo-page min-w-0 border-0 p-0 w-full"
+        >
+          <div className="demo-page">
+            {canOpenSchoolPath(snapshot, path) ? (
+              <Outlet />
+            ) : (
+              <section role="alert">
+                <h1>School module unavailable</h1>
+                <p>Your role or the school module settings do not grant access to this screen.</p>
+                <div className="demo-actions">
+                  {(['/attendance', '/fees', '/expenses', '/routine/teacher', '/settings'] as const)
+                    .filter((to) => canOpenSchoolPath(snapshot, to))
+                    .map((to) => (
+                      <Link key={to} to={to}>
+                        Open {to.slice(1)}
+                      </Link>
+                    ))}
+                </div>
+              </section>
+            )}
+          </div>
+        </fieldset>
       </main>
     </div>
   );

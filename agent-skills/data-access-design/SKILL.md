@@ -5,7 +5,7 @@ description: Design or improve EduOS Drizzle queries and PostgreSQL transaction 
 
 # Data Access Design
 
-Read root and database `AGENTS.md` instructions, `docs/architecture/database.md` and `docs/architecture/multi-tenancy.md`. Inspect the affected schema, committed migrations, `packages/database/src/client/index.ts` and the nearest capability service. `apps/api/src/modules/identity/service.ts` demonstrates membership checks repeated in the data query. Paths are relative to the repository root.
+Read root and database `AGENTS.md` instructions, `docs/architecture/database.md` and `docs/architecture/multi-tenancy.md`. Inspect the affected schema, committed migrations, `packages/database/src/client/index.ts` and the nearest capability service. `apps/api/src/services/identity/identity.service.ts` demonstrates membership checks repeated in the data query. Paths are relative to the repository root.
 
 ## Trace ownership and access patterns
 

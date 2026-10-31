@@ -38,8 +38,14 @@ export function SchoolChooser({ userId }: { userId: string }) {
               {schools.map((school) => (
                 <li key={school.institutionId}>
                   <Link
-                    to="/institutions/$institutionId"
-                    params={{ institutionId: school.institutionId }}
+                    to={
+                      school.role === 'teacher'
+                        ? '/attendance'
+                        : school.role === 'accountant'
+                          ? '/fees'
+                          : '/admissions'
+                    }
+                    search={{ institutionId: school.institutionId }}
                     className="flex items-center justify-between gap-4 p-5 transition-colors duration-150 ease-out hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring"
                   >
                     <span>

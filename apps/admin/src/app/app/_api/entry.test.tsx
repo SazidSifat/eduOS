@@ -29,7 +29,10 @@ async function expectDestination(action: () => Promise<unknown>, to: string, id?
     if (!isRedirect(error)) throw error;
     expect(error.options.to).toBe(to);
     expect(error.options.replace).toBe(true);
-    if (id) expect(error.options.params).toEqual({ institutionId: id });
+    if (id)
+      expect(to.startsWith('/institutions') ? error.options.params : error.options.search).toEqual({
+        institutionId: id,
+      });
   }
 }
 it('opens the only assigned school directly and ignores unassigned memberships', async () => {
@@ -37,7 +40,7 @@ it('opens the only assigned school directly and ignores unassigned memberships',
     membership,
     { ...membership, institutionId: '10000000-0000-4000-8000-000000000002', role: null },
   ]);
-  await expectDestination(requireApplicationEntry, '/institutions/$institutionId', institutionId);
+  await expectDestination(requireApplicationEntry, '/admissions', institutionId);
 });
 it('keeps a chooser when more than one school role is assigned', async () => {
   fetchQuery.mockResolvedValue([
@@ -80,3 +83,11 @@ it.each([new ApiError(403), new ApiError(500), new TypeError('Failed to fetch')]
     await expect(requireSchoolApplication({ params: { institutionId } })).rejects.toBe(error);
   },
 );
+
+it.each([
+  ['teacher', '/attendance'],
+  ['accountant', '/fees'],
+] as const)('opens the %s school home', async (role, to) => {
+  fetchQuery.mockResolvedValue([{ ...membership, role }]);
+  await expectDestination(requireApplicationEntry, to, institutionId);
+});

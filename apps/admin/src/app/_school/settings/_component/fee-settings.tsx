@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { z } from 'zod';
 import { Button } from '@eduos/ui';
 import { useDemo } from '../../_component/demo-provider';
-import { money } from '../../_component/demo-data';
+import { money } from '../../_component/school-format';
 import { AdmissionFees, demoFeeSchema } from '../../admissions/_component/admission-fees';
 import { DataTable, Notice, PageHeading, Panel, Status } from '../../_component/demo-ui';
 
@@ -24,13 +24,13 @@ export function FeeSettings() {
       <AdmissionFees fees={fees} onChange={setFees} credit={0} />
       <div className="demo-actions">
         <Button
-          onClick={() => {
+          onClick={async () => {
             const parsed = z.array(demoFeeSchema).min(1).safeParse(fees);
             if (!parsed.success) {
               setError(parsed.error.issues[0]?.message ?? 'Review fees.');
               return;
             }
-            dispatch({ type: 'fee-defaults', fees });
+            if (!(await dispatch({ type: 'fee-defaults', fees }))) return;
             setError('');
             notify(
               'Fee defaults saved. New admissions use these items; existing charges and receipts retain their values.',
@@ -64,8 +64,8 @@ export function FeeSettings() {
                   variant="outline"
                   size="sm"
                   disabled={!s.active}
-                  onClick={() => {
-                    dispatch({ type: 'schedule-stop', id: s.id });
+                  onClick={async () => {
+                    if (!(await dispatch({ type: 'schedule-stop', id: s.id }))) return;
                     notify('Future billing stopped. Existing financial records are unchanged.');
                   }}
                 >

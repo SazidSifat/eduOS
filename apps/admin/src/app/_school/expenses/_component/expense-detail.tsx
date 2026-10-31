@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { config } from '../../../../lib/config';
+import { schoolBase } from '../../_api/queries';
 import { Link } from '@tanstack/react-router';
 import { Button } from '@eduos/ui';
 import { useDemo } from '../../_component/demo-provider';
-import { money } from '../../_component/demo-data';
+import { money } from '../../_component/school-format';
 import { DemoForm, valueOf } from '../../_component/demo-form';
 import {
   DemoLink,
@@ -15,8 +16,7 @@ import {
 } from '../../_component/demo-ui';
 
 export function ExpenseDetail({ id }: { id: string }) {
-  const { state, dispatch, notify } = useDemo();
-  const [preview, setPreview] = useState(false);
+  const { state, snapshot, dispatch, notify } = useDemo();
   const expense = state.expenses.find((e) => e.id === id);
   if (!expense)
     return (
@@ -24,7 +24,7 @@ export function ExpenseDetail({ id }: { id: string }) {
         title="Expense unavailable"
         action={<DemoLink to="/expenses">Open expense register</DemoLink>}
       >
-        This expense is not in the current synthetic data.
+        This expense is not in this school.
       </EmptyState>
     );
   return (
@@ -51,57 +51,71 @@ export function ExpenseDetail({ id }: { id: string }) {
               ['Amount', money(expense.amount)],
               ['Expense date', expense.date],
               ['Reference', expense.reference || 'Not supplied'],
-              ['Requested by', 'Rashed Islam'],
+              ['Request history', 'See the audit entries below'],
               ['Payment state', expense.paid ? 'Paid' : 'Not paid'],
             ]}
           />
           {expense.notes && <p className="mt-6 text-muted-foreground">{expense.notes}</p>}
         </Panel>
         {expense.status === 'pending' ? (
-          <DemoForm
-            sections={[
-              {
-                title: 'Review decision',
-                description: 'Review the supporting evidence before authorizing this expense.',
-                fields: [
-                  {
-                    name: 'note',
-                    label: 'Reviewer note',
-                    kind: 'textarea',
-                    wide: true,
-                    required: true,
-                    value: expense.reviewNote,
-                  },
-                ],
-              },
-            ]}
-            submitLabel="Approve expense"
-            onSubmit={(values) => {
-              dispatch({
-                type: 'expense-review',
-                id,
-                approved: true,
-                note: valueOf(values, 'note'),
-              });
-              notify('Expense approved. An actual cash payment must still be recorded.');
-            }}
-            footer={
-              <Button
-                onClick={() => {
-                  dispatch({
+          <fieldset
+            disabled={!snapshot.permissions.includes('expenses.review')}
+            className="min-w-0 border-0 p-0"
+          >
+            {!snapshot.permissions.includes('expenses.review') && (
+              <p className="demo-help">An Admin or Principal must review this request.</p>
+            )}
+            <DemoForm
+              sections={[
+                {
+                  title: 'Review decision',
+                  description: 'Review the supporting evidence before authorizing this expense.',
+                  fields: [
+                    {
+                      name: 'note',
+                      label: 'Reviewer note',
+                      kind: 'textarea',
+                      wide: true,
+                      required: true,
+                      value: expense.reviewNote,
+                    },
+                  ],
+                },
+              ]}
+              submitLabel="Approve expense"
+              onSubmit={async (values) => {
+                if (
+                  !(await dispatch({
                     type: 'expense-review',
                     id,
-                    approved: false,
-                    note: 'Please review the amount and supporting evidence.',
-                  });
-                  notify('Expense returned for changes. No payment was recorded.');
-                }}
-                variant="outline"
-              >
-                Return for changes
-              </Button>
-            }
-          />
+                    approved: true,
+                    note: valueOf(values, 'note'),
+                  }))
+                )
+                  return;
+                notify('Expense approved. An actual cash payment must still be recorded.');
+              }}
+              footer={
+                <Button
+                  onClick={async () => {
+                    if (
+                      !(await dispatch({
+                        type: 'expense-review',
+                        id,
+                        approved: false,
+                        note: 'Please review the amount and supporting evidence.',
+                      }))
+                    )
+                      return;
+                    notify('Expense returned for changes. No payment was recorded.');
+                  }}
+                  variant="outline"
+                >
+                  Return for changes
+                </Button>
+              }
+            />
+          </fieldset>
         ) : (
           <Panel
             title={
@@ -130,15 +144,18 @@ export function ExpenseDetail({ id }: { id: string }) {
                 </Button>
                 <Button
                   className="mt-4"
-                  onClick={() => {
-                    dispatch({
-                      type: 'expense-save',
-                      expense: {
-                        ...expense,
-                        status: 'pending',
-                        history: [...expense.history, 'Request submitted for review.'],
-                      },
-                    });
+                  onClick={async () => {
+                    if (
+                      !(await dispatch({
+                        type: 'expense-save',
+                        expense: {
+                          ...expense,
+                          status: 'pending',
+                          history: [...expense.history, 'Request submitted for review.'],
+                        },
+                      }))
+                    )
+                      return;
                     notify('Expense submitted for review.');
                   }}
                 >
@@ -153,29 +170,18 @@ export function ExpenseDetail({ id }: { id: string }) {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="font-semibold">{expense.attachment || 'No attachment'}</p>
-            <p className="demo-help mt-1">Synthetic document metadata · No upload to a server</p>
+            <p className="demo-help mt-1">Stored supporting document · School access required</p>
           </div>
-          <Button
-            variant="outline"
-            disabled={!expense.attachment}
-            onClick={() => setPreview((value) => !value)}
-          >
-            {preview ? 'Hide bill preview' : 'Preview bill'}
-          </Button>
+          {expense.attachment && (
+            <Button asChild variant="outline">
+              <a
+                href={`${config.VITE_API_BASE_URL}${schoolBase(snapshot.institutionId)}/evidence/${encodeURIComponent(expense.attachment)}`}
+              >
+                Download evidence
+              </a>
+            </Button>
+          )}
         </div>
-        {preview && (
-          <div className="mt-5 rounded-md border border-border bg-muted p-6">
-            <p className="font-semibold">SYNTHETIC SCHOOL BILL</p>
-            <Details
-              items={[
-                ['Payee', expense.payee],
-                ['Description', expense.description],
-                ['Amount', money(expense.amount)],
-                ['Reference', expense.reference],
-              ]}
-            />
-          </div>
-        )}
       </Panel>
       <Panel title="Audit history">
         <ol className="demo-history">

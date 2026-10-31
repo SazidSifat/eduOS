@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from '@eduos/ui';
 import { z } from 'zod';
 import { useDemo } from '../../_component/demo-provider';
-import { roster } from '../../_component/demo-data';
+
 import { DemoForm, valueOf } from '../../_component/demo-form';
 import {
   Choice,
@@ -14,18 +14,13 @@ import {
 } from '../../_component/demo-ui';
 
 export function AttendanceCorrections() {
-  const { state, dispatch, notify } = useDemo();
+  const { state, dispatch, notify, roster, snapshot } = useDemo();
   const submitted = state.registers.filter((r) => r.submitted);
-  const [registerId, setRegisterId] = useState(
-    () =>
-      submitted.find((r) => r.date === '2026-10-25' && r.classId === '3-a')?.id ??
-      submitted[0]?.id ??
-      '',
-  );
+  const [registerId, setRegisterId] = useState(() => submitted[0]?.id ?? '');
   const [error, setError] = useState('');
   const register = submitted.find((r) => r.id === registerId);
   const options = register
-    ? roster(register.classId).map((s) => `${s.name} · ${register.marks[s.id]}`)
+    ? roster(register.classId, register.date).map((s) => `${s.name} · ${register.marks[s.id]}`)
     : [];
   return (
     <>
@@ -35,7 +30,7 @@ export function AttendanceCorrections() {
       />
       <Notice title="Original attendance is retained">
         A request records the original status, proposed status and reason. An authorized school
-        reviewer approves or rejects it. The demo shows both sides of the workflow.
+        reviewer approves or rejects it. Review actions are available to authorized reviewers.
       </Notice>
       {error && (
         <Notice title="Correction not sent" tone="danger">
@@ -89,8 +84,8 @@ export function AttendanceCorrections() {
               },
             ]}
             submitLabel="Send correction request"
-            onSubmit={(values) => {
-              const student = roster(register.classId).find(
+            onSubmit={async (values) => {
+              const student = roster(register.classId, register.date).find(
                 (s) => `${s.name} · ${register.marks[s.id]}` === valueOf(values, 'student'),
               );
               const proposed = z
@@ -112,18 +107,21 @@ export function AttendanceCorrections() {
                 setError('This student already has a pending correction for the register.');
                 return;
               }
-              dispatch({
-                type: 'correction-request',
-                correction: {
-                  id: `COR-${state.corrections.length + 1}`,
-                  registerId: register.id,
-                  studentId: student.id,
-                  original,
-                  proposed: proposed.data,
-                  reason: valueOf(values, 'reason'),
-                  status: 'pending',
-                },
-              });
+              if (
+                !(await dispatch({
+                  type: 'correction-request',
+                  correction: {
+                    id: crypto.randomUUID(),
+                    registerId: register.id,
+                    studentId: student.id,
+                    original,
+                    proposed: proposed.data,
+                    reason: valueOf(values, 'reason'),
+                    status: 'pending',
+                  },
+                }))
+              )
+                return;
               setError('');
               notify('Correction sent for school review. The original register is unchanged.');
             }}
@@ -140,7 +138,7 @@ export function AttendanceCorrections() {
             return (
               <tr key={c.id}>
                 <td>
-                  {roster(r?.classId ?? '3-a').find((s) => s.id === c.studentId)?.name}
+                  {roster(r?.classId ?? '', r?.date).find((s) => s.id === c.studentId)?.name}
                   <small>
                     {r?.date} · {r?.classId}
                   </small>
@@ -162,12 +160,19 @@ export function AttendanceCorrections() {
                   </Status>
                 </td>
                 <td>
-                  {c.status === 'pending' ? (
+                  {c.status === 'pending' && snapshot.permissions.includes('attendance.review') ? (
                     <div className="demo-row-actions">
                       <Button
                         size="sm"
-                        onClick={() => {
-                          dispatch({ type: 'correction-review', id: c.id, approved: true });
+                        onClick={async () => {
+                          if (
+                            !(await dispatch({
+                              type: 'correction-review',
+                              id: c.id,
+                              approved: true,
+                            }))
+                          )
+                            return;
                           notify(
                             'Correction approved. The original status is retained in this audit record.',
                           );

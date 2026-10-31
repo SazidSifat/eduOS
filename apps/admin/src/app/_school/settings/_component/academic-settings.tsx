@@ -4,6 +4,7 @@ import { Button } from '@eduos/ui';
 import { useDemo } from '../../_component/demo-provider';
 import { DemoForm, valueOf } from '../../_component/demo-form';
 import { DataTable, Notice, PageHeading, Status } from '../../_component/demo-ui';
+import { EnrollmentDates } from './enrollment-dates';
 
 export function AcademicSettings() {
   const { state, dispatch, notify } = useDemo();
@@ -35,7 +36,7 @@ export function AcademicSettings() {
               {
                 name: 'session',
                 label: 'Session name',
-                value: state.settings.session ?? '2026',
+                value: state.settings.session ?? '',
                 required: true,
               },
               {
@@ -56,12 +57,12 @@ export function AcademicSettings() {
           },
         ]}
         submitLabel="Save session"
-        onSubmit={(values) => {
+        onSubmit={async (values) => {
           if (valueOf(values, 'start') > valueOf(values, 'end')) {
             setError('The session end must be on or after its start.');
             return;
           }
-          dispatch({ type: 'settings-save', values });
+          if (!(await dispatch({ type: 'settings-save', values }))) return;
           setError('');
           notify('Academic session updated.');
         }}
@@ -81,7 +82,7 @@ export function AcademicSettings() {
             <td>{o.session}</td>
             <td>{o.sections}</td>
             <td>{o.capacity}</td>
-            <td>{o.teacher}</td>
+            <td>{state.members.find((m) => m.id === o.teacher)?.name ?? 'Unassigned'}</td>
             <td>
               <Status tone={o.active ? 'success' : 'neutral'}>
                 {o.active ? 'Open' : 'Closed'}
@@ -119,7 +120,7 @@ export function AcademicSettings() {
                 {
                   name: 'session',
                   label: 'Session',
-                  value: offering?.session ?? state.settings.session ?? '2026',
+                  value: offering?.session ?? state.settings.session ?? '',
                   required: true,
                 },
                 {
@@ -132,14 +133,20 @@ export function AcademicSettings() {
                 {
                   name: 'capacity',
                   label: 'Capacity per section',
-                  value: offering?.capacity ?? '36',
+                  value: offering?.capacity ?? '',
                   required: true,
                 },
                 {
                   name: 'teacher',
                   label: 'Class teacher',
-                  value: offering?.teacher ?? 'Farhana Akter',
-                  options: ['Farhana Akter', 'Sadia Karim', 'Sharmin Begum', 'Imran Hossain'],
+                  value:
+                    offering?.teacher ??
+                    state.members.find((m) => m.role === 'Teacher' && m.active)?.id ??
+                    '',
+                  options: state.members
+                    .filter((m) => m.role === 'Teacher' && m.active)
+                    .map((m) => m.id),
+                  optionLabels: Object.fromEntries(state.members.map((m) => [m.id, m.name])),
                 },
                 {
                   name: 'active',
@@ -156,7 +163,7 @@ export function AcademicSettings() {
               Cancel
             </Button>
           }
-          onSubmit={(values) => {
+          onSubmit={async (values) => {
             if (
               !z.coerce.number().int().positive().safeParse(valueOf(values, 'capacity')).success
             ) {
@@ -175,24 +182,28 @@ export function AcademicSettings() {
               );
               return;
             }
-            dispatch({
-              type: 'offering-save',
-              offering: {
-                id: offering?.id ?? `offering-${state.offerings.length + 1}`,
-                className,
-                session,
-                sections: valueOf(values, 'sections'),
-                capacity: valueOf(values, 'capacity'),
-                teacher: valueOf(values, 'teacher'),
-                active: valueOf(values, 'active') === 'yes',
-              },
-            });
+            if (
+              !(await dispatch({
+                type: 'offering-save',
+                offering: {
+                  id: offering?.id ?? crypto.randomUUID(),
+                  className,
+                  session,
+                  sections: valueOf(values, 'sections'),
+                  capacity: valueOf(values, 'capacity'),
+                  teacher: valueOf(values, 'teacher'),
+                  active: valueOf(values, 'active') === 'yes',
+                },
+              }))
+            )
+              return;
             setShowForm(false);
             setError('');
             notify('Class offering saved. New intake forms use the updated offerings.');
           }}
         />
       )}
+      <EnrollmentDates />
       <Notice title="Keep academic history">
         A new academic session uses new enrollments and assignments. Prior attendance and published
         routines remain in their history.

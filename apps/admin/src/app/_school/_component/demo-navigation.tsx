@@ -8,6 +8,8 @@ import {
   Settings2,
   Wallet,
 } from 'lucide-react';
+import { useDemo } from './demo-provider';
+import { canOpenSchoolPath } from './school-access';
 import type { DemoPath } from './demo-ui';
 
 const groups = [
@@ -16,10 +18,10 @@ const groups = [
     root: '/admissions',
     icon: GraduationCap,
     children: [
-      ['Follow-ups', '/admissions'],
-      ['Willing students', '/admissions/willing'],
-      ['Admitted students', '/admissions/admitted'],
-      ['Closed records', '/admissions/closed'],
+      { label: 'Follow-ups', to: '/admissions' },
+      { label: 'Willing students', to: '/admissions/willing' },
+      { label: 'Admitted students', to: '/admissions/admitted' },
+      { label: 'Closed records', to: '/admissions/closed' },
     ],
   },
   {
@@ -27,10 +29,10 @@ const groups = [
     root: '/attendance',
     icon: ClipboardCheck,
     children: [
-      ['Daily register', '/attendance'],
-      ['Monthly report', '/attendance/monthly'],
-      ['Corrections', '/attendance/corrections'],
-      ['Mobile classes', '/attendance/classes'],
+      { label: 'Daily register', to: '/attendance' },
+      { label: 'Monthly report', to: '/attendance/monthly' },
+      { label: 'Corrections', to: '/attendance/corrections' },
+      { label: 'Mobile classes', to: '/attendance/classes' },
     ],
   },
   {
@@ -38,9 +40,9 @@ const groups = [
     root: '/fees',
     icon: Wallet,
     children: [
-      ['Collect payment', '/fees'],
-      ['Outstanding dues', '/fees/dues'],
-      ['Collection report', '/fees/report'],
+      { label: 'Collect payment', to: '/fees' },
+      { label: 'Outstanding dues', to: '/fees/dues' },
+      { label: 'Collection report', to: '/fees/report' },
     ],
   },
   {
@@ -48,9 +50,9 @@ const groups = [
     root: '/expenses',
     icon: Receipt,
     children: [
-      ['Expense register', '/expenses'],
-      ['New expense', '/expenses/new'],
-      ['Expense report', '/expenses/report'],
+      { label: 'Expense register', to: '/expenses' },
+      { label: 'New expense', to: '/expenses/new' },
+      { label: 'Expense report', to: '/expenses/report' },
     ],
   },
   {
@@ -58,9 +60,9 @@ const groups = [
     root: '/routine',
     icon: CalendarDays,
     children: [
-      ['Class routine', '/routine'],
-      ['Create routine', '/routine/new'],
-      ['Teacher routine', '/routine/teacher'],
+      { label: 'Class routine', to: '/routine' },
+      { label: 'Create routine', to: '/routine/new' },
+      { label: 'Teacher routine', to: '/routine/teacher' },
     ],
   },
   {
@@ -68,53 +70,64 @@ const groups = [
     root: '/settings',
     icon: Settings2,
     children: [
-      ['Overview', '/settings'],
-      ['School profile', '/settings/school'],
-      ['Academics', '/settings/academics'],
-      ['People & access', '/settings/people'],
-      ['Admissions', '/settings/admissions'],
-      ['Attendance', '/settings/attendance'],
-      ['Fees & schedules', '/settings/fees'],
-      ['Expense policy', '/settings/expenses'],
+      { label: 'Overview', to: '/settings' },
+      { label: 'School profile', to: '/settings/school' },
+      { label: 'Academics', to: '/settings/academics' },
+      { label: 'People & access', to: '/settings/people' },
+      { label: 'Admissions', to: '/settings/admissions' },
+      { label: 'Attendance', to: '/settings/attendance' },
+      { label: 'Fees & schedules', to: '/settings/fees' },
+      { label: 'Expense policy', to: '/settings/expenses' },
     ],
   },
 ] satisfies {
   label: string;
   root: DemoPath;
   icon: typeof GraduationCap;
-  children: [string, DemoPath][];
+  children: { label: string; to: DemoPath }[];
 }[];
 
 export function DemoNavigation({ close }: { close: () => void }) {
+  const { snapshot } = useDemo();
   const location = useLocation();
-  const path = location.pathname.replace(/\/$/, '');
+  const path = location.pathname.replace(/\/$/, '') || '/';
+
   return (
-    <nav aria-label="Demo school navigation" className="demo-navigation">
-      {groups.map((group) => {
-        const active = path.startsWith(group.root);
-        const Icon = group.icon;
-        return (
-          <details key={`${group.label}-${active}`} open={active}>
-            <summary className={active ? 'demo-nav-active' : ''}>
-              <Icon size={16} aria-hidden="true" />
-              <span>{group.label}</span>
-              <ChevronDown size={14} aria-hidden="true" />
-            </summary>
-            <div className="demo-nav-children">
-              {group.children.map(([label, to]) => (
-                <Link
-                  key={to}
-                  to={to}
-                  onClick={close}
-                  aria-current={path === to ? 'page' : undefined}
-                >
-                  {label}
-                </Link>
-              ))}
-            </div>
-          </details>
-        );
-      })}
+    <nav aria-label="School navigation" className="demo-navigation">
+      {groups
+        .filter((group) => group.children.some((child) => canOpenSchoolPath(snapshot, child.to)))
+        .map((group) => {
+          const isGroupActive = path === group.root || path.startsWith(`${group.root}/`);
+          const Icon = group.icon;
+          return (
+            <details key={group.label} open={isGroupActive} className="demo-nav-group">
+              <summary className={`demo-nav-summary ${isGroupActive ? 'demo-nav-active' : ''}`}>
+                <Icon size={16} aria-hidden="true" />
+                <span>{group.label}</span>
+                <ChevronDown size={14} aria-hidden="true" className="demo-nav-chevron" />
+              </summary>
+              <div className="demo-nav-children">
+                {group.children
+                  .filter((child) => canOpenSchoolPath(snapshot, child.to))
+                  .map((child) => {
+                    const isChildActive = path === child.to;
+                    return (
+                      <Link
+                        key={child.to}
+                        to={child.to}
+                        onClick={close}
+                        activeOptions={{ exact: true }}
+                        className={`demo-nav-sublink ${isChildActive ? 'demo-nav-sublink-active' : ''}`}
+                        aria-current={isChildActive ? 'page' : undefined}
+                      >
+                        {child.label}
+                      </Link>
+                    );
+                  })}
+              </div>
+            </details>
+          );
+        })}
     </nav>
   );
 }

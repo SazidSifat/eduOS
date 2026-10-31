@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { Button } from '@eduos/ui';
 import { useDemo } from '../../_component/demo-provider';
-import { money } from '../../_component/demo-data';
-import { receiptId } from '../../_component/demo-finance';
+import { money } from '../../_component/school-format';
+
 import {
   DataTable,
   DemoLink,
@@ -15,7 +15,7 @@ import {
 } from '../../_component/demo-ui';
 
 export function PaymentReview({ studentId }: { studentId: string }) {
-  const { state, dispatch, feeDraft, setFeeDraft, notify } = useDemo();
+  const { state, snapshot, dispatch, feeDraft, setFeeDraft, notify } = useDemo();
   const navigate = useNavigate();
   const [confirmed, setConfirmed] = useState(false);
   const [error, setError] = useState('');
@@ -33,7 +33,7 @@ export function PaymentReview({ studentId }: { studentId: string }) {
   const balance = state.charges
     .filter((c) => c.candidateId === studentId)
     .reduce((sum, c) => sum + c.amount - c.paid, 0);
-  function collect() {
+  async function collect() {
     if (!feeDraft || !confirmed) {
       setError('Confirm the actual cash received before posting this payment.');
       return;
@@ -47,16 +47,16 @@ export function PaymentReview({ studentId }: { studentId: string }) {
       setError('A charge balance changed. Return to the account and review the allocation.');
       return;
     }
-    const id = receiptId(state);
-    dispatch({
+    const saved = await dispatch({
       type: 'collect',
       candidateId: studentId,
       allocations: feeDraft.allocations,
       date: feeDraft.date,
     });
+    if (!saved?.id) return;
     setFeeDraft(null);
     notify('Cash payment and allocations recorded. Your receipt is ready.');
-    void navigate({ to: '/fees/receipts/$receiptId', params: { receiptId: id } });
+    void navigate({ to: '/fees/receipts/$receiptId', params: { receiptId: saved.id } });
   }
   return (
     <>
@@ -94,7 +94,7 @@ export function PaymentReview({ studentId }: { studentId: string }) {
               ['Total cash received', money(total)],
               ['Method', 'Cash'],
               ['Collection date', feeDraft.date],
-              ['Collected by', 'Nusrat Ahmed'],
+              ['Collected by', snapshot.identity.name],
               ['Remaining balance', money(balance - total)],
             ]}
           />

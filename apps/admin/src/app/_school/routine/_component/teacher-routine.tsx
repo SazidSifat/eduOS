@@ -12,12 +12,27 @@ import {
   PageHeading,
   Panel,
 } from '../../_component/demo-ui';
-import { subjects } from './routine-model';
 
 export function TeacherRoutine() {
-  const { state } = useDemo();
-  const [teacher, setTeacher] = useState('Farhana Akter');
-  const published = state.routineHistory.at(-1);
+  const { state, snapshot } = useDemo();
+  const [teacher, setTeacher] = useState(
+    snapshot.identity.role === 'Teacher'
+      ? snapshot.identity.id
+      : (state.members.find((m) => m.role === 'Teacher' && m.active)?.id ?? ''),
+  );
+  const grouped = new Map<string, typeof state.routineHistory>();
+  for (const r of state.routineHistory) {
+    const key = r.classId ?? r.className;
+    grouped.set(key, [...(grouped.get(key) ?? []), r]);
+  }
+  const publishedRoutines = [...grouped.values()].flatMap((versions) => {
+    const sorted = versions.toSorted(
+      (a, b) => b.effective.localeCompare(a.effective) || b.version - a.version,
+    );
+    const selected = sorted.find((r) => r.effective <= snapshot.today) ?? sorted.at(-1);
+    return selected ? [selected] : [];
+  });
+  const published = publishedRoutines.at(-1);
   if (!published)
     return (
       <EmptyState
@@ -27,7 +42,8 @@ export function TeacherRoutine() {
         Publish the first complete routine to make it available to teachers.
       </EmptyState>
     );
-  const lessons = published.lessons
+  const lessons = publishedRoutines
+    .flatMap((routine) => routine.lessons.map((l) => ({ ...l, routine })))
     .filter((l) => l.teacher === teacher)
     .toSorted(
       (a, b) =>
@@ -39,7 +55,7 @@ export function TeacherRoutine() {
       <div className="demo-print-hide">
         <PageHeading
           title="Teacher routine"
-          description={`${teacher} · Academic session ${state.settings.session}`}
+          description={`${state.members.find((m) => m.id === teacher)?.name ?? 'Teacher'} · Academic session ${state.settings.session}`}
           action={
             <Button variant="outline" onClick={() => window.print()}>
               <Printer size={16} />
@@ -57,7 +73,15 @@ export function TeacherRoutine() {
           id="routine-teacher"
           label="Teacher"
           value={teacher}
-          options={subjects.map((s) => s.teacher)}
+          optionLabels={Object.fromEntries(state.members.map((m) => [m.id, m.name]))}
+          options={state.members
+            .filter(
+              (m) =>
+                m.role === 'Teacher' &&
+                m.active &&
+                (snapshot.identity.role !== 'Teacher' || m.id === snapshot.identity.id),
+            )
+            .map((m) => m.id)}
           onChange={setTeacher}
         />
       </div>
@@ -66,11 +90,11 @@ export function TeacherRoutine() {
           {
             label: 'Teaching periods',
             value: lessons.length,
-            detail: 'Selected published routine',
+            detail: 'Current published assignments',
           },
           {
             label: 'Class / section',
-            value: published.className.replace('Class ', ''),
+            value: new Set(lessons.map((l) => l.routine.classId ?? l.routine.className)).size,
             detail: 'Assigned class',
           },
           {
@@ -90,9 +114,9 @@ export function TeacherRoutine() {
           headers={['Day', 'Period / time', 'Subject', 'Class / section', 'Room']}
         >
           {lessons.map((l) => {
-            const p = published.periods.find((p) => p.id === l.period);
+            const p = l.routine.periods.find((p) => p.id === l.period);
             return (
-              <tr key={l.id}>
+              <tr key={`${l.routine.classId ?? l.routine.className}-${l.id}`}>
                 <td>{l.day}</td>
                 <td>
                   Period {l.period}
@@ -101,7 +125,9 @@ export function TeacherRoutine() {
                   </small>
                 </td>
                 <td>{l.subject}</td>
-                <td>{published.className}</td>
+                <td>
+                  {l.routine.className} · {l.routine.session}
+                </td>
                 <td>{l.room}</td>
               </tr>
             );
@@ -114,7 +140,7 @@ export function TeacherRoutine() {
           headers={['Version', 'Effective from', 'Class', 'Publication note']}
         >
           {state.routineHistory.toReversed().map((r) => (
-            <tr key={r.version}>
+            <tr key={`${r.classId ?? r.className}-${r.version}`}>
               <td>Version {r.version}</td>
               <td>{r.effective}</td>
               <td>{r.className}</td>

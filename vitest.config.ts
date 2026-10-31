@@ -9,6 +9,7 @@ export default defineConfig({
           include: [
             'packages/*/src/**/*.test.ts',
             'apps/api/src/**/*.test.ts',
+            'apps/api/test/**/*.test.ts',
             'apps/platform/src/lib/**/*.test.ts',
           ],
           exclude: ['**/node_modules/**', '**/dist/**', '**/*.integration.test.ts'],

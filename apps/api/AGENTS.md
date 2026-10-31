@@ -1,3 +1,5 @@
 # Workspace instructions
 
 Read the root instructions and backend/authentication/multi-tenancy docs. Use the app factory for testable dependencies. Route handlers validate and delegate to capability services. Session → active membership → permission → ownership is mandatory. Keep raw errors and request payloads out of logs. Cover forbidden and cross-tenant requests in integration tests.
+
+Follow the MVC API layout: startup in `src/index.ts`, the testable Hono app factory in `src/app.ts`, URL registration in `src/routes/<capability>.routes.ts`, request validation and response mapping in `src/controllers/<capability>.controller.ts`, business rules in `src/services/<capability>` and focused persistence helpers in `src/models`. Shared Drizzle models remain in `packages/database`; do not duplicate schemas in the API. Keep middleware in `src/middleware` and utilities/OpenAPI builders in `src/lib`. Controllers use typed Hono handler chains to preserve validator inference and authorization order. Integration tests live under `test/<capability>`.

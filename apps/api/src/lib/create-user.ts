@@ -4,7 +4,7 @@ import { parseEnv } from '../config/env.js';
 import {
   provisionDevelopmentUser,
   provisionUserSchema,
-} from '../modules/identity/provision-user.js';
+} from '../services/identity/provision-user.js';
 const env = parseEnv(process.env);
 if (env.NODE_ENV !== 'development')
   throw new Error('Development user creation is disabled outside development.');

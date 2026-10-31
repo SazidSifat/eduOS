@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import { Button, DatePicker, Label } from '@eduos/ui';
 import { useDemo } from '../../_component/demo-provider';
-import { DEMO_TODAY, money } from '../../_component/demo-data';
+import { DEMO_TODAY, money } from '../../_component/school-format';
 import { DemoForm, valueOf } from '../../_component/demo-form';
 import {
   DataTable,
@@ -16,7 +16,7 @@ import {
 } from '../../_component/demo-ui';
 
 export function CollectionReport() {
-  const { state, dispatch, notify } = useDemo();
+  const { state, snapshot, dispatch, notify } = useDemo();
   const [date, setDate] = useState(DEMO_TODAY);
   const [reverseId, setReverseId] = useState('');
   const payments = state.payments.filter((p) => p.date === date);
@@ -29,7 +29,7 @@ export function CollectionReport() {
         description="Posted payments and reversals with accountable collector totals."
         action={
           <ExportButton
-            filename="school-collections-demo"
+            filename="school-collections"
             headers={['Receipt', 'Student', 'Date', 'Amount BDT', 'State']}
             rows={payments.map((p) => [
               p.id,
@@ -44,7 +44,13 @@ export function CollectionReport() {
       <div className="demo-filters">
         <div>
           <Label htmlFor="collection-date">Collection date</Label>
-          <DatePicker id="collection-date" value={date} onValueChange={setDate} />
+          <DatePicker
+            id="collection-date"
+            value={date}
+            onValueChange={(value) => {
+              if (value) setDate(value);
+            }}
+          />
         </div>
       </div>
       <Metrics
@@ -67,13 +73,20 @@ export function CollectionReport() {
           caption="Collector totals"
           headers={['Collector', 'Receipts', 'Gross', 'Reversed', 'Net']}
         >
-          <tr>
-            <td>Nusrat Ahmed</td>
-            <td>{payments.length}</td>
-            <td>{money(gross)}</td>
-            <td>{money(reversed)}</td>
-            <td>{money(gross - reversed)}</td>
-          </tr>
+          {[...new Set(payments.map((p) => p.collector))].map((collector) => {
+            const rows = payments.filter((p) => p.collector === collector);
+            const total = rows.reduce((s, p) => s + p.amount, 0);
+            const reversedTotal = rows.filter((p) => p.reversed).reduce((s, p) => s + p.amount, 0);
+            return (
+              <tr key={collector}>
+                <td>{collector}</td>
+                <td>{rows.length}</td>
+                <td>{money(total)}</td>
+                <td>{money(reversedTotal)}</td>
+                <td>{money(total - reversedTotal)}</td>
+              </tr>
+            );
+          })}
         </DataTable>
       </Panel>
       <Panel
@@ -109,7 +122,10 @@ export function CollectionReport() {
                   </Status>
                 </td>
                 <td>
-                  {p.kind === 'school' && !p.reversed ? (
+                  {p.kind === 'school' &&
+                  !p.reversed &&
+                  snapshot.permissions.includes('fees.reverse') &&
+                  /^[0-9a-f-]{36}$/.test(p.id) ? (
                     <Button size="sm" variant="outline" onClick={() => setReverseId(p.id)}>
                       Reverse receipt
                     </Button>
@@ -149,8 +165,15 @@ export function CollectionReport() {
               Cancel
             </Button>
           }
-          onSubmit={(values) => {
-            dispatch({ type: 'reverse', paymentId: reverseId, reason: valueOf(values, 'reason') });
+          onSubmit={async (values) => {
+            if (
+              !(await dispatch({
+                type: 'reverse',
+                paymentId: reverseId,
+                reason: valueOf(values, 'reason'),
+              }))
+            )
+              return;
             setReverseId('');
             notify(
               'Receipt reversed. The original record is retained and its charges are open again.',

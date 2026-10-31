@@ -8,7 +8,10 @@ import {
   validPeriods,
 } from '../routine/_component/routine-model';
 
-export function demoReducer(state: DemoState, action: DemoAction): DemoState {
+export function demoReducer(
+  state: DemoState,
+  action: Exclude<DemoAction, { type: 'enrollment-dates' }>,
+): DemoState {
   switch (action.type) {
     case 'reset':
       return initialState();
@@ -179,7 +182,7 @@ export function demoReducer(state: DemoState, action: DemoAction): DemoState {
         !register?.submitted ||
         register.marks[request.studentId] !== request.original ||
         request.original === request.proposed ||
-        request.proposed === 'Unmarked' ||
+        String(request.proposed) === 'Unmarked' ||
         !request.reason.trim() ||
         state.corrections.some(
           (c) =>

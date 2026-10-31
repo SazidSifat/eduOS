@@ -15,11 +15,12 @@ import {
 } from '@eduos/database/schema';
 import { platformInstitutionSchema, type platformInstitutionCreateSchema } from '@eduos/contracts';
 import type { z } from 'zod';
-import { createApp } from '../src/app/create-app.js';
+import { createApp } from '../src/app.js';
 import { parseEnv } from '../src/config/env.js';
-import { createIdentityService } from '../src/modules/identity/service.js';
-import { createPlatformService } from '../src/modules/platform/service.js';
-import { createAdmissionsService } from '../src/modules/admissions/service.js';
+import { createIdentityService } from '../src/services/identity/identity.service.js';
+import { createPlatformService } from '../src/services/platform/platform.service.js';
+import { createSchoolService } from '../src/services/school/school.service.js';
+import { createAdmissionsService } from '../src/services/admissions/admissions.service.js';
 
 export function institutionInput(): z.input<typeof platformInstitutionCreateSchema> {
   const suffix = randomUUID();
@@ -65,6 +66,7 @@ export function createPlatformFixture(options: { adminUrl?: string; authBaseUrl?
     identity,
     platform,
     admissions,
+    school: createSchoolService(connection.db),
     logger: { write() {} },
     checkDatabase: async () => {},
   });
@@ -113,6 +115,7 @@ export function createPlatformFixture(options: { adminUrl?: string; authBaseUrl?
     identity,
     platform,
     admissions,
+    school: createSchoolService(connection.db),
     auth,
     app,
     operatorIds,

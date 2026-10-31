@@ -41,7 +41,7 @@ export function SchoolSettings({ kind }: { kind: 'school' | 'admissions' | 'atte
           {
             title: 'Regional preferences',
             fields: [
-              { name: 'timezone', label: 'Timezone', value: 'Asia/Dhaka', options: ['Asia/Dhaka'] },
+              { name: 'timezone', label: 'Timezone', value: v('timezone'), readOnly: true },
               { name: 'currency', label: 'Currency', value: 'BDT', options: ['BDT'] },
               { name: 'weeklyClosure', label: 'Weekly closure', value: v('weeklyClosure') },
             ],
@@ -58,7 +58,7 @@ export function SchoolSettings({ kind }: { kind: 'school' | 'admissions' | 'atte
                   name: 'reminderDays',
                   label: 'Days before follow-up',
                   value: v('reminderDays'),
-                  options: ['0', '1', '2', '3'],
+                  options: ['1', '2', '3'],
                 },
                 {
                   name: 'reminderTime',
@@ -67,7 +67,7 @@ export function SchoolSettings({ kind }: { kind: 'school' | 'admissions' | 'atte
                   value: v('reminderTime'),
                   required: true,
                 },
-                { name: 'timezone', label: 'Timezone', value: 'Asia/Dhaka', readOnly: true },
+                { name: 'timezone', label: 'Timezone', value: v('timezone'), readOnly: true },
               ],
             },
             {
@@ -141,13 +141,13 @@ export function SchoolSettings({ kind }: { kind: 'school' | 'admissions' | 'atte
                 {
                   name: 'holidayName',
                   label: 'Holiday name',
-                  value: v('holidayName') || 'Victory Day',
+                  value: v('holidayName'),
                 },
                 {
                   name: 'holidayDate',
                   label: 'Holiday date',
                   kind: 'date',
-                  value: v('holidayDate') || '2026-12-16',
+                  value: v('holidayDate'),
                 },
               ],
             },
@@ -162,7 +162,7 @@ export function SchoolSettings({ kind }: { kind: 'school' | 'admissions' | 'atte
               ? 'Admissions settings'
               : 'Attendance settings'
         }
-        description="Configure school-level defaults. Saved values remain in this browser session."
+        description="Configure school-level defaults. Saved values apply to this school."
       />
       {error && (
         <Notice title="Review these settings" tone="danger">
@@ -173,14 +173,14 @@ export function SchoolSettings({ kind }: { kind: 'school' | 'admissions' | 'atte
         sections={sections}
         submitLabel="Save settings"
         footer={<DemoLink to="/settings">Cancel</DemoLink>}
-        onSubmit={(data) => {
+        onSubmit={async (data) => {
           if (kind === 'admissions' && Number(valueOf(data, 'willingFee')) > 1000000) {
             setError('Use a willing fee of BDT 1,000,000 or less.');
             return;
           }
-          dispatch({ type: 'settings-save', values: data });
+          if (!(await dispatch({ type: 'settings-save', values: data }))) return;
           setError('');
-          notify('School settings saved in frontend demo data.');
+          notify('School settings saved.');
         }}
       />
       {kind === 'admissions' && (

@@ -21,7 +21,7 @@ describe('institution role policy', () => {
       ['admin', 'principal', 'admission_officer'].includes(role),
     );
     expect(grants.includes('fees.collect')).toBe(
-      ['admin', 'principal', 'admission_officer'].includes(role),
+      ['admin', 'principal', 'admission_officer', 'accountant'].includes(role),
     );
     expect(grants.includes('admissions.manage')).toBe(role === 'admin' || role === 'principal');
     expect(grants.includes('admissions.settings')).toBe(role === 'admin' || role === 'principal');

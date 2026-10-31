@@ -1,8 +1,9 @@
 import { useNavigate } from '@tanstack/react-router';
 import { Button } from '@eduos/ui';
 import { useDemo } from '../../_component/demo-provider';
-import { classes, roster } from '../../_component/demo-data';
+
 import {
+  EmptyState,
   DataTable,
   DemoLink,
   Details,
@@ -20,12 +21,18 @@ export function AttendanceReview({
   submitted?: boolean;
   offline?: boolean;
 }) {
-  const { state, dispatch, notify } = useDemo();
+  const { state, dispatch, notify, classes, roster, snapshot } = useDemo();
   const navigate = useNavigate();
   const register = currentRegister(state);
-  if (!register) return null;
+  if (!register)
+    return (
+      <EmptyState title="No class register available">
+        Configure an academic offering and class teacher, then enroll students to start attendance.
+      </EmptyState>
+    );
   const counts = markCounts(register);
-  const complete = counts.Unmarked === 0;
+  const hasStudents = Object.keys(register.marks).length > 0;
+  const complete = hasStudents && counts.Unmarked === 0;
   const saved = submitted && register.submitted;
   return (
     <>
@@ -33,42 +40,51 @@ export function AttendanceReview({
         title={
           offline ? 'Connection unavailable' : saved ? 'Attendance submitted' : 'Review register'
         }
-        description={`${classes.find((c) => c.id === register.classId)?.label} · ${register.date} · Farhana Akter`}
+        description={`${classes.find((c) => c.id === register.classId)?.label} · ${register.date} · ${snapshot.identity.name}`}
       />
       {offline ? (
         <Notice title="Register not submitted" tone="danger">
-          The example connection was interrupted. Keep the screen open and retry; the selections
-          below are still in memory.
+          The connection is unavailable. Keep the screen open and retry; the selections below remain
+          on this screen until you leave or reload.
         </Notice>
       ) : saved ? (
         <Notice title="Register saved successfully" tone="success">
-          Original submission · Submitted by Farhana Akter. Later changes use a correction request.
+          Original submission is preserved in the school record. Later changes use a correction
+          request.
         </Notice>
       ) : (
         <Notice
-          title={complete ? 'Ready to submit' : `${counts.Unmarked} students need a status`}
+          title={
+            !hasStudents
+              ? 'No enrolled students on this date'
+              : complete
+                ? 'Ready to submit'
+                : `${counts.Unmarked} students need a status`
+          }
           tone={complete ? 'info' : 'warning'}
         >
-          {complete
-            ? 'Check absent and late students before confirming this class register.'
-            : 'Return to marking before submitting. No partial register will be published.'}
+          {!hasStudents
+            ? 'Choose a date when students are enrolled in this class.'
+            : complete
+              ? 'Check absent and late students before confirming this class register.'
+              : 'Return to marking before submitting. No partial register will be published.'}
         </Notice>
       )}
       <Panel title="Submission summary">
         <Details
           items={[
-            ['Roster', `${roster(register.classId).length} students`],
+            ['Roster', `${roster(register.classId, register.date).length} students`],
             ['Present', counts.Present],
             ['Absent', counts.Absent],
             ['Late', counts.Late],
             ['Unmarked', counts.Unmarked],
-            ['Submitted by', saved ? 'Farhana Akter' : 'Not submitted'],
+            ['Submitted by', saved ? 'See submission history' : 'Not submitted'],
           ]}
         />
       </Panel>
       <Panel title={saved ? 'Submitted class register' : 'Absent and late students'}>
         <DataTable caption="Attendance review" headers={['Roll / student', 'Status']}>
-          {roster(register.classId)
+          {roster(register.classId, register.date)
             .filter((s) => saved || ['Absent', 'Late'].includes(register.marks[s.id] ?? ''))
             .map((s) => (
               <tr key={s.id}>
@@ -105,9 +121,9 @@ export function AttendanceReview({
             <DemoLink to="/attendance">Return to marking</DemoLink>
             <Button
               disabled={!complete || register.submitted}
-              onClick={() => {
-                dispatch({ type: 'attendance-submit' });
-                notify('Class attendance submitted in demo data.');
+              onClick={async () => {
+                if (!(await dispatch({ type: 'attendance-submit' }))) return;
+                notify('Class attendance submitted.');
                 void navigate({ to: '/attendance/submitted' });
               }}
             >
@@ -118,7 +134,7 @@ export function AttendanceReview({
       </div>
       {!saved && !offline && (
         <div className="demo-actions">
-          <DemoLink to="/attendance/offline">View connection recovery state</DemoLink>
+          <DemoLink to="/attendance/offline">Connection status and retry</DemoLink>
         </div>
       )}
     </>

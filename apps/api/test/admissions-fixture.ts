@@ -2,6 +2,21 @@ import { randomUUID, randomBytes } from 'node:crypto';
 import { hashPassword } from '@eduos/auth/server';
 import { eq, inArray } from '@eduos/database';
 import {
+  schoolFeeReversal,
+  schoolFeeAllocation,
+  schoolFeePayment,
+  monthlyFeePayment,
+  monthlyFeeCharge,
+  monthlyFeeSchedule,
+  admissionFeeItem,
+  schoolOperation,
+  schoolExpense,
+  schoolEvidence,
+  schoolConfiguration,
+  attendanceCorrection,
+  attendanceRegisterMark,
+  attendanceRegister,
+  classRoutine,
   academicOffering,
   account,
   admissionCandidate,
@@ -14,8 +29,10 @@ import {
   admissionSettings,
   followUpReminder,
   membership,
+  membershipChange,
   student,
   studentEnrollment,
+  enrollmentDateChange,
   user,
 } from '@eduos/database/schema';
 import {
@@ -138,6 +155,22 @@ export function createAdmissionsFixture(options: Parameters<typeof createPlatfor
     async cleanup() {
       if (schools.length) {
         for (const table of [
+          schoolFeeReversal,
+          schoolFeeAllocation,
+          schoolFeePayment,
+          monthlyFeePayment,
+          monthlyFeeCharge,
+          monthlyFeeSchedule,
+          admissionFeeItem,
+          schoolOperation,
+          schoolExpense,
+          schoolEvidence,
+          schoolConfiguration,
+          attendanceCorrection,
+          attendanceRegisterMark,
+          attendanceRegister,
+          classRoutine,
+          membershipChange,
           admissionReceipt,
           admissionPayment,
           admissionCharge,
@@ -146,6 +179,7 @@ export function createAdmissionsFixture(options: Parameters<typeof createPlatfor
           admissionOperation,
           admissionConfigurationHistory,
           admissionCandidate,
+          enrollmentDateChange,
           studentEnrollment,
           student,
           academicOffering,
@@ -155,6 +189,10 @@ export function createAdmissionsFixture(options: Parameters<typeof createPlatfor
         }
       }
       for (const id of staff) {
+        await fixture.db
+          .update(academicOffering)
+          .set({ teacherId: null })
+          .where(eq(academicOffering.teacherId, id));
         await fixture.db.delete(membership).where(eq(membership.userId, id));
         await fixture.db.delete(user).where(eq(user.id, id));
       }

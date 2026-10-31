@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import { Input, Label } from '@eduos/ui';
 import { useDemo } from '../../_component/demo-provider';
-import { DEMO_TODAY, money } from '../../_component/demo-data';
+import { DEMO_TODAY, money } from '../../_component/school-format';
 import {
   DataTable,
   DemoLink,
@@ -46,7 +46,7 @@ export function FeeDirectory({ dues = false }: { dues?: boolean }) {
         action={
           dues ? (
             <ExportButton
-              filename="school-dues-demo"
+              filename="school-dues"
               headers={['Student', 'Class', 'Balance BDT']}
               rows={students.map((c) => [c.name, c.className, balance(c.id) / 100])}
             />
@@ -76,7 +76,7 @@ export function FeeDirectory({ dues = false }: { dues?: boolean }) {
       />
       <Panel
         title={dues ? 'Student balances' : 'Find a student'}
-        description="Use a student name, record ID, guardian or synthetic contact number."
+        description="Use a student name, record ID, guardian or contact number."
       >
         <div className="demo-filters mb-5">
           <div>
@@ -174,7 +174,7 @@ export function FeeDirectory({ dues = false }: { dues?: boolean }) {
             </DataTable>
           ) : (
             <EmptyState title="No collections recorded yet">
-              Choose a student and collect a payment to create the first demo receipt.
+              Choose a student and collect a payment to create the first receipt.
             </EmptyState>
           )}
         </Panel>
