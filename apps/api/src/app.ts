@@ -10,13 +10,13 @@ import type { ApiEnv } from './config/env.js';
 import type { Logger } from './lib/logger.js';
 import type { IdentityService } from './services/identity/identity.service.js';
 import type { ApiVariables, HttpAuth } from './middleware/auth.js';
-import { createIdentityRoutes } from './route/identity.routes.js';
-import { createPlatformRoutes } from './route/platform.routes.js';
+import { createIdentityRoutes } from './route/identity/identity.routes.js';
+import { createPlatformRoutes } from './route/platform/platform.routes.js';
 import type { PlatformService } from './services/platform/platform.service.js';
 import { openapi } from './lib/openapi/openapi.js';
 import type { AdmissionsService } from './services/admissions/admissions.service.js';
-import { createAdmissionsRoutes } from './route/admissions.routes.js';
-import { createSchoolRoutes } from './route/school.routes.js';
+import { createAdmissionsRoutes } from './route/admissions/admissions.routes.js';
+import { createSchoolRoutes } from './route/school/school.routes.js';
 import type { SchoolService } from './services/school/school.service.js';
 import { AdmissionError } from './services/admissions/errors.js';
 export interface AppDependencies {
