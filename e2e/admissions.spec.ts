@@ -352,3 +352,8 @@ test('date pickers support leap days, keyboard selection, clearing and mobile da
   await page.keyboard.press('Escape');
   await expect(birthDate).toBeFocused();
 });
+
+// Preserve the English workflow while the app also supports Bangla by default.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('eduos-language', 'en'));
+});

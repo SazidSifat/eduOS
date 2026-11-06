@@ -1,3 +1,4 @@
+import { useLanguage } from '@eduos/ui';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
@@ -17,8 +18,10 @@ import { useAdmissions } from './admissions-shell';
 import { ErrorState, LoadingState } from '../../../../../components/feedback';
 import { CandidateForm } from './candidate-form';
 import { CallForm } from './call-form';
-import { money } from './form-controls';
+
 export function CandidateDetails({ candidateId }: { candidateId: string }) {
+  const { t, money, locale } = useLanguage();
+
   const { userId, institutionId, access, setup } = useAdmissions();
   const detail = useQuery(candidateDetailQuery(userId, institutionId, candidateId));
   const [mode, setMode] = useState<
@@ -50,18 +53,18 @@ export function CandidateDetails({ candidateId }: { candidateId: string }) {
         className="mb-6 inline-flex items-center gap-2 text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft size={16} />
-        Back to{' '}
+        {t('Back to')}{' '}
         {candidate.state === 'follow_up'
           ? 'follow-ups'
           : candidate.state === 'closed'
-            ? 'closed records'
-            : `${candidate.state} students`}
+            ? t('closed records')
+            : t('{value0} students', { value0: candidate.state })}
       </Link>
       <header className="mb-7 flex flex-wrap justify-between gap-5">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-3">
             <h1 className="min-w-0 break-words text-2xl font-semibold">{candidate.studentName}</h1>
-            <Badge variant="outline">{candidate.state.replace('_', ' ')}</Badge>
+            <Badge variant="outline">{t(candidate.state)}</Badge>
           </div>
           <p className="mt-2 text-muted-foreground">
             {candidate.className} · {candidate.session} · {candidate.assigneeName}
@@ -77,20 +80,20 @@ export function CandidateDetails({ candidateId }: { candidateId: string }) {
             {candidate.state === 'follow_up' && (
               <>
                 <Button variant="outline" onClick={() => setMode('call')}>
-                  Record call
+                  {t('Record call')}{' '}
                 </Button>
                 <Button variant="outline" onClick={() => setMode('willing')}>
-                  Mark willing
+                  {t('Mark willing')}{' '}
                 </Button>
               </>
             )}
             {candidate.state === 'willing' || candidate.state === 'closed' ? (
               <Button variant="outline" onClick={() => setMode('reopen')}>
-                Return to follow-up
+                {t('Return to follow-up')}{' '}
               </Button>
             ) : null}
             {candidate.state !== 'closed' && (
-              <Button onClick={() => setMode('admitted')}>Complete admission</Button>
+              <Button onClick={() => setMode('admitted')}>{t('Complete admission')}</Button>
             )}
           </div>
         )}
@@ -109,10 +112,10 @@ export function CandidateDetails({ candidateId }: { candidateId: string }) {
         <div className="min-w-0 space-y-8">
           <section className="rounded-md border border-border">
             <div className="flex items-center justify-between border-b border-border px-5 py-4">
-              <h2 className="font-semibold">Student and guardian</h2>
+              <h2 className="font-semibold">{t('Student and guardian')}</h2>
               {writable && (
                 <Button variant="ghost" size="sm" onClick={() => setMode('edit')}>
-                  Edit details
+                  {t('Edit details')}{' '}
                 </Button>
               )}
             </div>
@@ -130,30 +133,32 @@ export function CandidateDetails({ candidateId }: { candidateId: string }) {
                 ['Lead source', profile.source],
               ].map(([label, value]) => (
                 <div key={label} className="min-w-0">
-                  <dt className="text-xs text-muted-foreground">{label}</dt>
-                  <dd className="mt-1 break-words">{value || 'Not supplied'}</dd>
+                  <dt className="text-xs text-muted-foreground">{t(label)}</dt>
+                  <dd className="mt-1 break-words">{value || t('Not supplied')}</dd>
                 </div>
               ))}
             </dl>
             <div className="border-t border-border p-5">
               <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-                <h3 className="font-medium">Identity information</h3>
+                <h3 className="font-medium">{t('Identity information')}</h3>
                 <Button variant="outline" size="sm" onClick={() => setShowIdentity(!showIdentity)}>
-                  {showIdentity ? 'Hide identity details' : 'Show identity details'}
+                  {showIdentity ? t('Hide identity details') : t('Show identity details')}
                 </Button>
               </div>
               <dl className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <dt className="text-xs text-muted-foreground">Birth certificate</dt>
+                  <dt className="text-xs text-muted-foreground">{t('Birth certificate')}</dt>
                   <dd className="mt-1 font-mono">{mask(profile.birthCertificate)}</dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-muted-foreground">Parent / guardian NID</dt>
+                  <dt className="text-xs text-muted-foreground">{t('Parent / guardian NID')}</dt>
                   <dd className="mt-1 font-mono">{mask(profile.guardianNid)}</dd>
                 </div>
               </dl>
               {profile.identityException && (
-                <p className="mt-4 text-muted-foreground">Exception: {profile.identityException}</p>
+                <p className="mt-4 text-muted-foreground">
+                  {t('Exception:')} {profile.identityException}
+                </p>
               )}
             </div>
             {profile.notes && (
@@ -161,18 +166,18 @@ export function CandidateDetails({ candidateId }: { candidateId: string }) {
             )}
           </section>
           <section className="overflow-hidden rounded-md border border-border">
-            <h2 className="border-b border-border px-5 py-4 font-semibold">Cash receipts</h2>
+            <h2 className="border-b border-border px-5 py-4 font-semibold">{t('Cash receipts')}</h2>
             {!receipts.length ? (
               <p className="p-5 text-muted-foreground">
-                No fees have been collected for this record.
+                {t('No fees have been collected for this record.')}{' '}
               </p>
             ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Receipt / date</TableHead>
-                    <TableHead>Purpose</TableHead>
-                    <TableHead className="text-right">Collected</TableHead>
+                    <TableHead>{t('Receipt / date')}</TableHead>
+                    <TableHead>{t('Purpose')}</TableHead>
+                    <TableHead className="text-right">{t('Collected')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -181,13 +186,13 @@ export function CandidateDetails({ candidateId }: { candidateId: string }) {
                       <TableCell>
                         <span className="break-all font-mono text-xs">{receipt.number}</span>
                         <p className="mt-1 text-xs text-muted-foreground">
-                          {new Date(receipt.createdAt).toLocaleDateString('en-BD', {
+                          {new Date(receipt.createdAt).toLocaleDateString(locale, {
                             timeZone: setup.settings.timezone,
                           })}
                         </p>
                       </TableCell>
                       <TableCell>
-                        {receipt.kind === 'willing' ? 'Willing fee' : 'Admission'}
+                        {receipt.kind === 'willing' ? t('Willing fee') : t('Admission')}
                       </TableCell>
                       <TableCell className="text-right tabular-nums">
                         {money(receipt.amountMinor)}
@@ -201,23 +206,23 @@ export function CandidateDetails({ candidateId }: { candidateId: string }) {
         </div>
         <aside className="min-w-0 space-y-7">
           <section className="border-t border-border pt-4">
-            <h2 className="font-semibold">Next conversation</h2>
-            <p className="mt-3 tabular-nums">{candidate.followUpDate ?? 'No call scheduled'}</p>
+            <h2 className="font-semibold">{t('Next conversation')}</h2>
+            <p className="mt-3 tabular-nums">{candidate.followUpDate ?? t('No call scheduled')}</p>
             <p className="mt-2 text-xs text-muted-foreground">
               {candidate.state === 'follow_up'
-                ? 'Reminders follow the institution’s configured schedule.'
-                : 'Follow-up reminders are off for this record.'}
+                ? t('Reminders follow the institution’s configured schedule.')
+                : t('Follow-up reminders are off for this record.')}
             </p>
           </section>
           <section className="border-t border-border pt-4">
-            <h2 className="font-semibold">Record history</h2>
+            <h2 className="font-semibold">{t('Record history')}</h2>
             <ol className="mt-4 space-y-5">
               {history.map((event) => (
                 <li key={event.id}>
-                  <p className="font-medium">{event.action.replaceAll('_', ' ')}</p>
+                  <p className="font-medium">{t(event.action)}</p>
                   <p className="mt-1 text-xs text-muted-foreground">
                     {event.actorName} ·{' '}
-                    {new Date(event.createdAt).toLocaleString('en-BD', {
+                    {new Date(event.createdAt).toLocaleString(locale, {
                       timeZone: setup.settings.timezone,
                       dateStyle: 'medium',
                       timeStyle: 'short',
@@ -232,7 +237,7 @@ export function CandidateDetails({ candidateId }: { candidateId: string }) {
           </section>
           {writable && candidate.state !== 'closed' && (
             <Button variant="outline" onClick={() => setMode('close')}>
-              Close record
+              {t('Close record')}{' '}
             </Button>
           )}
         </aside>

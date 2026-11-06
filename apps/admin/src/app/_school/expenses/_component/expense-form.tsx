@@ -1,3 +1,4 @@
+import { useLanguage } from '@eduos/ui';
 import { uploadEvidence } from '../../_api/queries';
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -5,12 +6,14 @@ import { useNavigate } from '@tanstack/react-router';
 import { z } from 'zod';
 import { Button, Input, Label } from '@eduos/ui';
 import { useDemo } from '../../_component/demo-provider';
-import { DEMO_TODAY, money } from '../../_component/school-format';
+import { DEMO_TODAY } from '../../_component/school-format';
 import { amountOf, DemoForm, valueOf } from '../../_component/demo-form';
 import { DemoLink, EmptyState, Notice, PageHeading, Panel } from '../../_component/demo-ui';
 import type { Expense } from '../../_component/demo-model';
 
 export function ExpenseForm({ expenseId }: { expenseId: string }) {
+  const { t, money } = useLanguage();
+
   const { state, snapshot, dispatch, notify } = useDemo();
   const navigate = useNavigate();
   const [newId] = useState(() => crypto.randomUUID());
@@ -24,11 +27,12 @@ export function ExpenseForm({ expenseId }: { expenseId: string }) {
   if (expense?.paid || expense?.status === 'approved')
     return (
       <EmptyState
-        title="This expense is locked"
-        action={<DemoLink to="/expenses">Open register</DemoLink>}
+        title={t('This expense is locked')}
+        action={<DemoLink to="/expenses">{t('Open register')}</DemoLink>}
       >
-        Approved or paid expenses cannot be overwritten. View their original request and payment
-        voucher.
+        {t(
+          'Approved or paid expenses cannot be overwritten. View their original request and payment voucher.',
+        )}{' '}
       </EmptyState>
     );
   async function submit(values: Record<string, string>, draft = false) {
@@ -75,11 +79,11 @@ export function ExpenseForm({ expenseId }: { expenseId: string }) {
   return (
     <>
       <PageHeading
-        title={expense ? 'Edit expense request' : 'Record an expense'}
-        description="Capture the request and evidence before approval or payment."
+        title={expense ? t('Edit expense request') : t('Record an expense')}
+        description={t('Capture the request and evidence before approval or payment.')}
       />
       {error && (
-        <Notice title="Review this expense" tone="danger">
+        <Notice title={t('Review this expense')} tone="danger">
           {error}
         </Notice>
       )}
@@ -134,22 +138,24 @@ export function ExpenseForm({ expenseId }: { expenseId: string }) {
           },
         ]}
         onSubmit={(values) => submit(values)}
-        submitLabel="Submit for approval"
+        submitLabel={t('Submit for approval')}
         busy={uploading}
         footer={
           <>
-            <DemoLink to="/expenses">Cancel</DemoLink>
+            <DemoLink to="/expenses">{t('Cancel')}</DemoLink>
             <SaveDraft onSave={(values) => submit(values, true)} />
           </>
         }
       >
         <Panel
-          title="Supporting evidence"
-          description="Upload supporting documents to the school record. Only authorized school staff can download them."
+          title={t('Supporting evidence')}
+          description={t(
+            'Upload supporting documents to the school record. Only authorized school staff can download them.',
+          )}
         >
           <div className="demo-file demo-field">
             <Label htmlFor="expense-evidence">
-              Bill or receipt · PDF, PNG or JPEG · Up to 5 MB
+              {t('Bill or receipt · PDF, PNG or JPEG · Up to 5 MB')}{' '}
             </Label>
             <Input
               id="expense-evidence"
@@ -185,28 +191,32 @@ export function ExpenseForm({ expenseId }: { expenseId: string }) {
             <div className="flex flex-wrap items-center justify-between gap-4">
               <p>
                 {uploading
-                  ? 'Uploading document…'
-                  : evidenceName || 'No supporting document uploaded.'}
+                  ? t('Uploading document…')
+                  : evidenceName || t('No supporting document uploaded.')}
               </p>
             </div>
           </div>
         </Panel>
         <Notice
-          title={`Approval threshold · ${money(Math.round(Number(state.settings.expenseThreshold ?? '0') * 100))}`}
+          title={t('Approval threshold · {value0}', {
+            value0: money(Math.round(Number(state.settings.expenseThreshold ?? '0') * 100)),
+          })}
           tone="warning"
         >
-          Requests are reviewed by {state.settings.expenseReviewer ?? 'Admin / Principal'}.
-          Submission does not record a payment.
+          {t('Requests are reviewed by')} {state.settings.expenseReviewer ?? t('Admin / Principal')}
+          . Submission does not record a payment.
         </Notice>
       </DemoForm>
     </>
   );
 }
 function SaveDraft({ onSave }: { onSave: (values: Record<string, string>) => void }) {
+  const { t } = useLanguage();
+
   const form = useFormContext<Record<string, string>>();
   return (
     <Button variant="outline" onClick={form.handleSubmit(onSave)}>
-      Save draft
+      {t('Save draft')}{' '}
     </Button>
   );
 }

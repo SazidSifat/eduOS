@@ -1,9 +1,10 @@
+import { useLanguage } from '@eduos/ui';
 import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import { Button } from '@eduos/ui';
 import { Printer } from 'lucide-react';
 import { useDemo } from '../../_component/demo-provider';
-import { DEMO_TODAY, money } from '../../_component/school-format';
+import { DEMO_TODAY } from '../../_component/school-format';
 import {
   DemoLink,
   Details,
@@ -14,6 +15,8 @@ import {
 } from '../../_component/demo-ui';
 
 export function ExpensePayment({ id }: { id: string }) {
+  const { t, money } = useLanguage();
+
   const { state, dispatch, notify } = useDemo();
   const [confirmed, setConfirmed] = useState(false);
   const [error, setError] = useState('');
@@ -21,26 +24,26 @@ export function ExpensePayment({ id }: { id: string }) {
   if (!expense)
     return (
       <EmptyState
-        title="Expense unavailable"
-        action={<DemoLink to="/expenses">Open expense register</DemoLink>}
+        title={t('Expense unavailable')}
+        action={<DemoLink to="/expenses">{t('Open expense register')}</DemoLink>}
       >
-        Choose an approved expense before recording payment.
+        {t('Choose an approved expense before recording payment.')}{' '}
       </EmptyState>
     );
   return (
     <>
       <div className="demo-print-hide">
         <PageHeading
-          title="Payment voucher"
+          title={t('Payment voucher')}
           description={`${expense.id} · ${expense.description}`}
           action={
             expense.paid ? (
               <Button variant="outline" onClick={() => window.print()}>
                 <Printer size={16} />
-                Print voucher
+                {t('Print voucher')}{' '}
               </Button>
             ) : (
-              <DemoLink to="/expenses">Expense register</DemoLink>
+              <DemoLink to="/expenses">{t('Expense register')}</DemoLink>
             )
           }
         />
@@ -48,20 +51,20 @@ export function ExpensePayment({ id }: { id: string }) {
       <Notice
         title={
           expense.paid
-            ? `Paid · ${expense.voucher}`
+            ? t('Paid · {value0}', { value0: expense.voucher })
             : expense.status === 'approved'
-              ? 'Approved · Awaiting payment'
-              : 'Approval required'
+              ? t('Approved · Awaiting payment')
+              : t('Approval required')
         }
         tone={expense.paid ? 'success' : 'warning'}
       >
         {expense.paid
-          ? 'The actual cash payment has been recorded in the school ledger.'
-          : 'Record payment only after the approved cash amount has actually been paid.'}
+          ? t('The actual cash payment has been recorded in the school ledger.')
+          : t('Record payment only after the approved cash amount has actually been paid.')}
       </Notice>
       <Panel
-        title={state.settings.name ?? 'School'}
-        description="School expense payment voucher"
+        title={state.settings.name ?? t('School')}
+        description={t('School expense payment voucher')}
         className="demo-receipt"
       >
         <Details
@@ -78,26 +81,26 @@ export function ExpensePayment({ id }: { id: string }) {
         />
       </Panel>
       {error && (
-        <Notice title="Payment not recorded" tone="danger">
+        <Notice title={t('Payment not recorded')} tone="danger">
           {error}
         </Notice>
       )}
       {!expense.paid && expense.status === 'approved' && (
         <>
-          <Notice title="Cash payment confirmation" tone="success">
+          <Notice title={t('Cash payment confirmation')} tone="success">
             <label className="demo-check">
               <input
                 type="checkbox"
                 checked={confirmed}
                 onChange={(e) => setConfirmed(e.target.checked)}
               />
-              I have paid {money(expense.amount)} to {expense.payee}.
+              {t('I have paid')} {money(expense.amount)} to {expense.payee}.
             </label>
           </Notice>
           <div className="demo-actions">
             <Button asChild variant="outline">
               <Link to="/expenses/$expenseId" params={{ expenseId: id }}>
-                Back to review
+                {t('Back to review')}{' '}
               </Link>
             </Button>
             <Button
@@ -113,14 +116,14 @@ export function ExpensePayment({ id }: { id: string }) {
                 );
               }}
             >
-              Confirm payment
+              {t('Confirm payment')}{' '}
             </Button>
           </div>
         </>
       )}
       {expense.paid && (
         <div className="demo-actions demo-print-hide">
-          <DemoLink to="/expenses">Back to expenses</DemoLink>
+          <DemoLink to="/expenses">{t('Back to expenses')}</DemoLink>
         </div>
       )}
     </>

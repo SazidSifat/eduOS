@@ -1,3 +1,4 @@
+import { useLanguage } from '@eduos/ui';
 import { useMemo, useState } from 'react';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -14,7 +15,7 @@ import {
 import { apiPost } from '../../../../../lib/api-client';
 import { admissionKey, admissionPath } from '../_api/queries';
 import { useAdmissions } from './admissions-shell';
-import { Choice, FormSection, money, Toggle } from './form-controls';
+import { Choice, FormSection, Toggle } from './form-controls';
 import { ProfileFields } from './profile-fields';
 import { CandidateSetup } from './candidate-setup';
 import { AdmissionFeeEditor } from './admission-fee-editor';
@@ -46,6 +47,8 @@ export function CandidateForm({
   mode?: CandidateCreate['state'] | 'edit';
   onSaved?: () => void;
 }) {
+  const { t, money } = useLanguage();
+
   const { userId, institutionId, setup, access } = useAdmissions();
   const navigate = useNavigate();
   const cache = useQueryClient();
@@ -128,23 +131,23 @@ export function CandidateForm({
         <h1 className="text-2xl font-semibold">
           {existing
             ? mode === 'edit'
-              ? 'Update candidate details'
+              ? t('Update candidate details')
               : state === 'admitted'
-                ? 'Complete admission'
-                : 'Mark student willing'
-            : 'New admission record'}
+                ? t('Complete admission')
+                : t('Mark student willing')
+            : t('New admission record')}
         </h1>
         <p className="mt-2 text-muted-foreground">
           {existing
-            ? 'Review the collected information before saving this change.'
-            : 'Start with a follow-up, willingness to admit, or direct admission.'}
+            ? t('Review the collected information before saving this change.')
+            : t('Start with a follow-up, willingness to admit, or direct admission.')}
         </p>
       </div>
       {!existing && <CandidateSetup />}
       <FormProvider {...form}>
-        <form aria-label="Admission record" noValidate onSubmit={form.handleSubmit(submit)}>
+        <form aria-label={t('Admission record')} noValidate onSubmit={form.handleSubmit(submit)}>
           <fieldset disabled={mutation.isPending}>
-            <FormSection title="Admission destination">
+            <FormSection title={t('Admission destination')}>
               {!existing && (
                 <Controller
                   control={form.control}
@@ -152,7 +155,7 @@ export function CandidateForm({
                   render={({ field }) => (
                     <Choice
                       id="entry-stage"
-                      label="Entry stage"
+                      label={t('Entry stage')}
                       value={field.value}
                       onChange={(value) => {
                         const parsed = candidateCreateSchema.shape.state.safeParse(value);
@@ -178,7 +181,7 @@ export function CandidateForm({
                 render={({ field, fieldState }) => (
                   <Choice
                     id="offering"
-                    label="Academic session and class"
+                    label={t('Academic session and class')}
                     value={field.value}
                     onChange={field.onChange}
                     options={offerings}
@@ -193,7 +196,7 @@ export function CandidateForm({
                 render={({ field, fieldState }) => (
                   <Choice
                     id="assignee"
-                    label="Admission Officer"
+                    label={t('Admission Officer')}
                     value={field.value}
                     onChange={field.onChange}
                     options={setup.assignees.map((a) => ({ value: a.userId, label: a.name }))}
@@ -207,7 +210,7 @@ export function CandidateForm({
               />
               {state === 'follow_up' && mode !== 'edit' && (
                 <div className="space-y-2">
-                  <Label htmlFor="next-date">Next follow-up date *</Label>
+                  <Label htmlFor="next-date">{t('Next follow-up date *')}</Label>
                   <Controller
                     control={form.control}
                     name="followUpDate"
@@ -226,7 +229,7 @@ export function CandidateForm({
                   />
                   {form.formState.errors.followUpDate && (
                     <p id="next-date-error" role="alert" className="text-xs text-destructive">
-                      {form.formState.errors.followUpDate.message}
+                      {t(form.formState.errors.followUpDate.message)}
                     </p>
                   )}
                 </div>
@@ -238,16 +241,20 @@ export function CandidateForm({
             />
             {mode !== 'edit' && state === 'willing' && (
               <section className="border-t border-border py-6">
-                <h2 className="font-semibold">Optional willing fee</h2>
+                <h2 className="font-semibold">{t('Optional willing fee')}</h2>
                 <Toggle
                   id="collect-willing"
-                  label="Collect willing fee now"
+                  label={t('Collect willing fee now')}
                   description={
                     paidWilling > 0
-                      ? 'A willing fee has already been collected for this record.'
+                      ? t('A willing fee has already been collected for this record.')
                       : canCollect
-                        ? `Cash collection · ${money(willingAmount)}. You can save without collecting a fee.`
-                        : 'Fee collection needs the Fees module and a configured positive amount. You can save without a fee.'
+                        ? t('Cash collection · {value0}. You can save without collecting a fee.', {
+                            value0: money(willingAmount),
+                          })
+                        : t(
+                            'Fee collection needs the Fees module and a configured positive amount. You can save without a fee.',
+                          )
                   }
                   checked={collectingWilling}
                   onChange={(value) => form.setValue('collectWillingFee', value)}
@@ -255,8 +262,8 @@ export function CandidateForm({
                 />
                 {collectingWilling && (
                   <p className="text-xs text-muted-foreground">
-                    Confirm that you have received {money(willingAmount)} in cash. A receipt will be
-                    issued when this record is saved.
+                    {t('Confirm that you have received')} {money(willingAmount)}{' '}
+                    {t('in cash. A receipt will be issued when this record is saved.')}{' '}
                   </p>
                 )}
               </section>
@@ -275,7 +282,7 @@ export function CandidateForm({
           </fieldset>
           {mutation.isError && (
             <p role="alert" className="mb-4 text-destructive">
-              {mutation.error.message}
+              {t(mutation.error.message)}
             </p>
           )}
           <div className="flex justify-end gap-3 border-t border-border pt-5">
@@ -285,17 +292,17 @@ export function CandidateForm({
                 params={{ institutionId }}
                 search={{ state: 'follow_up', due: 'all', search: '', offset: 0 }}
               >
-                Cancel
+                {t('Cancel')}{' '}
               </Link>
             </Button>
             <Button type="submit" disabled={mutation.isPending || setupMissing}>
               {mutation.isPending
-                ? 'Saving…'
+                ? t('Saving…')
                 : mode === 'edit'
-                  ? 'Save details'
+                  ? t('Save details')
                   : state === 'admitted'
-                    ? 'Confirm admission'
-                    : 'Save record'}
+                    ? t('Confirm admission')
+                    : t('Save record')}
             </Button>
           </div>
         </form>

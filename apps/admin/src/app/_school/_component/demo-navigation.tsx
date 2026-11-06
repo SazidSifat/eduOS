@@ -1,3 +1,4 @@
+import { useLanguage } from '@eduos/ui';
 import { Link, useLocation } from '@tanstack/react-router';
 import {
   CalendarDays,
@@ -88,12 +89,14 @@ const groups = [
 }[];
 
 export function DemoNavigation({ close }: { close: () => void }) {
+  const { t } = useLanguage();
+
   const { snapshot } = useDemo();
   const location = useLocation();
   const path = location.pathname.replace(/\/$/, '') || '/';
 
   return (
-    <nav aria-label="School navigation" className="demo-navigation">
+    <nav aria-label={t('School navigation')} className="demo-navigation">
       {groups
         .filter((group) => group.children.some((child) => canOpenSchoolPath(snapshot, child.to)))
         .map((group) => {
@@ -103,7 +106,7 @@ export function DemoNavigation({ close }: { close: () => void }) {
             <details key={group.label} open={isGroupActive} className="demo-nav-group">
               <summary className={`demo-nav-summary ${isGroupActive ? 'demo-nav-active' : ''}`}>
                 <Icon size={16} aria-hidden="true" />
-                <span>{group.label}</span>
+                <span>{t(group.label)}</span>
                 <ChevronDown size={14} aria-hidden="true" className="demo-nav-chevron" />
               </summary>
               <div className="demo-nav-children">
@@ -120,7 +123,7 @@ export function DemoNavigation({ close }: { close: () => void }) {
                         className={`demo-nav-sublink ${isChildActive ? 'demo-nav-sublink-active' : ''}`}
                         aria-current={isChildActive ? 'page' : undefined}
                       >
-                        {child.label}
+                        {t(child.label)}
                       </Link>
                     );
                   })}

@@ -145,3 +145,8 @@ test('keeps school-management controls out of the Manager preview', async ({ pag
     page.getByRole('navigation').getByRole('link', { name: 'Subscriptions', exact: true }),
   ).toHaveCount(0);
 });
+
+// Preserve the English workflow while the app also supports Bangla by default.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('eduos-language', 'en'));
+});

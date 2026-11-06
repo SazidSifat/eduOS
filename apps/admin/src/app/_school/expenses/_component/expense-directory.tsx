@@ -1,7 +1,8 @@
+import { useLanguage } from '@eduos/ui';
 import { Link } from '@tanstack/react-router';
 import { Input, Label } from '@eduos/ui';
 import { useDemo } from '../../_component/demo-provider';
-import { money } from '../../_component/school-format';
+
 import {
   Choice,
   DataTable,
@@ -16,6 +17,8 @@ import {
 import { useSchoolUiStore } from '../../../../stores/school-ui-store';
 
 export function ExpenseDirectory() {
+  const { t, money } = useLanguage();
+
   const { state } = useDemo();
   const { expenseFilter, setExpenseFilter } = useSchoolUiStore();
 
@@ -36,11 +39,11 @@ export function ExpenseDirectory() {
   return (
     <>
       <PageHeading
-        title="Expense register"
-        description="Track school spending from request to approval and actual payment."
+        title={t('Expense register')}
+        description={t('Track school spending from request to approval and actual payment.')}
         action={
           <DemoLink to="/expenses/new" primary>
-            Record expense
+            {t('Record expense')}{' '}
           </DemoLink>
         }
       />
@@ -49,7 +52,7 @@ export function ExpenseDirectory() {
           {
             label: 'Recorded expenses',
             value: money(sum(() => true)),
-            detail: `${state.expenses.length} records`,
+            detail: t('{value0} records', { value0: state.expenses.length }),
           },
           { label: 'Paid', value: money(sum((e) => e.paid)), detail: 'Posted payment vouchers' },
           {
@@ -66,43 +69,43 @@ export function ExpenseDirectory() {
       />
       <div className="demo-filters">
         <div>
-          <Label htmlFor="expense-search">Search expenses</Label>
+          <Label htmlFor="expense-search">{t('Search expenses')}</Label>
           <Input
             id="expense-search"
             value={expenseFilter.search}
             onChange={(e) => setExpenseFilter({ search: e.target.value })}
-            placeholder="Reference, description or payee"
+            placeholder={t('Reference, description or payee')}
           />
         </div>
         <Choice
           id="expense-category"
-          label="Category"
+          label={t('Category')}
           value={expenseFilter.category}
           options={['All categories', ...state.categories]}
           onChange={(category) => setExpenseFilter({ category })}
         />
         <Choice
           id="expense-state"
-          label="Approval"
+          label={t('Approval')}
           value={expenseFilter.status}
           options={['All states', 'draft', 'pending', 'approved', 'returned']}
           onChange={(status) => setExpenseFilter({ status })}
         />
         <Choice
           id="expense-payment"
-          label="Payment status"
+          label={t('Payment status')}
           value={expenseFilter.payment}
           options={['All payments', 'Paid', 'Unpaid']}
           onChange={(payment) => setExpenseFilter({ payment })}
         />
       </div>
       {!items.length ? (
-        <EmptyState title="No matching expenses">
-          Try another category, payment state or search term.
+        <EmptyState title={t('No matching expenses')}>
+          {t('Try another category, payment state or search term.')}{' '}
         </EmptyState>
       ) : (
         <DataTable
-          caption="School expense register"
+          caption={t('School expense register')}
           headers={['Expense / payee', 'Category', 'Amount (BDT)', 'Approval', 'Payment', 'Action']}
         >
           {items.map((e) => (
@@ -110,7 +113,7 @@ export function ExpenseDirectory() {
               <td>
                 <p className="font-semibold">{e.id}</p>
                 <small className="text-muted-foreground">
-                  {e.description} · {e.payee}
+                  {t(e.description)} · {e.payee}
                 </small>
               </td>
               <td>{e.category}</td>
@@ -127,12 +130,12 @@ export function ExpenseDirectory() {
                           : 'neutral'
                   }
                 >
-                  {e.status}
+                  {t(e.status)}
                 </Status>
               </td>
               <td>
                 <Status tone={e.paid ? 'success' : e.status === 'approved' ? 'warning' : 'neutral'}>
-                  {e.paid ? 'Paid' : 'Unpaid'}
+                  {e.paid ? t('Paid') : t('Unpaid')}
                 </Status>
               </td>
               <td>
@@ -142,7 +145,7 @@ export function ExpenseDirectory() {
                     to="/expenses/$expenseId/payment"
                     params={{ expenseId: e.id }}
                   >
-                    Voucher
+                    {t('Voucher')}{' '}
                   </Link>
                 ) : e.status === 'pending' ? (
                   <Link
@@ -150,7 +153,7 @@ export function ExpenseDirectory() {
                     to="/expenses/$expenseId"
                     params={{ expenseId: e.id }}
                   >
-                    Review
+                    {t('Review')}{' '}
                   </Link>
                 ) : (
                   <Link
@@ -158,7 +161,7 @@ export function ExpenseDirectory() {
                     to="/expenses/$expenseId"
                     params={{ expenseId: e.id }}
                   >
-                    Open
+                    {t('Open')}{' '}
                   </Link>
                 )}
               </td>
@@ -179,11 +182,12 @@ export function ExpenseDirectory() {
             e.paid ? 'Yes' : 'No',
           ])}
         />
-        <DemoLink to="/expenses/report">Expense report</DemoLink>
+        <DemoLink to="/expenses/report">{t('Expense report')}</DemoLink>
       </div>
-      <Notice title="Every posted payment has a voucher" tone="info">
-        Approval authorizes spending. Payment records the actual money paid; these are separate
-        actions.
+      <Notice title={t('Every posted payment has a voucher')} tone="info">
+        {t(
+          'Approval authorizes spending. Payment records the actual money paid; these are separate actions.',
+        )}{' '}
       </Notice>
     </>
   );

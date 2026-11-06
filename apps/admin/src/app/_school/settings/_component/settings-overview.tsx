@@ -1,6 +1,9 @@
+import { useLanguage } from '@eduos/ui';
 import { Link } from '@tanstack/react-router';
 import { Button } from '@eduos/ui';
 import { Notice, PageHeading, Status, type DemoPath } from '../../_component/demo-ui';
+import { useDemo } from '../../_component/demo-provider';
+import { LanguageSettings } from '../../../../components/settings/language-settings';
 
 interface SettingSection {
   title: string;
@@ -61,35 +64,51 @@ const sections: SettingSection[] = [
 ];
 
 export function SettingsOverview() {
+  const { t } = useLanguage();
+  const { snapshot } = useDemo();
+  const canConfigureSchool = snapshot.permissions.includes('school.settings');
+
   return (
     <>
       <PageHeading
-        title="Settings"
-        description="Manage school details, academic structure, access and module policies."
+        title={t('Settings')}
+        description={t(
+          canConfigureSchool
+            ? 'Manage school details, academic structure, access and module policies.'
+            : 'Manage your display preferences.',
+        )}
       />
-      <Notice title="School configuration" tone="info">
-        School Admins and Principals manage these settings. Platform subscriptions stay separate.
-      </Notice>
-      <div className="demo-setting-grid">
-        {sections.map((section) => (
-          <div key={section.to} className="flex flex-col justify-between p-6">
-            <div>
-              <h2 className="text-sm font-semibold">{section.title}</h2>
-              <p className="mt-1 text-sm text-muted-foreground">{section.description}</p>
-            </div>
-            <div className="mt-6 flex items-center justify-between">
-              <Status tone="neutral">{section.tag}</Status>
-              <Button asChild size="sm" variant="outline" className="min-w-[100px]">
-                <Link to={section.to}>Manage</Link>
-              </Button>
-            </div>
+      <LanguageSettings />
+      {canConfigureSchool && (
+        <>
+          <Notice title={t('School configuration')} tone="info">
+            {t(
+              'School Admins and Principals manage these settings. Platform subscriptions stay separate.',
+            )}{' '}
+          </Notice>
+          <div className="demo-setting-grid">
+            {sections.map((section) => (
+              <div key={section.to} className="flex flex-col justify-between p-6">
+                <div>
+                  <h2 className="text-sm font-semibold">{t(section.title)}</h2>
+                  <p className="mt-1 text-sm text-muted-foreground">{t(section.description)}</p>
+                </div>
+                <div className="mt-6 flex items-center justify-between">
+                  <Status tone="neutral">{section.tag}</Status>
+                  <Button asChild size="sm" variant="outline" className="min-w-[100px]">
+                    <Link to={section.to}>{t('Manage')}</Link>
+                  </Button>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-      <p className="text-xs text-muted-foreground">
-        Settings changes should show who changed them and when. Sensitive changes need an explicit
-        permission check.
-      </p>
+          <p className="text-xs text-muted-foreground">
+            {t(
+              'Settings changes should show who changed them and when. Sensitive changes need an explicit permission check.',
+            )}{' '}
+          </p>
+        </>
+      )}
     </>
   );
 }

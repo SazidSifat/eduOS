@@ -317,3 +317,60 @@ test('academic settings saves, clears and audits enrollment dates', async ({ pag
   );
   await editor.screenshot({ path: '/tmp/eduos-enrollment-editor-mobile-dark.png' });
 });
+
+// Preserve the English workflow while the app also supports Bangla by default.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    if (!localStorage.getItem('eduos-language')) localStorage.setItem('eduos-language', 'en');
+  });
+});
+
+test('school screens use the language preference saved in Settings and localized dropdowns', async ({
+  page,
+}, testInfo) => {
+  await login(page);
+  await expect(page.getByRole('button', { name: 'বাংলা', exact: true })).toHaveCount(0);
+  await page.goto(`/settings?institutionId=${school.data.id}`);
+  await page.getByRole('button', { name: 'বাংলা', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'প্রদর্শনের ভাষা', exact: true })).toBeVisible();
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'bn');
+  await page.goto(`/admissions?institutionId=${school.data.id}`);
+  await expect(page.getByRole('heading', { name: 'ফলো-আপ', exact: true })).toBeVisible();
+  await expect(page.getByRole('navigation', { name: 'প্রতিষ্ঠানের মেনু' })).toBeVisible();
+  await page.getByRole('combobox', { name: 'শ্রেণি / শিক্ষাবর্ষ', exact: true }).click();
+  await expect(page.getByRole('option', { name: 'সব শ্রেণি', exact: true })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await page.getByRole('link', { name: 'নতুন রেকর্ড', exact: true }).click();
+  await page.getByLabel('শিক্ষার্থীর নাম', { exact: false }).fill('Synthetic Bilingual Form');
+  await page.getByRole('combobox', { name: 'সম্পর্ক', exact: true }).click();
+  await page.getByRole('option', { name: 'মা', exact: true }).click();
+  await expect(page.getByLabel('শিক্ষার্থীর নাম', { exact: false })).toHaveValue(
+    'Synthetic Bilingual Form',
+  );
+  await expect(page.getByRole('combobox', { name: 'সম্পর্ক', exact: true })).toHaveText('মা');
+  await page.screenshot({ path: testInfo.outputPath('admin-bangla-intake.png'), fullPage: true });
+  const views: [string, string][] = [
+    ['/admissions', 'ফলো-আপ'],
+    ['/expenses', 'ব্যয়ের খাতা'],
+    ['/settings', 'সেটিংস'],
+  ];
+  for (const [path, heading] of views) {
+    await page.goto(`${path}?institutionId=${school.data.id}`);
+    await expect(page.getByRole('heading', { name: heading, exact: true })).toBeVisible();
+  }
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto(`/settings?institutionId=${school.data.id}`);
+  await page.getByRole('button', { name: 'English', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Display language', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'বাংলা', exact: true }).click();
+  await page.goto(`/admissions?institutionId=${school.data.id}`);
+  await expect(page.getByRole('button', { name: 'English', exact: true })).toHaveCount(0);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.getByRole('button', { name: 'প্রতিষ্ঠানের মেনু খুলুন' }).click();
+  await expect(page.getByRole('navigation', { name: 'প্রতিষ্ঠানের মেনু' })).toBeVisible();
+  await page.screenshot({
+    path: testInfo.outputPath('admin-bangla-workspace-mobile.png'),
+    fullPage: true,
+  });
+});

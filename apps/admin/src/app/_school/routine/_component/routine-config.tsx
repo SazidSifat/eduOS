@@ -1,3 +1,4 @@
+import { useLanguage } from '@eduos/ui';
 import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { Button, Input, Label } from '@eduos/ui';
@@ -8,6 +9,8 @@ import { DemoLink, Notice, PageHeading, Panel } from '../../_component/demo-ui';
 import { validPeriods } from './routine-validation';
 
 export function RoutineConfig() {
+  const { t } = useLanguage();
+
   const { state, snapshot, dispatch, notify } = useDemo();
   const navigate = useNavigate();
   const [days, setDays] = useState(state.routine.days);
@@ -16,11 +19,13 @@ export function RoutineConfig() {
   return (
     <>
       <PageHeading
-        title="Create a class routine"
-        description="Choose the class, teaching days and period structure before assigning lessons."
+        title={t('Create a class routine')}
+        description={t(
+          'Choose the class, teaching days and period structure before assigning lessons.',
+        )}
       />
       {error && (
-        <Notice title="Review the routine structure" tone="danger">
+        <Notice title={t('Review the routine structure')} tone="danger">
           {error}
         </Notice>
       )}
@@ -53,8 +58,8 @@ export function RoutineConfig() {
             ],
           },
         ]}
-        submitLabel="Continue to lesson builder"
-        footer={<DemoLink to="/routine">Cancel</DemoLink>}
+        submitLabel={t('Continue to lesson builder')}
+        footer={<DemoLink to="/routine">{t('Cancel')}</DemoLink>}
         onSubmit={async (values) => {
           if (!days.length || !validPeriods(periods)) {
             setError(
@@ -81,8 +86,8 @@ export function RoutineConfig() {
         }}
       >
         <Panel
-          title="Teaching days"
-          description="The weekly pattern is configurable for the school."
+          title={t('Teaching days')}
+          description={t('The weekly pattern is configurable for the school.')}
         >
           <div className="flex flex-wrap gap-3">
             {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(
@@ -97,22 +102,24 @@ export function RoutineConfig() {
                       )
                     }
                   />
-                  {day}
+                  {t(day)}
                 </label>
               ),
             )}
           </div>
         </Panel>
         <Panel
-          title="Periods and breaks"
-          description="Any gap between periods is displayed as a break in the weekly grid."
+          title={t('Periods and breaks')}
+          description={t('Any gap between periods is displayed as a break in the weekly grid.')}
         >
           <div className="demo-stack">
             {periods.map((period) => (
               <div key={period.id} className="demo-period-form">
-                <p className="font-semibold">Period {period.id}</p>
+                <p className="font-semibold">
+                  {t('Period')} {period.id}
+                </p>
                 <div className="demo-field">
-                  <Label htmlFor={`period-${period.id}-start`}>Starts</Label>
+                  <Label htmlFor={`period-${period.id}-start`}>{t('Starts')}</Label>
                   <Input
                     id={`period-${period.id}-start`}
                     type="time"
@@ -127,7 +134,7 @@ export function RoutineConfig() {
                   />
                 </div>
                 <div className="demo-field">
-                  <Label htmlFor={`period-${period.id}-end`}>Ends</Label>
+                  <Label htmlFor={`period-${period.id}-end`}>{t('Ends')}</Label>
                   <Input
                     id={`period-${period.id}-end`}
                     type="time"
@@ -143,7 +150,7 @@ export function RoutineConfig() {
                 </div>
                 <Button
                   variant="ghost"
-                  aria-label={`Remove period ${period.id}`}
+                  aria-label={t('Remove period {value0}', { value0: period.id })}
                   disabled={periods.length < 2}
                   onClick={() => setPeriods((current) => current.filter((p) => p.id !== period.id))}
                 >
@@ -169,7 +176,7 @@ export function RoutineConfig() {
                 }}
               >
                 <Plus size={16} />
-                Add period
+                {t('Add period')}{' '}
               </Button>
             </div>
           </div>

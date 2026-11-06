@@ -1,3 +1,4 @@
+import { useLanguage } from '@eduos/ui';
 import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import { Button, DatePicker, Input, Label } from '@eduos/ui';
@@ -17,13 +18,17 @@ import {
 import { currentRegister, markCounts, markOptions } from './attendance-model';
 
 export function DailyAttendance() {
+  const { t } = useLanguage();
+
   const { state, dispatch, notify, classes, roster } = useDemo();
   const [search, setSearch] = useState('');
   const register = currentRegister(state);
   if (!register)
     return (
-      <EmptyState title="No class register available">
-        Configure an academic offering and class teacher, then enroll students to start attendance.
+      <EmptyState title={t('No class register available')}>
+        {t(
+          'Configure an academic offering and class teacher, then enroll students to start attendance.',
+        )}{' '}
       </EmptyState>
     );
   const counts = markCounts(register);
@@ -34,7 +39,11 @@ export function DailyAttendance() {
     return (
       <fieldset
         className="demo-attendance-controls"
-        aria-label={`Attendance for ${roster(register?.classId ?? '', register?.date).find((s) => s.id === id)?.name ?? 'student'}`}
+        aria-label={t('Attendance for {value0}', {
+          value0:
+            roster(register?.classId ?? '', register?.date).find((s) => s.id === id)?.name ??
+            'student',
+        })}
       >
         {markOptions.map((value) => (
           <Button
@@ -45,7 +54,7 @@ export function DailyAttendance() {
             disabled={register?.submitted}
             onClick={() => dispatch({ type: 'attendance-mark', studentId: id, mark: value })}
           >
-            {value}
+            {t(value)}
           </Button>
         ))}
       </fieldset>
@@ -54,12 +63,19 @@ export function DailyAttendance() {
   return (
     <>
       <PageHeading
-        title="Daily attendance"
-        description={`${classes.find((c) => c.id === register.classId)?.label} · ${register.date} · Class teacher: ${state.members.find((m) => m.id === classes.find((c) => c.id === register.classId)?.teacherId)?.name ?? 'Unassigned'}`}
+        title={t('Daily attendance')}
+        description={t('{value0} · {value1} · Class teacher: {value2}', {
+          value0: classes.find((c) => c.id === register.classId)?.label,
+          value1: register.date,
+          value2:
+            state.members.find(
+              (m) => m.id === classes.find((c) => c.id === register.classId)?.teacherId,
+            )?.name ?? 'Unassigned',
+        })}
       />
       <div className="demo-filters">
         <div>
-          <Label htmlFor="attendance-date">Register date</Label>
+          <Label htmlFor="attendance-date">{t('Register date')}</Label>
           <DatePicker
             id="attendance-date"
             value={register.date}
@@ -70,7 +86,7 @@ export function DailyAttendance() {
         </div>
         <Choice
           id="attendance-class"
-          label="Class / section"
+          label={t('Class / section')}
           value={classes.find((c) => c.id === register.classId)?.label ?? 'Class 3 · A'}
           options={classes.map((c) => c.label)}
           onChange={async (label) => {
@@ -85,10 +101,14 @@ export function DailyAttendance() {
       </div>
       <div className="demo-row-actions">
         <Status tone={register.submitted ? 'success' : 'warning'}>
-          {register.submitted ? 'Submitted' : register.saved ? 'Saved draft' : 'Unsaved draft'}
+          {register.submitted
+            ? t('Submitted')
+            : register.saved
+              ? t('Saved draft')
+              : t('Unsaved draft')}
         </Status>
         <span className="demo-help">
-          {roster(register.classId, register.date).length} active enrollments
+          {roster(register.classId, register.date).length} {t('active enrollments')}{' '}
         </span>
       </div>
       <Metrics
@@ -101,10 +121,10 @@ export function DailyAttendance() {
       />
       <div className="demo-filters">
         <div>
-          <Label htmlFor="roster-search">Find a student</Label>
+          <Label htmlFor="roster-search">{t('Find a student')}</Label>
           <Input
             id="roster-search"
-            placeholder="Student name or roll"
+            placeholder={t('Student name or roll')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -114,12 +134,12 @@ export function DailyAttendance() {
           disabled={register.submitted || counts.Unmarked === 0}
           onClick={() => dispatch({ type: 'attendance-bulk' })}
         >
-          Mark unmarked present
+          {t('Mark unmarked present')}{' '}
         </Button>
       </div>
       <div className="demo-roster-table">
         <DataTable
-          caption="Daily class attendance"
+          caption={t('Daily class attendance')}
           headers={['Roll / student', 'Attendance', 'Status']}
         >
           {students.map((student) => {
@@ -137,7 +157,7 @@ export function DailyAttendance() {
                   <Status
                     tone={mark === 'Present' ? 'success' : mark === 'Absent' ? 'danger' : 'warning'}
                   >
-                    {mark}
+                    {t(mark)}
                   </Status>
                 </td>
               </tr>
@@ -151,7 +171,7 @@ export function DailyAttendance() {
             <h2>
               {student.roll} · {student.name}
             </h2>
-            <p className="demo-help">{register.marks[student.id] ?? 'Unmarked'}</p>
+            <p className="demo-help">{t(register.marks[student.id] ?? 'Unmarked')}</p>
             {controls(student.id, register.marks[student.id] ?? 'Unmarked')}
           </section>
         ))}
@@ -159,21 +179,25 @@ export function DailyAttendance() {
       {!students.length && (
         <p className="text-muted-foreground">
           {Object.keys(register.marks).length
-            ? 'No students match this name or roll.'
-            : 'No students are enrolled for this date.'}
+            ? t('No students match this name or roll.')
+            : t('No students are enrolled for this date.')}
         </p>
       )}
       {counts.Unmarked > 0 && (
-        <Notice title={`${counts.Unmarked} students still need a status`} tone="warning">
-          Mark every student before reviewing and submitting. Saving a draft does not publish
-          attendance.
+        <Notice
+          title={t('{value0} students still need a status', { value0: counts.Unmarked })}
+          tone="warning"
+        >
+          {t(
+            'Mark every student before reviewing and submitting. Saving a draft does not publish attendance.',
+          )}{' '}
         </Notice>
       )}
       {register.submitted ? (
         <div className="demo-actions">
-          <DemoLink to="/attendance/corrections">Request correction</DemoLink>
+          <DemoLink to="/attendance/corrections">{t('Request correction')}</DemoLink>
           <DemoLink to="/attendance/submitted" primary>
-            View submission
+            {t('View submission')}{' '}
           </DemoLink>
         </div>
       ) : (
@@ -186,13 +210,13 @@ export function DailyAttendance() {
               notify('Attendance draft saved to the school record. It is not yet submitted.');
             }}
           >
-            Save draft
+            {t('Save draft')}{' '}
           </Button>
           {counts.Unmarked > 0 || Object.keys(register.marks).length === 0 ? (
-            <Button disabled>Review register</Button>
+            <Button disabled>{t('Review register')}</Button>
           ) : (
             <Button asChild>
-              <Link to="/attendance/review">Review register</Link>
+              <Link to="/attendance/review">{t('Review register')}</Link>
             </Button>
           )}
         </div>

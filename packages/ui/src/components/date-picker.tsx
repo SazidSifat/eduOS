@@ -1,3 +1,4 @@
+import { useLanguage } from '../i18n/language-provider.js';
 import { useState, type ComponentProps } from 'react';
 import { Button } from './button.js';
 import { Calendar } from './calendar.js';
@@ -21,6 +22,8 @@ export function DatePicker({
   maxDate,
   ...props
 }: DatePickerProps) {
+  const { t, locale } = useLanguage();
+
   const [open, setOpen] = useState(false);
   const [today] = useState(() => new Date());
   const selected = calendarDate(value);
@@ -38,12 +41,12 @@ export function DatePicker({
         >
           <span>
             {selected
-              ? new Intl.DateTimeFormat('en-GB', {
+              ? new Intl.DateTimeFormat(locale, {
                   day: '2-digit',
                   month: 'short',
                   year: 'numeric',
                 }).format(selected)
-              : placeholder}
+              : t(placeholder)}
           </span>
           <svg
             aria-hidden="true"
@@ -59,7 +62,7 @@ export function DatePicker({
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        aria-label="Choose a date"
+        aria-label={t('Choose a date')}
         className="w-[min(20rem,calc(100vw-2rem))] p-0"
         onOpenAutoFocus={(event) => {
           const day =
@@ -97,7 +100,7 @@ export function DatePicker({
               setOpen(false);
             }}
           >
-            Clear date
+            {t('Clear date')}{' '}
           </Button>
         </div>
       </PopoverContent>

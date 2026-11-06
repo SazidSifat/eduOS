@@ -36,3 +36,8 @@ test('keeps the auth shell visible while the session request is pending', async 
   }
   await expect(page.getByLabel('Email')).toBeVisible();
 });
+
+// Preserve the English workflow while the app also supports Bangla by default.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('eduos-language', 'en'));
+});

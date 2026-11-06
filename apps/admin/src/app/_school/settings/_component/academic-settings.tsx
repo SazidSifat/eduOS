@@ -1,3 +1,4 @@
+import { useLanguage } from '@eduos/ui';
 import { useState } from 'react';
 import { z } from 'zod';
 import { Button } from '@eduos/ui';
@@ -7,6 +8,8 @@ import { DataTable, Notice, PageHeading, Status } from '../../_component/demo-ui
 import { EnrollmentDates } from './enrollment-dates';
 
 export function AcademicSettings() {
+  const { t } = useLanguage();
+
   const { state, dispatch, notify } = useDemo();
   const [editing, setEditing] = useState('');
   const [showForm, setShowForm] = useState(false);
@@ -15,8 +18,10 @@ export function AcademicSettings() {
   return (
     <>
       <PageHeading
-        title="Academic setup"
-        description="Maintain sessions, class offerings and assignments shared across the school."
+        title={t('Academic setup')}
+        description={t(
+          'Maintain sessions, class offerings and assignments shared across the school.',
+        )}
         action={
           <Button
             onClick={() => {
@@ -24,7 +29,7 @@ export function AcademicSettings() {
               setShowForm(true);
             }}
           >
-            Add class / section
+            {t('Add class / section')}{' '}
           </Button>
         }
       />
@@ -56,7 +61,7 @@ export function AcademicSettings() {
             ],
           },
         ]}
-        submitLabel="Save session"
+        submitLabel={t('Save session')}
         onSubmit={async (values) => {
           if (valueOf(values, 'start') > valueOf(values, 'end')) {
             setError('The session end must be on or after its start.');
@@ -68,12 +73,12 @@ export function AcademicSettings() {
         }}
       />
       {error && (
-        <Notice title="Review academic setup" tone="danger">
+        <Notice title={t('Review academic setup')} tone="danger">
           {error}
         </Notice>
       )}
       <DataTable
-        caption="Class and section offerings"
+        caption={t('Class and section offerings')}
         headers={['Class', 'Session', 'Sections', 'Capacity', 'Class teacher', 'State', 'Action']}
       >
         {state.offerings.map((o) => (
@@ -82,10 +87,10 @@ export function AcademicSettings() {
             <td>{o.session}</td>
             <td>{o.sections}</td>
             <td>{o.capacity}</td>
-            <td>{state.members.find((m) => m.id === o.teacher)?.name ?? 'Unassigned'}</td>
+            <td>{state.members.find((m) => m.id === o.teacher)?.name ?? t('Unassigned')}</td>
             <td>
               <Status tone={o.active ? 'success' : 'neutral'}>
-                {o.active ? 'Open' : 'Closed'}
+                {o.active ? t('Open') : t('Closed')}
               </Status>
             </td>
             <td>
@@ -97,7 +102,7 @@ export function AcademicSettings() {
                   setShowForm(true);
                 }}
               >
-                Edit offering
+                {t('Edit offering')}{' '}
               </Button>
             </td>
           </tr>
@@ -157,10 +162,10 @@ export function AcademicSettings() {
               ],
             },
           ]}
-          submitLabel="Save offering"
+          submitLabel={t('Save offering')}
           footer={
             <Button variant="outline" onClick={() => setShowForm(false)}>
-              Cancel
+              {t('Cancel')}{' '}
             </Button>
           }
           onSubmit={async (values) => {
@@ -204,9 +209,10 @@ export function AcademicSettings() {
         />
       )}
       <EnrollmentDates />
-      <Notice title="Keep academic history">
-        A new academic session uses new enrollments and assignments. Prior attendance and published
-        routines remain in their history.
+      <Notice title={t('Keep academic history')}>
+        {t(
+          'A new academic session uses new enrollments and assignments. Prior attendance and published routines remain in their history.',
+        )}{' '}
       </Notice>
     </>
   );

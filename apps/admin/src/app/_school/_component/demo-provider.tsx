@@ -1,3 +1,4 @@
+import { useLanguage } from '@eduos/ui';
 import {
   createContext,
   useCallback,
@@ -54,6 +55,8 @@ function SchoolProvider({
   institutionId: string;
   children: ReactNode;
 }) {
+  const { t } = useLanguage();
+
   const query = schoolQuery(userId, institutionId);
   const result = useQuery(query);
   const mutation = useMutation({
@@ -82,10 +85,10 @@ function SchoolProvider({
       <section role={result.isError ? 'alert' : 'status'} className="p-6">
         <p>
           {result.isError
-            ? 'School data could not be loaded. Check access and API connectivity.'
-            : 'Loading school records…'}
+            ? t('School data could not be loaded. Check access and API connectivity.')
+            : t('Loading school records…')}
         </p>
-        {result.isError && <Button onClick={() => void result.refetch()}>Retry</Button>}
+        {result.isError && <Button onClick={() => void result.refetch()}>{t('Retry')}</Button>}
       </section>
     );
   const snapshot = result.data;

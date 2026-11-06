@@ -1,3 +1,4 @@
+import { LanguageToggle } from '@eduos/ui';
 import type { ReactNode } from 'react';
 import { Link } from '@tanstack/react-router';
 import { AppBrand } from './app-brand';
@@ -11,7 +12,10 @@ export function AppShell({ children }: { children: ReactNode }) {
           <Link to="/app" className="rounded focus-visible:outline-2 focus-visible:outline-ring">
             <AppBrand />
           </Link>
-          <ThemeToggle />
+          <div className="flex items-center gap-2">
+            <LanguageToggle />
+            <ThemeToggle />
+          </div>
         </div>
       </header>
       <main id="main-content" tabIndex={-1} className="mx-auto max-w-5xl px-6 py-12">

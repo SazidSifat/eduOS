@@ -1,3 +1,4 @@
+import { useLanguage } from '@eduos/ui';
 import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useFormContext, useWatch } from 'react-hook-form';
@@ -7,6 +8,8 @@ import { DemoLink, Notice, PageHeading } from '../../_component/demo-ui';
 import type { Lesson } from '../../_component/demo-model';
 
 export function LessonForm({ day, period }: { day: string; period: string }) {
+  const { t } = useLanguage();
+
   const { state, dispatch, notify } = useDemo();
   const navigate = useNavigate();
   const [error] = useState('');
@@ -14,11 +17,15 @@ export function LessonForm({ day, period }: { day: string; period: string }) {
   return (
     <>
       <PageHeading
-        title={lesson ? 'Edit lesson' : 'Add a lesson'}
-        description={`${state.routine.className} · ${day} · Period ${period}`}
+        title={lesson ? t('Edit lesson') : t('Add a lesson')}
+        description={t('{value0} · {value1} · Period {value2}', {
+          value0: state.routine.className,
+          value1: day,
+          value2: period,
+        })}
       />
       {error && (
-        <Notice title="Review this assignment" tone="danger">
+        <Notice title={t('Review this assignment')} tone="danger">
           {error}
         </Notice>
       )}
@@ -69,8 +76,8 @@ export function LessonForm({ day, period }: { day: string; period: string }) {
             ],
           },
         ]}
-        submitLabel="Save lesson & review"
-        footer={<DemoLink to="/routine">Cancel</DemoLink>}
+        submitLabel={t('Save lesson & review')}
+        footer={<DemoLink to="/routine">{t('Cancel')}</DemoLink>}
         onSubmit={async (values) => {
           const day = valueOf(values, 'day');
           const period = valueOf(values, 'period');
@@ -88,15 +95,18 @@ export function LessonForm({ day, period }: { day: string; period: string }) {
         }}
       >
         <LessonFeedback />
-        <Notice title="Subject teaching assignments">
-          Select an active school Teacher. The API checks published class routines for overlapping
-          teacher and room assignments.
+        <Notice title={t('Subject teaching assignments')}>
+          {t(
+            'Select an active school Teacher. The API checks published class routines for overlapping teacher and room assignments.',
+          )}{' '}
         </Notice>
       </DemoForm>
     </>
   );
 }
 function LessonFeedback() {
+  const { t } = useLanguage();
+
   const { snapshot } = useDemo();
   const { control } = useFormContext<Record<string, string>>();
   const values = useWatch({ control });
@@ -106,7 +116,7 @@ function LessonFeedback() {
         .filter((i) => i.lessonId === `${values.day}-${values.period}`)
         .map((issue) => (
           <Notice key={`${issue.lessonId}-${issue.kind}`} title={issue.title} tone="warning">
-            {issue.detail}
+            {t(issue.detail)}
           </Notice>
         ))}
     </>

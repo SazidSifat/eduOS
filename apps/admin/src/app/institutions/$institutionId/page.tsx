@@ -1,8 +1,11 @@
+import { useLanguage } from '@eduos/ui';
 import { createFileRoute } from '@tanstack/react-router';
 import { AppShell } from '../../../components/layout/app-shell';
 import { SignOutButton } from '../../../components/layout/sign-out-button';
 import { requireSchoolApplication } from './_api/entry';
 function Page() {
+  const { t } = useLanguage();
+
   const { workspace } = Route.useRouteContext();
   return (
     <AppShell>
@@ -11,11 +14,14 @@ function Page() {
           <h1 className="text-2xl font-semibold">{workspace.name}</h1>
           <SignOutButton />
         </div>
-        <p className="text-xs text-muted-foreground">Institution {workspace.code}</p>
-        <h2 className="font-semibold">No application modules available</h2>
+        <p className="text-xs text-muted-foreground">
+          {t('Institution')} {workspace.code}
+        </p>
+        <h2 className="font-semibold">{t('No application modules available')}</h2>
         <p className="text-muted-foreground">
-          Contact your school administrator to check your role and enabled modules. Your account
-          does not currently have an available school module to open.
+          {t(
+            'Contact your school administrator to check your role and enabled modules. Your account does not currently have an available school module to open.',
+          )}{' '}
         </p>
       </section>
     </AppShell>

@@ -1,3 +1,4 @@
+import { useLanguage } from '@eduos/ui';
 import { useNavigate } from '@tanstack/react-router';
 import { Button } from '@eduos/ui';
 import { useDemo } from '../../_component/demo-provider';
@@ -6,6 +7,8 @@ import { DemoLink, Details, PageHeading, Panel, Status } from '../../_component/
 import { markCounts } from './attendance-model';
 
 export function AttendanceHistory() {
+  const { t } = useLanguage();
+
   const { state, dispatch, classes } = useDemo();
   const navigate = useNavigate();
   const registers = state.registers
@@ -14,14 +17,14 @@ export function AttendanceHistory() {
   return (
     <div className="demo-stack demo-width-phone">
       <PageHeading
-        title="Attendance history"
-        description="Submitted registers and correction requests for your assigned classes."
+        title={t('Attendance history')}
+        description={t('Submitted registers and correction requests for your assigned classes.')}
       />
       {registers.map((r) => {
         const counts = markCounts(r);
         return (
           <Panel key={r.id} title={`${classes.find((c) => c.id === r.classId)?.label} · ${r.date}`}>
-            <Status tone="success">Submitted</Status>
+            <Status tone="success">{t('Submitted')}</Status>
             <div className="my-5">
               <Details
                 items={[
@@ -43,15 +46,15 @@ export function AttendanceHistory() {
                 void navigate({ to: '/attendance/submitted' });
               }}
             >
-              View register
+              {t('View register')}{' '}
             </Button>
           </Panel>
         );
       })}
       <DemoLink to="/attendance/corrections" primary>
-        History & correction request
+        {t('History & correction request')}{' '}
       </DemoLink>
-      <DemoLink to="/attendance/classes">Back to my classes</DemoLink>
+      <DemoLink to="/attendance/classes">{t('Back to my classes')}</DemoLink>
     </div>
   );
 }

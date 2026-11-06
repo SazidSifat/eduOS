@@ -1,3 +1,4 @@
+import { useLanguage } from '@eduos/ui';
 import { useEffect, useId, useMemo } from 'react';
 import { Controller, useFieldArray, useFormContext, useWatch } from 'react-hook-form';
 import { Plus, Trash2 } from 'lucide-react';
@@ -7,7 +8,7 @@ import {
   type AdmissionFeeItem,
   type CandidateCreate,
 } from '@eduos/contracts';
-import { Choice, money, Toggle } from './form-controls';
+import { Choice, Toggle } from './form-controls';
 
 const feeTypes = [
   { value: 'admission', label: 'Admission fees' },
@@ -41,6 +42,8 @@ export function AdmissionFeeEditor({
   canConfigure: boolean;
   timezone: string;
 }) {
+  const { t, money } = useLanguage();
+
   const {
     control,
     getValues,
@@ -76,9 +79,9 @@ export function AdmissionFeeEditor({
     setValue('collectAdmissionFee', false);
   }, [payable, setValue]);
   return (
-    <section aria-label="Admission fee configuration" className="border-t border-border py-6">
+    <section aria-label={t('Admission fee configuration')} className="border-t border-border py-6">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h2 className="font-semibold">Fees and payment</h2>
+        <h2 className="font-semibold">{t('Fees and payment')}</h2>
         {canConfigure && (
           <Button
             type="button"
@@ -96,17 +99,18 @@ export function AdmissionFeeEditor({
             }
           >
             <Plus size={16} aria-hidden="true" />
-            Add fee
+            {t('Add fee')}{' '}
           </Button>
         )}
       </div>
       <p className="mb-5 text-muted-foreground">
-        Configure the fees collected with this admission. Monthly fees include the first installment
-        now and create a recurring billing schedule.
+        {t(
+          'Configure the fees collected with this admission. Monthly fees include the first installment now and create a recurring billing schedule.',
+        )}{' '}
       </p>
       {!canConfigure && (
         <p className="mb-4 text-muted-foreground">
-          An Admin or Principal can change fee items and amounts.
+          {t('An Admin or Principal can change fee items and amounts.')}{' '}
         </p>
       )}
       <div className="space-y-5">
@@ -123,22 +127,24 @@ export function AdmissionFeeEditor({
       </div>
       {errors.admissionFees?.root?.message && (
         <p role="alert" className="mt-3 text-destructive">
-          {errors.admissionFees.root.message}
+          {t(errors.admissionFees.root.message)}
         </p>
       )}
       <dl className="my-5 grid grid-cols-2 gap-3 border-t border-border pt-5">
-        <dt>Total fees</dt>
+        <dt>{t('Total fees')}</dt>
         <dd className="text-right tabular-nums">{money(total)}</dd>
-        <dt>Willing fee credit</dt>
+        <dt>{t('Willing fee credit')}</dt>
         <dd className="text-right tabular-nums">{money(credit)}</dd>
-        <dt className="font-semibold">Collect now</dt>
+        <dt className="font-semibold">{t('Collect now')}</dt>
         <dd className="text-right font-semibold tabular-nums">{money(payable)}</dd>
       </dl>
       {payable > 0 && (
         <Toggle
           id="collect-admission"
-          label="Confirm cash received"
-          description={`I have collected ${money(payable)} for this admission.`}
+          label={t('Confirm cash received')}
+          description={t('I have collected {value0} for this admission.', {
+            value0: money(payable),
+          })}
           checked={collecting}
           onChange={(value) => setValue('collectAdmissionFee', value)}
           disabled={!canCollect}
@@ -146,7 +152,7 @@ export function AdmissionFeeEditor({
       )}
       {total > 0 && !canCollect && (
         <p role="alert" className="text-destructive">
-          Enable the Fees module before confirming this admission.
+          {t('Enable the Fees module before confirming this admission.')}{' '}
         </p>
       )}
     </section>
@@ -165,6 +171,8 @@ function FeeRow({
   remove: () => void;
   timezone: string;
 }) {
+  const { t } = useLanguage();
+
   const id = useId();
   const {
     control,
@@ -176,7 +184,9 @@ function FeeRow({
   const rowErrors = errors.admissionFees?.[index];
   return (
     <fieldset disabled={!canConfigure} className="space-y-4 border-b border-border pb-5">
-      <legend className="sr-only">Fee {index + 1}</legend>
+      <legend className="sr-only">
+        {t('Fee')} {index + 1}
+      </legend>
       <div className="grid gap-5 md:grid-cols-3">
         <Controller
           control={control}
@@ -184,7 +194,7 @@ function FeeRow({
           render={({ field }) => (
             <Choice
               id={`${id}-type`}
-              label={`Fee type ${index + 1}`}
+              label={t('Fee type {value0}', { value0: index + 1 })}
               value={field.value ?? 'admission'}
               disabled={!canConfigure}
               options={feeTypes}
@@ -206,7 +216,9 @@ function FeeRow({
           )}
         />
         <div className="space-y-2">
-          <Label htmlFor={`${id}-name`}>Fee name {index + 1}</Label>
+          <Label htmlFor={`${id}-name`}>
+            {t('Fee name')} {index + 1}
+          </Label>
           <Input
             id={`${id}-name`}
             {...register(`admissionFees.${index}.label`)}
@@ -215,12 +227,14 @@ function FeeRow({
           />
           {rowErrors?.label?.message && (
             <p id={`${id}-name-error`} role="alert" className="text-xs text-destructive">
-              {rowErrors.label.message}
+              {t(rowErrors.label.message)}
             </p>
           )}
         </div>
         <div className="space-y-2">
-          <Label htmlFor={`${id}-amount`}>Amount {index + 1} (BDT)</Label>
+          <Label htmlFor={`${id}-amount`}>
+            {t('Amount')} {index + 1} {t('(BDT)')}
+          </Label>
           <div className="flex gap-2">
             <Controller
               control={control}
@@ -255,7 +269,7 @@ function FeeRow({
                 type="button"
                 variant="ghost"
                 size="icon"
-                aria-label={`Remove fee ${index + 1}`}
+                aria-label={t('Remove fee {value0}', { value0: index + 1 })}
                 disabled={!canRemove}
                 onClick={remove}
               >
@@ -265,7 +279,7 @@ function FeeRow({
           </div>
           {rowErrors?.amountMinor?.message && (
             <p id={`${id}-amount-error`} role="alert" className="text-xs text-destructive">
-              {rowErrors.amountMinor.message}
+              {t(rowErrors.amountMinor.message)}
             </p>
           )}
         </div>
@@ -276,20 +290,20 @@ function FeeRow({
             <BillingDate
               index={index}
               name="billingStartDate"
-              label={`First billing date ${index + 1}`}
+              label={t('First billing date {value0}', { value0: index + 1 })}
               id={`${id}-start`}
             />
             <BillingDate
               index={index}
               name="billingEndDate"
-              label={`Last billing date ${index + 1} (optional)`}
+              label={t('Last billing date {value0} (optional)', { value0: index + 1 })}
               id={`${id}-end`}
             />
           </div>
           <p className="text-xs text-muted-foreground">
-            The first installment is collected now. Future charges fall on the same day each month,
-            using the last day for shorter months. Leave the last date empty to bill until an Admin
-            or Principal stops the schedule.
+            {t(
+              'The first installment is collected now. Future charges fall on the same day each month, using the last day for shorter months. Leave the last date empty to bill until an Admin or Principal stops the schedule.',
+            )}{' '}
           </p>
         </>
       )}
@@ -307,6 +321,8 @@ function BillingDate({
   label: string;
   id: string;
 }) {
+  const { t } = useLanguage();
+
   const { control } = useFormContext<CandidateCreate>();
   return (
     <Controller
@@ -314,7 +330,7 @@ function BillingDate({
       name={`admissionFees.${index}.${name}`}
       render={({ field, fieldState }) => (
         <div className="space-y-2">
-          <Label htmlFor={id}>{label}</Label>
+          <Label htmlFor={id}>{t(label)}</Label>
           <DatePicker
             id={id}
             ref={field.ref}
@@ -326,7 +342,7 @@ function BillingDate({
           />
           {fieldState.error && (
             <p id={`${id}-error`} role="alert" className="text-xs text-destructive">
-              {fieldState.error.message}
+              {t(fieldState.error.message)}
             </p>
           )}
         </div>

@@ -1,8 +1,9 @@
+import { useLanguage } from '@eduos/ui';
 import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import { Button, DatePicker, Label } from '@eduos/ui';
 import { useDemo } from '../../_component/demo-provider';
-import { DEMO_TODAY, money } from '../../_component/school-format';
+import { DEMO_TODAY } from '../../_component/school-format';
 import { DemoForm, valueOf } from '../../_component/demo-form';
 import {
   DataTable,
@@ -16,6 +17,8 @@ import {
 } from '../../_component/demo-ui';
 
 export function CollectionReport() {
+  const { t, money } = useLanguage();
+
   const { state, snapshot, dispatch, notify } = useDemo();
   const [date, setDate] = useState(DEMO_TODAY);
   const [reverseId, setReverseId] = useState('');
@@ -25,8 +28,8 @@ export function CollectionReport() {
   return (
     <>
       <PageHeading
-        title="Collection report"
-        description="Posted payments and reversals with accountable collector totals."
+        title={t('Collection report')}
+        description={t('Posted payments and reversals with accountable collector totals.')}
         action={
           <ExportButton
             filename="school-collections"
@@ -43,7 +46,7 @@ export function CollectionReport() {
       />
       <div className="demo-filters">
         <div>
-          <Label htmlFor="collection-date">Collection date</Label>
+          <Label htmlFor="collection-date">{t('Collection date')}</Label>
           <DatePicker
             id="collection-date"
             value={date}
@@ -55,11 +58,17 @@ export function CollectionReport() {
       </div>
       <Metrics
         items={[
-          { label: 'Gross receipts', value: money(gross), detail: `${payments.length} receipts` },
+          {
+            label: 'Gross receipts',
+            value: money(gross),
+            detail: t('{value0} receipts', { value0: payments.length }),
+          },
           {
             label: 'Reversals',
             value: money(reversed),
-            detail: `${payments.filter((p) => p.reversed).length} reversed receipts`,
+            detail: t('{value0} reversed receipts', {
+              value0: payments.filter((p) => p.reversed).length,
+            }),
           },
           {
             label: 'Net collection',
@@ -68,9 +77,9 @@ export function CollectionReport() {
           },
         ]}
       />
-      <Panel title="Collector summary">
+      <Panel title={t('Collector summary')}>
         <DataTable
-          caption="Collector totals"
+          caption={t('Collector totals')}
           headers={['Collector', 'Receipts', 'Gross', 'Reversed', 'Net']}
         >
           {[...new Set(payments.map((p) => p.collector))].map((collector) => {
@@ -90,16 +99,16 @@ export function CollectionReport() {
         </DataTable>
       </Panel>
       <Panel
-        title="Collection ledger"
-        description="Historical receipts remain visible after reversal."
+        title={t('Collection ledger')}
+        description={t('Historical receipts remain visible after reversal.')}
       >
         {!payments.length ? (
-          <EmptyState title="No collections on this date">
-            Collect a student fee or choose another collection date.
+          <EmptyState title={t('No collections on this date')}>
+            {t('Collect a student fee or choose another collection date.')}{' '}
           </EmptyState>
         ) : (
           <DataTable
-            caption="School collection ledger"
+            caption={t('School collection ledger')}
             headers={['Receipt / student', 'Method', 'Amount', 'State', 'Action']}
           >
             {payments.map((p) => (
@@ -114,11 +123,11 @@ export function CollectionReport() {
                   </Link>
                   <small>{state.candidates.find((c) => c.id === p.candidateId)?.name}</small>
                 </td>
-                <td>Cash</td>
+                <td>{t('Cash')}</td>
                 <td>{money(p.amount)}</td>
                 <td>
                   <Status tone={p.reversed ? 'danger' : 'success'}>
-                    {p.reversed ? 'Reversed' : 'Posted'}
+                    {p.reversed ? t('Reversed') : t('Posted')}
                   </Status>
                 </td>
                 <td>
@@ -127,11 +136,11 @@ export function CollectionReport() {
                   snapshot.permissions.includes('fees.reverse') &&
                   /^[0-9a-f-]{36}$/.test(p.id) ? (
                     <Button size="sm" variant="outline" onClick={() => setReverseId(p.id)}>
-                      Reverse receipt
+                      {t('Reverse receipt')}{' '}
                     </Button>
                   ) : (
                     <span className="demo-help">
-                      {p.reversed ? p.reversed : 'Admission receipt'}
+                      {p.reversed ? p.reversed : t('Admission receipt')}
                     </span>
                   )}
                 </td>
@@ -145,7 +154,7 @@ export function CollectionReport() {
           key={reverseId}
           sections={[
             {
-              title: `Reverse ${reverseId}`,
+              title: t('Reverse {value0}', { value0: reverseId }),
               description:
                 'The original receipt remains in the ledger. Its allocations return to the student’s open balance.',
               fields: [
@@ -159,10 +168,10 @@ export function CollectionReport() {
               ],
             },
           ]}
-          submitLabel="Confirm authorized reversal"
+          submitLabel={t('Confirm authorized reversal')}
           footer={
             <Button variant="outline" onClick={() => setReverseId('')}>
-              Cancel
+              {t('Cancel')}{' '}
             </Button>
           }
           onSubmit={async (values) => {
@@ -181,9 +190,10 @@ export function CollectionReport() {
           }}
         />
       )}
-      <Notice title="School fees and subscriptions are separate">
-        These are student fee collections. Institution subscriptions and operating expenses have
-        their own records.
+      <Notice title={t('School fees and subscriptions are separate')}>
+        {t(
+          'These are student fee collections. Institution subscriptions and operating expenses have their own records.',
+        )}{' '}
       </Notice>
     </>
   );

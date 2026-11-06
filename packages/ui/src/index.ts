@@ -26,3 +26,6 @@ export {
 } from './components/table.js';
 export { Textarea } from './components/textarea.js';
 export { cn } from './lib/utils.js';
+export { LanguageProvider, useLanguage } from './i18n/language-provider.js';
+export { LanguageToggle } from './components/language-toggle.js';
+export { translate, languageStorageKey, type Language } from './i18n/language.js';

@@ -1,9 +1,10 @@
+import { useLanguage } from '@eduos/ui';
 import { config } from '../../../../lib/config';
 import { schoolBase } from '../../_api/queries';
 import { Link } from '@tanstack/react-router';
 import { Button } from '@eduos/ui';
 import { useDemo } from '../../_component/demo-provider';
-import { money } from '../../_component/school-format';
+
 import { DemoForm, valueOf } from '../../_component/demo-form';
 import {
   DemoLink,
@@ -16,34 +17,36 @@ import {
 } from '../../_component/demo-ui';
 
 export function ExpenseDetail({ id }: { id: string }) {
+  const { t, money } = useLanguage();
+
   const { state, snapshot, dispatch, notify } = useDemo();
   const expense = state.expenses.find((e) => e.id === id);
   if (!expense)
     return (
       <EmptyState
-        title="Expense unavailable"
-        action={<DemoLink to="/expenses">Open expense register</DemoLink>}
+        title={t('Expense unavailable')}
+        action={<DemoLink to="/expenses">{t('Open expense register')}</DemoLink>}
       >
-        This expense is not in this school.
+        {t('This expense is not in this school.')}{' '}
       </EmptyState>
     );
   return (
     <>
       <PageHeading
-        title="Expense review"
+        title={t('Expense review')}
         description={`${expense.id} · ${expense.description}`}
-        action={<DemoLink to="/expenses">Back to register</DemoLink>}
+        action={<DemoLink to="/expenses">{t('Back to register')}</DemoLink>}
       />
       <div className="demo-row-actions">
         <Status tone={expense.status === 'approved' ? 'success' : 'warning'}>
-          {expense.status}
+          {t(expense.status)}
         </Status>
         <Status tone={expense.paid ? 'success' : 'neutral'}>
-          {expense.paid ? 'Paid' : 'Not paid'}
+          {expense.paid ? t('Paid') : t('Not paid')}
         </Status>
       </div>
       <div className="demo-columns demo-columns-wide">
-        <Panel title="Expense summary">
+        <Panel title={t('Expense summary')}>
           <Details
             items={[
               ['Payee', expense.payee],
@@ -63,7 +66,7 @@ export function ExpenseDetail({ id }: { id: string }) {
             className="min-w-0 border-0 p-0"
           >
             {!snapshot.permissions.includes('expenses.review') && (
-              <p className="demo-help">An Admin or Principal must review this request.</p>
+              <p className="demo-help">{t('An Admin or Principal must review this request.')}</p>
             )}
             <DemoForm
               sections={[
@@ -82,7 +85,7 @@ export function ExpenseDetail({ id }: { id: string }) {
                   ],
                 },
               ]}
-              submitLabel="Approve expense"
+              submitLabel={t('Approve expense')}
               onSubmit={async (values) => {
                 if (
                   !(await dispatch({
@@ -111,7 +114,7 @@ export function ExpenseDetail({ id }: { id: string }) {
                   }}
                   variant="outline"
                 >
-                  Return for changes
+                  {t('Return for changes')}{' '}
                 </Button>
               }
             />
@@ -120,10 +123,10 @@ export function ExpenseDetail({ id }: { id: string }) {
           <Panel
             title={
               expense.paid
-                ? 'Payment recorded'
+                ? t('Payment recorded')
                 : expense.status === 'approved'
-                  ? 'Ready for payment'
-                  : 'Request needs attention'
+                  ? t('Ready for payment')
+                  : t('Request needs attention')
             }
           >
             {expense.reviewNote && (
@@ -132,14 +135,14 @@ export function ExpenseDetail({ id }: { id: string }) {
             {expense.status === 'approved' ? (
               <Button asChild>
                 <Link to="/expenses/$expenseId/payment" params={{ expenseId: id }}>
-                  {expense.paid ? 'View payment voucher' : 'Record actual payment'}
+                  {expense.paid ? t('View payment voucher') : t('Record actual payment')}
                 </Link>
               </Button>
             ) : (
               <>
                 <Button asChild variant="outline">
                   <Link to="/expenses/new" search={{ expense: id }}>
-                    Edit request
+                    {t('Edit request')}{' '}
                   </Link>
                 </Button>
                 <Button
@@ -159,31 +162,33 @@ export function ExpenseDetail({ id }: { id: string }) {
                     notify('Expense submitted for review.');
                   }}
                 >
-                  Submit for review
+                  {t('Submit for review')}{' '}
                 </Button>
               </>
             )}
           </Panel>
         )}
       </div>
-      <Panel title="Supporting evidence">
+      <Panel title={t('Supporting evidence')}>
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className="font-semibold">{expense.attachment || 'No attachment'}</p>
-            <p className="demo-help mt-1">Stored supporting document · School access required</p>
+            <p className="font-semibold">{expense.attachment || t('No attachment')}</p>
+            <p className="demo-help mt-1">
+              {t('Stored supporting document · School access required')}
+            </p>
           </div>
           {expense.attachment && (
             <Button asChild variant="outline">
               <a
                 href={`${config.VITE_API_BASE_URL}${schoolBase(snapshot.institutionId)}/evidence/${encodeURIComponent(expense.attachment)}`}
               >
-                Download evidence
+                {t('Download evidence')}{' '}
               </a>
             </Button>
           )}
         </div>
       </Panel>
-      <Panel title="Audit history">
+      <Panel title={t('Audit history')}>
         <ol className="demo-history">
           {expense.history.map((event, i) => (
             <li key={`${i}-${event}`}>
@@ -193,9 +198,10 @@ export function ExpenseDetail({ id }: { id: string }) {
           ))}
         </ol>
       </Panel>
-      <Notice title="Approval does not record a payment">
-        The payment voucher confirms the actual money paid. Approved and paid records are protected
-        from editing.
+      <Notice title={t('Approval does not record a payment')}>
+        {t(
+          'The payment voucher confirms the actual money paid. Approved and paid records are protected from editing.',
+        )}{' '}
       </Notice>
     </>
   );

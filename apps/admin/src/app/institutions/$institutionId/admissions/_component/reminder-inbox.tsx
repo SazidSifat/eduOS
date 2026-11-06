@@ -1,3 +1,4 @@
+import { useLanguage } from '@eduos/ui';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { Bell, ArrowUpRight } from 'lucide-react';
@@ -7,6 +8,8 @@ import { apiPut } from '../../../../../lib/api-client';
 import { admissionKey, admissionPath, notificationsQuery } from '../_api/queries';
 import { useAdmissions } from './admissions-shell';
 export function ReminderInbox() {
+  const { t } = useLanguage();
+
   const { userId, institutionId } = useAdmissions();
   const notifications = useQuery(notificationsQuery(userId, institutionId));
   const cache = useQueryClient();
@@ -29,7 +32,7 @@ export function ReminderInbox() {
         aria-live="polite"
         className="mb-5 flex flex-wrap items-center gap-3 rounded-md border border-border p-4"
       >
-        <p>Reminders could not be loaded.</p>
+        <p>{t('Reminders could not be loaded.')}</p>
         <Button
           variant="outline"
           size="sm"
@@ -37,7 +40,7 @@ export function ReminderInbox() {
             void notifications.refetch();
           }}
         >
-          Retry reminders
+          {t('Retry reminders')}{' '}
         </Button>
       </div>
     );
@@ -47,7 +50,7 @@ export function ReminderInbox() {
     <details className="mb-6 rounded-md border border-border bg-muted/20">
       <summary className="flex cursor-pointer items-center gap-2 p-4 font-medium">
         <Bell size={16} aria-hidden="true" />
-        {unread.length} follow-up reminders
+        {unread.length} {t('follow-up reminders')}{' '}
       </summary>
       <ul className="divide-y divide-border border-t border-border">
         {unread.map((n) => (
@@ -58,7 +61,7 @@ export function ReminderInbox() {
               className="flex items-center gap-3 rounded-sm hover:text-primary"
             >
               <span>
-                {n.kind === 'before' ? 'Upcoming call' : 'Call due'} · {n.dueDate}
+                {n.kind === 'before' ? t('Upcoming call') : t('Call due')} · {n.dueDate}
               </span>
               <ArrowUpRight size={16} aria-hidden="true" />
             </Link>
@@ -68,14 +71,14 @@ export function ReminderInbox() {
               disabled={read.isPending}
               onClick={() => read.mutate(n.id)}
             >
-              Mark read
+              {t('Mark read')}{' '}
             </Button>
           </li>
         ))}
       </ul>
       {read.isError && (
         <p role="alert" className="p-4 text-destructive">
-          Could not mark the reminder read. Try again.
+          {t('Could not mark the reminder read. Try again.')}{' '}
         </p>
       )}
     </details>

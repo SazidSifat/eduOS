@@ -1,3 +1,5 @@
+import { bangla } from './lib/i18n/translations';
+import { LanguageProvider } from '@eduos/ui';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { QueryClientProvider } from '@tanstack/react-query';
@@ -11,12 +13,14 @@ const root = document.getElementById('root');
 if (!root) throw new Error('Missing application root');
 createRoot(root).render(
   <StrictMode>
-    <ErrorBoundary>
-      <ThemeProvider>
-        <QueryClientProvider client={queryClient}>
-          <RouterProvider router={router} />
-        </QueryClientProvider>
-      </ThemeProvider>
-    </ErrorBoundary>
+    <LanguageProvider defaultLanguage="bn" translations={bangla}>
+      <ErrorBoundary>
+        <ThemeProvider>
+          <QueryClientProvider client={queryClient}>
+            <RouterProvider router={router} />
+          </QueryClientProvider>
+        </ThemeProvider>
+      </ErrorBoundary>
+    </LanguageProvider>
   </StrictMode>,
 );

@@ -1,3 +1,4 @@
+import { useLanguage } from '@eduos/ui';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
@@ -32,6 +33,8 @@ const descriptions = {
   closed: 'Previous conversations retained for review and reopening.',
 };
 export function CandidateList({ filters }: { filters: Omit<CandidateListQuery, 'limit'> }) {
+  const { t, locale } = useLanguage();
+
   const { userId, institutionId, access, setup } = useAdmissions();
   const list = useQuery(candidateListQuery(userId, institutionId, { ...filters, limit: 25 }));
   const [search, setSearch] = useState(filters.search);
@@ -48,23 +51,23 @@ export function CandidateList({ filters }: { filters: Omit<CandidateListQuery, '
       <header className="mb-8 flex flex-wrap items-start justify-between gap-5">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-semibold">{titles[filters.state]}</h1>
+            <h1 className="text-2xl font-semibold">{t(titles[filters.state])}</h1>
             {list.data && <Badge variant="outline">{list.data.total}</Badge>}
           </div>
-          <p className="mt-2 max-w-xl text-muted-foreground">{descriptions[filters.state]}</p>
+          <p className="mt-2 max-w-xl text-muted-foreground">{t(descriptions[filters.state])}</p>
         </div>
         {access.permissions.includes('admissions.write') && (
           <Button asChild>
             <Link to="/institutions/$institutionId/admissions/new" params={{ institutionId }}>
               <Plus size={16} aria-hidden="true" />
-              New record
+              {t('New record')}{' '}
             </Link>
           </Button>
         )}
       </header>
       <ReminderInbox />
       <section
-        aria-label="Candidate directory"
+        aria-label={t('Candidate directory')}
         className="overflow-hidden rounded-md border border-border"
       >
         <div className="flex flex-wrap items-end gap-4 border-b border-border p-4">
@@ -83,22 +86,22 @@ export function CandidateList({ filters }: { filters: Omit<CandidateListQuery, '
               />
               <Input
                 className="pl-9"
-                aria-label="Search students or phone"
-                placeholder="Search student name or phone"
+                aria-label={t('Search students or phone')}
+                placeholder={t('Search student name or phone')}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 maxLength={100}
               />
             </div>
             <Button variant="outline" type="submit">
-              Search
+              {t('Search')}{' '}
             </Button>
           </form>
           {filters.state === 'follow_up' && (
             <div className="w-full sm:w-44">
               <Choice
                 id="call-filter"
-                label="Call schedule"
+                label={t('Call schedule')}
                 value={filters.due}
                 onChange={(value) => {
                   if (
@@ -123,7 +126,7 @@ export function CandidateList({ filters }: { filters: Omit<CandidateListQuery, '
           <div className="w-full sm:w-52">
             <Choice
               id="class-filter"
-              label="Class / session"
+              label={t('Class / session')}
               value={filters.offeringId ?? 'all'}
               onChange={(value) =>
                 update({ offeringId: value === 'all' ? undefined : value, offset: 0 })
@@ -141,7 +144,7 @@ export function CandidateList({ filters }: { filters: Omit<CandidateListQuery, '
             <div className="w-full sm:w-52">
               <Choice
                 id="officer-filter"
-                label="Admission Officer"
+                label={t('Admission Officer')}
                 value={filters.assigneeId ?? 'all'}
                 onChange={(value) =>
                   update({ assigneeId: value === 'all' ? undefined : value, offset: 0 })
@@ -156,7 +159,7 @@ export function CandidateList({ filters }: { filters: Omit<CandidateListQuery, '
         </div>
         {list.isPending ? (
           <div className="p-6">
-            <LoadingState label="Loading admission records…" />
+            <LoadingState label={t('Loading admission records…')} />
           </div>
         ) : list.isError ? (
           <div className="p-6">
@@ -170,26 +173,26 @@ export function CandidateList({ filters }: { filters: Omit<CandidateListQuery, '
           <div className="px-6 py-16 text-center">
             <h2 className="font-semibold">
               {filters.search || filters.due !== 'all'
-                ? 'No matching records'
-                : `No ${titles[filters.state].toLowerCase()} yet`}
+                ? t('No matching records')
+                : t('No {value0} yet', { value0: titles[filters.state].toLowerCase() })}
             </h2>
             <p className="mt-2 text-muted-foreground">
               {filters.search || filters.due !== 'all'
-                ? 'Try a different name, phone number or call schedule.'
-                : 'New school records will appear here as your admission work progresses.'}
+                ? t('Try a different name, phone number or call schedule.')
+                : t('New school records will appear here as your admission work progresses.')}
             </p>
           </div>
         ) : (
           <Table className="min-w-[760px]">
             <TableHeader>
               <TableRow>
-                <TableHead>Student / guardian</TableHead>
-                <TableHead>Class / session</TableHead>
-                <TableHead>Admission Officer</TableHead>
+                <TableHead>{t('Student / guardian')}</TableHead>
+                <TableHead>{t('Class / session')}</TableHead>
+                <TableHead>{t('Admission Officer')}</TableHead>
                 <TableHead>
-                  {filters.state === 'admitted' ? 'Admission date' : 'Next call'}
+                  {filters.state === 'admitted' ? t('Admission date') : t('Next call')}
                 </TableHead>
-                <TableHead className="text-right">Details</TableHead>
+                <TableHead className="text-right">{t('Details')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -215,7 +218,7 @@ export function CandidateList({ filters }: { filters: Omit<CandidateListQuery, '
                   <TableCell className="tabular-nums">
                     {filters.state === 'admitted'
                       ? item.admittedAt &&
-                        new Date(item.admittedAt).toLocaleDateString('en-GB', {
+                        new Date(item.admittedAt).toLocaleDateString(locale, {
                           day: '2-digit',
                           month: 'short',
                           year: 'numeric',
@@ -228,7 +231,7 @@ export function CandidateList({ filters }: { filters: Omit<CandidateListQuery, '
                       <Link
                         to="/institutions/$institutionId/admissions/$candidateId"
                         params={{ institutionId, candidateId: item.id }}
-                        aria-label={`View ${item.studentName}`}
+                        aria-label={t('View {value0}', { value0: item.studentName })}
                       >
                         <ArrowUpRight size={16} />
                       </Link>
@@ -243,7 +246,11 @@ export function CandidateList({ filters }: { filters: Omit<CandidateListQuery, '
           <footer className="flex items-center justify-between border-t border-border px-4 py-3">
             <p className="text-xs text-muted-foreground">
               {list.data.total
-                ? `${filters.offset + 1}–${Math.min(filters.offset + 25, list.data.total)} of ${list.data.total}`
+                ? t('{value0}–{value1} of {value2}', {
+                    value0: filters.offset + 1,
+                    value1: Math.min(filters.offset + 25, list.data.total),
+                    value2: list.data.total,
+                  })
                 : '0 records'}
             </p>
             <div className="flex gap-2">
@@ -253,7 +260,7 @@ export function CandidateList({ filters }: { filters: Omit<CandidateListQuery, '
                 disabled={!filters.offset || list.isFetching}
                 onClick={() => update({ offset: Math.max(0, filters.offset - 25) })}
               >
-                Previous
+                {t('Previous')}{' '}
               </Button>
               <Button
                 variant="outline"
@@ -261,7 +268,7 @@ export function CandidateList({ filters }: { filters: Omit<CandidateListQuery, '
                 disabled={filters.offset + 25 >= list.data.total || list.isFetching}
                 onClick={() => update({ offset: filters.offset + 25 })}
               >
-                Next
+                {t('Next')}{' '}
               </Button>
             </div>
           </footer>

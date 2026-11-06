@@ -1,23 +1,26 @@
+import { useLanguage } from '@eduos/ui';
 import { useState } from 'react';
 import { z } from 'zod';
 import { Button } from '@eduos/ui';
 import { useDemo } from '../../_component/demo-provider';
-import { money } from '../../_component/school-format';
+
 import { AdmissionFees, demoFeeSchema } from '../../admissions/_component/admission-fees';
 import { DataTable, Notice, PageHeading, Panel, Status } from '../../_component/demo-ui';
 
 export function FeeSettings() {
+  const { t, money } = useLanguage();
+
   const { state, dispatch, notify } = useDemo();
   const [fees, setFees] = useState(() => state.feeDefaults.map((f) => ({ ...f })));
   const [error, setError] = useState('');
   return (
     <>
       <PageHeading
-        title="Fees and billing schedules"
-        description="Configure future admission charges and monthly student schedules."
+        title={t('Fees and billing schedules')}
+        description={t('Configure future admission charges and monthly student schedules.')}
       />
       {error && (
-        <Notice title="Review fee definitions" tone="danger">
+        <Notice title={t('Review fee definitions')} tone="danger">
           {error}
         </Notice>
       )}
@@ -37,26 +40,28 @@ export function FeeSettings() {
             );
           }}
         >
-          Save fee defaults
+          {t('Save fee defaults')}{' '}
         </Button>
       </div>
       <Panel
-        title="Student monthly schedules"
-        description="Stopping a schedule prevents future billing. Existing charges and receipts remain in the account."
+        title={t('Student monthly schedules')}
+        description={t(
+          'Stopping a schedule prevents future billing. Existing charges and receipts remain in the account.',
+        )}
       >
         <DataTable
-          caption="Student billing schedules"
+          caption={t('Student billing schedules')}
           headers={['Student', 'Fee', 'Installment', 'Next charge', 'State', 'Action']}
         >
           {state.schedules.map((s) => (
             <tr key={s.id}>
               <td>{state.candidates.find((c) => c.id === s.candidateId)?.name}</td>
-              <td>{s.label}</td>
+              <td>{t(s.label)}</td>
               <td>{money(s.amount)}</td>
               <td>{s.next}</td>
               <td>
                 <Status tone={s.active ? 'success' : 'neutral'}>
-                  {s.active ? 'Active' : 'Stopped'}
+                  {s.active ? t('Active') : t('Stopped')}
                 </Status>
               </td>
               <td>
@@ -69,16 +74,17 @@ export function FeeSettings() {
                     notify('Future billing stopped. Existing financial records are unchanged.');
                   }}
                 >
-                  Stop schedule
+                  {t('Stop schedule')}{' '}
                 </Button>
               </td>
             </tr>
           ))}
         </DataTable>
       </Panel>
-      <Notice title="Charges do not collect money">
-        The first installment can be collected at admission. A future monthly bill requires a
-        separate cash payment. No automatic payment is taken.
+      <Notice title={t('Charges do not collect money')}>
+        {t(
+          'The first installment can be collected at admission. A future monthly bill requires a separate cash payment. No automatic payment is taken.',
+        )}{' '}
       </Notice>
     </>
   );

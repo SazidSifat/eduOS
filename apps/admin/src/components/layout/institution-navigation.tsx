@@ -1,3 +1,4 @@
+import { useLanguage } from '@eduos/ui';
 import { Link, useLocation } from '@tanstack/react-router';
 import {
   Archive,
@@ -26,17 +27,19 @@ export function InstitutionNavigation({
   institutionId: string;
   access: z.infer<typeof accessSchema>;
 }) {
+  const { t } = useLanguage();
+
   const location = useLocation();
   const path = location.pathname.replace(/\/$/, '');
   const settingsActive = path.includes('/settings');
   const admissionsAvailable =
     access.modules.includes('admissions') && access.permissions.includes('admissions.read');
   return (
-    <nav aria-label="School navigation" className="space-y-2 p-3">
+    <nav aria-label={t('School navigation')} className="space-y-2 p-3">
       {admissionsAvailable && (
         <NavigationModule
           key={`admissions-${settingsActive}`}
-          label="Admissions"
+          label={t('Admissions')}
           icon={<GraduationCap size={16} aria-hidden="true" />}
           active={!settingsActive}
         >
@@ -54,30 +57,39 @@ export function InstitutionNavigation({
                 activeOptions={{ exact: true, includeSearch: true }}
               >
                 <Icon size={16} aria-hidden="true" />
-                {label}
+                {t(label)}
               </Link>
             );
           })}
         </NavigationModule>
       )}
-      {admissionsAvailable && access.permissions.includes('admissions.settings') && (
-        <NavigationModule
-          key={`settings-${settingsActive}`}
-          label="Settings"
-          icon={<Settings2 size={16} aria-hidden="true" />}
-          active={settingsActive}
+      <NavigationModule
+        key={`settings-${settingsActive}`}
+        label={t('Settings')}
+        icon={<Settings2 size={16} aria-hidden="true" />}
+        active={settingsActive}
+      >
+        <Link
+          to="/institutions/$institutionId/settings"
+          params={{ institutionId }}
+          data-current={path.endsWith('/settings')}
+          aria-current={path.endsWith('/settings') ? 'page' : undefined}
+          className={linkClass}
         >
+          {t('Overview')}
+        </Link>
+        {admissionsAvailable && access.permissions.includes('admissions.settings') && (
           <Link
             to="/institutions/$institutionId/settings/admissions"
             params={{ institutionId }}
-            data-current={settingsActive}
-            aria-current={settingsActive ? 'page' : undefined}
+            data-current={path.endsWith('/settings/admissions')}
+            aria-current={path.endsWith('/settings/admissions') ? 'page' : undefined}
             className={linkClass}
           >
-            Admissions settings
+            {t('Admissions settings')}{' '}
           </Link>
-        </NavigationModule>
-      )}
+        )}
+      </NavigationModule>
     </nav>
   );
 }
@@ -93,6 +105,8 @@ function NavigationModule({
   active: boolean;
   children: ReactNode;
 }) {
+  const { t } = useLanguage();
+
   return (
     <details open={active || label === 'Admissions'} className="group">
       <summary
@@ -100,7 +114,7 @@ function NavigationModule({
         data-current={active}
       >
         {icon}
-        <span className="flex-1">{label}</span>
+        <span className="flex-1">{t(label)}</span>
         <ChevronDown size={14} aria-hidden="true" className="-rotate-90 group-open:rotate-0" />
       </summary>
       <div className="mt-1 ml-5 space-y-1 border-l border-border pl-2">{children}</div>

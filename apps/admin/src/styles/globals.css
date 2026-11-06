@@ -1,9 +1,11 @@
 @import '@eduos/ui/styles.css';
+@import './typography.css';
+@import './mobile-nav.css';
 @source '../';
 
 .admissions-app {
-  font-family: 'Avenir Next', Avenir, 'Segoe UI Variable', 'Segoe UI', sans-serif;
-  font-size: 14px;
+  font-family: var(--font-sans);
+  font-size: 16px;
   --border: #e0e5de;
 }
 .dark .admissions-app {
@@ -12,7 +14,7 @@
 .admissions-app input,
 .admissions-app textarea,
 .admissions-app button {
-  font-size: 14px;
+  font-size: 16px;
 }
 .admissions-app input,
 .admissions-app textarea {
@@ -70,7 +72,7 @@
   --ring: #315b45;
   background: var(--background);
   color: var(--foreground);
-  font-family: 'Avenir Next', Avenir, 'Segoe UI Variable', 'Segoe UI', sans-serif;
+  font-family: var(--font-sans);
 }
 
 .dark .auth-page {
@@ -92,7 +94,7 @@
 }
 
 .auth-page [role='alert'] button {
-  font-size: 1rem;
+  font-size: var(--text-base);
 }
 
 .auth-page input,
@@ -106,7 +108,7 @@
   height: 48px;
   border-color: var(--control-border);
   caret-color: var(--primary);
-  font-size: 1rem;
+  font-size: var(--text-base);
 }
 
 .auth-page input::placeholder {

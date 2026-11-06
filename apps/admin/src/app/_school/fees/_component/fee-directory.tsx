@@ -1,8 +1,9 @@
+import { useLanguage } from '@eduos/ui';
 import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import { Input, Label } from '@eduos/ui';
 import { useDemo } from '../../_component/demo-provider';
-import { DEMO_TODAY, money } from '../../_component/school-format';
+import { DEMO_TODAY } from '../../_component/school-format';
 import {
   DataTable,
   DemoLink,
@@ -15,6 +16,8 @@ import {
 } from '../../_component/demo-ui';
 
 export function FeeDirectory({ dues = false }: { dues?: boolean }) {
+  const { t, money } = useLanguage();
+
   const { state } = useDemo();
   const [search, setSearch] = useState('');
   const [overdue, setOverdue] = useState(false);
@@ -37,11 +40,11 @@ export function FeeDirectory({ dues = false }: { dues?: boolean }) {
   return (
     <>
       <PageHeading
-        title={dues ? 'Outstanding dues' : 'Collect a payment'}
+        title={dues ? t('Outstanding dues') : t('Collect a payment')}
         description={
           dues
-            ? 'Review unpaid charges by student, class and due date.'
-            : 'Find the student, review open charges and collect the actual cash received.'
+            ? t('Review unpaid charges by student, class and due date.')
+            : t('Find the student, review open charges and collect the actual cash received.')
         }
         action={
           dues ? (
@@ -51,7 +54,7 @@ export function FeeDirectory({ dues = false }: { dues?: boolean }) {
               rows={students.map((c) => [c.name, c.className, balance(c.id) / 100])}
             />
           ) : (
-            <DemoLink to="/fees/report">Collection report</DemoLink>
+            <DemoLink to="/fees/report">{t('Collection report')}</DemoLink>
           )
         }
       />
@@ -60,7 +63,7 @@ export function FeeDirectory({ dues = false }: { dues?: boolean }) {
           {
             label: 'Collected today',
             value: money(collected.reduce((sum, p) => sum + p.amount, 0)),
-            detail: `${collected.length} cash receipts`,
+            detail: t('{value0} cash receipts', { value0: collected.length }),
           },
           {
             label: 'Outstanding balance',
@@ -75,17 +78,17 @@ export function FeeDirectory({ dues = false }: { dues?: boolean }) {
         ]}
       />
       <Panel
-        title={dues ? 'Student balances' : 'Find a student'}
-        description="Use a student name, record ID, guardian or contact number."
+        title={dues ? t('Student balances') : t('Find a student')}
+        description={t('Use a student name, record ID, guardian or contact number.')}
       >
         <div className="demo-filters mb-5">
           <div>
-            <Label htmlFor="fee-search">Search student</Label>
+            <Label htmlFor="fee-search">{t('Search student')}</Label>
             <Input
               id="fee-search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Student name, record ID or guardian"
+              placeholder={t('Student name, record ID or guardian')}
             />
           </div>
           {dues && (
@@ -95,17 +98,17 @@ export function FeeDirectory({ dues = false }: { dues?: boolean }) {
                 checked={overdue}
                 onChange={(e) => setOverdue(e.target.checked)}
               />
-              Overdue only
+              {t('Overdue only')}{' '}
             </label>
           )}
         </div>
         {!students.length ? (
-          <EmptyState title="No matching student accounts">
-            Try another name, or admit a student before collecting school fees.
+          <EmptyState title={t('No matching student accounts')}>
+            {t('Try another name, or admit a student before collecting school fees.')}{' '}
           </EmptyState>
         ) : (
           <DataTable
-            caption="Student fee accounts"
+            caption={t('Student fee accounts')}
             headers={['Student / ID', 'Class / session', 'Guardian', 'Outstanding', 'Action']}
           >
             {students.map((c) => (
@@ -132,7 +135,7 @@ export function FeeDirectory({ dues = false }: { dues?: boolean }) {
                     params={{ studentId: c.id }}
                     className="demo-inline-link"
                   >
-                    Open account
+                    {t('Open account')}{' '}
                   </Link>
                 </td>
               </tr>
@@ -141,10 +144,10 @@ export function FeeDirectory({ dues = false }: { dues?: boolean }) {
         )}
       </Panel>
       {!dues && (
-        <Panel title="Recent collections">
+        <Panel title={t('Recent collections')}>
           {state.payments.length ? (
             <DataTable
-              caption="Recent cash receipts"
+              caption={t('Recent cash receipts')}
               headers={['Receipt', 'Student', 'Collected on', 'Amount', 'State']}
             >
               {state.payments
@@ -166,15 +169,15 @@ export function FeeDirectory({ dues = false }: { dues?: boolean }) {
                     <td>{money(p.amount)}</td>
                     <td>
                       <Status tone={p.reversed ? 'danger' : 'success'}>
-                        {p.reversed ? 'Reversed' : 'Posted'}
+                        {p.reversed ? t('Reversed') : t('Posted')}
                       </Status>
                     </td>
                   </tr>
                 ))}
             </DataTable>
           ) : (
-            <EmptyState title="No collections recorded yet">
-              Choose a student and collect a payment to create the first receipt.
+            <EmptyState title={t('No collections recorded yet')}>
+              {t('Choose a student and collect a payment to create the first receipt.')}{' '}
             </EmptyState>
           )}
         </Panel>

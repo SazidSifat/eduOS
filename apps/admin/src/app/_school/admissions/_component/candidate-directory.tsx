@@ -1,3 +1,4 @@
+import { useLanguage } from '@eduos/ui';
 import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import {
@@ -30,6 +31,8 @@ const headings = {
   closed: 'Closed records',
 };
 export function CandidateDirectory({ state: view = 'follow_up' }: { state?: CandidateState }) {
+  const { t, locale } = useLanguage();
+
   const { state, snapshot } = useDemo();
   const [search, setSearch] = useState('');
   const [schedule, setSchedule] = useState('All dates');
@@ -58,18 +61,18 @@ export function CandidateDirectory({ state: view = 'follow_up' }: { state?: Cand
         title={headings[view]}
         description={
           view === 'follow_up'
-            ? 'Plan the next conversation and keep every call in context.'
+            ? t('Plan the next conversation and keep every call in context.')
             : view === 'willing'
-              ? 'Families ready for the next step. No prospect reminders are scheduled.'
+              ? t('Families ready for the next step. No prospect reminders are scheduled.')
               : view === 'admitted'
-                ? 'Confirmed students, academic enrollments and admission history.'
-                : 'Review closed conversations and reopen with a new follow-up date.'
+                ? t('Confirmed students, academic enrollments and admission history.')
+                : t('Review closed conversations and reopen with a new follow-up date.')
         }
         action={
           <Button asChild>
             <Link to="/admissions/new" search={{ mode, candidate: '' }}>
               <Plus size={16} aria-hidden="true" />
-              New record
+              {t('New record')}{' '}
             </Link>
           </Button>
         }
@@ -86,7 +89,7 @@ export function CandidateDirectory({ state: view = 'follow_up' }: { state?: Cand
             value: state.candidates.filter(
               (c) => c.state === 'follow_up' && c.nextCall === DEMO_TODAY,
             ).length,
-            detail: new Intl.DateTimeFormat('en-GB', {
+            detail: new Intl.DateTimeFormat(locale, {
               day: 'numeric',
               month: 'long',
               year: 'numeric',
@@ -106,14 +109,15 @@ export function CandidateDirectory({ state: view = 'follow_up' }: { state?: Cand
         ]}
       />
       {view === 'follow_up' && all.some((c) => c.nextCall < DEMO_TODAY) && (
-        <Notice title="Overdue conversations need attention" tone="warning">
-          Use the call schedule filter to start with overdue families, then work through today’s
-          calls.
+        <Notice title={t('Overdue conversations need attention')} tone="warning">
+          {t(
+            'Use the call schedule filter to start with overdue families, then work through today’s calls.',
+          )}{' '}
         </Notice>
       )}
       <div className="demo-filters">
         <div>
-          <Label htmlFor="candidate-search">Find a student</Label>
+          <Label htmlFor="candidate-search">{t('Find a student')}</Label>
           <Input
             id="candidate-search"
             value={search}
@@ -121,7 +125,7 @@ export function CandidateDirectory({ state: view = 'follow_up' }: { state?: Cand
               setSearch(e.target.value);
               setPage(0);
             }}
-            placeholder="Student, guardian, phone or record ID"
+            placeholder={t('Student, guardian, phone or record ID')}
           />
         </div>
         {[
@@ -152,7 +156,7 @@ export function CandidateDirectory({ state: view = 'follow_up' }: { state?: Cand
             : []),
         ].map((filter) => (
           <div key={filter.id}>
-            <Label htmlFor={`candidate-${filter.id}`}>{filter.label}</Label>
+            <Label htmlFor={`candidate-${filter.id}`}>{t(filter.label)}</Label>
             <Select
               value={filter.value}
               onValueChange={(value) => {
@@ -167,8 +171,8 @@ export function CandidateDirectory({ state: view = 'follow_up' }: { state?: Cand
                 {filter.options.map((option) => (
                   <SelectItem key={option} value={option}>
                     {filter.id === 'officer'
-                      ? (state.members.find((m) => m.id === option)?.name ?? option)
-                      : option}
+                      ? (state.members.find((m) => m.id === option)?.name ?? t(option))
+                      : t(option)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -178,7 +182,7 @@ export function CandidateDirectory({ state: view = 'follow_up' }: { state?: Cand
       </div>
       {!items.length ? (
         <EmptyState
-          title="No matching records"
+          title={t('No matching records')}
           action={
             <Button
               variant="outline"
@@ -189,16 +193,16 @@ export function CandidateDirectory({ state: view = 'follow_up' }: { state?: Cand
                 setSchedule('All dates');
               }}
             >
-              Clear filters
+              {t('Clear filters')}{' '}
             </Button>
           }
         >
-          Try another student name, class or call schedule.
+          {t('Try another student name, class or call schedule.')}{' '}
         </EmptyState>
       ) : (
         <>
           <DataTable
-            caption={`${headings[view]} directory`}
+            caption={t('{value0} directory', { value0: headings[view] })}
             headers={[
               'Student / guardian',
               'Class / session',
@@ -225,14 +229,14 @@ export function CandidateDirectory({ state: view = 'follow_up' }: { state?: Cand
                   {c.className}
                   <small>{c.session}</small>
                 </td>
-                <td>{state.members.find((m) => m.id === c.officer)?.name ?? 'Unassigned'}</td>
+                <td>{state.members.find((m) => m.id === c.officer)?.name ?? t('Unassigned')}</td>
                 <td>
                   {view === 'admitted' ? (
                     c.admittedOn
                   ) : view === 'closed' ? (
-                    <Status>Closed</Status>
+                    <Status>{t('Closed')}</Status>
                   ) : view === 'willing' ? (
-                    <Status tone="success">No reminders</Status>
+                    <Status tone="success">{t('No reminders')}</Status>
                   ) : (
                     <Status
                       tone={
@@ -253,7 +257,7 @@ export function CandidateDirectory({ state: view = 'follow_up' }: { state?: Cand
                     to="/admissions/$candidateId"
                     params={{ candidateId: c.id }}
                   >
-                    Open record
+                    {t('Open record')}{' '}
                   </Link>
                 </td>
               </tr>
@@ -261,8 +265,8 @@ export function CandidateDirectory({ state: view = 'follow_up' }: { state?: Cand
           </DataTable>
           <footer className="flex flex-wrap items-center justify-between gap-3">
             <p className="demo-help">
-              Showing {page * 6 + 1}–{Math.min(page * 6 + 6, items.length)} of {items.length}{' '}
-              records
+              {t('Showing')} {page * 6 + 1}–{Math.min(page * 6 + 6, items.length)} {t('of')}{' '}
+              {items.length} {t('records')}{' '}
             </p>
             <div className="flex gap-2">
               <Button
@@ -270,14 +274,14 @@ export function CandidateDirectory({ state: view = 'follow_up' }: { state?: Cand
                 disabled={page === 0}
                 onClick={() => setPage((value) => value - 1)}
               >
-                Previous
+                {t('Previous')}{' '}
               </Button>
               <Button
                 variant="outline"
                 disabled={(page + 1) * 6 >= items.length}
                 onClick={() => setPage((value) => value + 1)}
               >
-                Next
+                {t('Next')}{' '}
               </Button>
             </div>
           </footer>

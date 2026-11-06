@@ -91,3 +91,8 @@ test('keeps a failed session check visible and allows a retry', async ({ page })
   await page.getByRole('button', { name: 'Try again' }).click();
   await expect(page.getByRole('heading', { name: 'Sign in to EduOS' })).toBeVisible();
 });
+
+// Preserve the English workflow while the app also supports Bangla by default.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('eduos-language', 'en'));
+});

@@ -1,9 +1,10 @@
+import { useLanguage } from '@eduos/ui';
 import { useState } from 'react';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { z } from 'zod';
 import { Button, Switch, Textarea, Label } from '@eduos/ui';
 import { useDemo } from '../../_component/demo-provider';
-import { DEMO_TODAY, money } from '../../_component/school-format';
+import { DEMO_TODAY } from '../../_component/school-format';
 import { admissionTotal } from '../../_component/school-finance';
 import type { Candidate, CandidateState, FeeItem } from '../../_component/demo-model';
 import { DemoForm, valueOf, type FormSection } from '../../_component/demo-form';
@@ -17,6 +18,8 @@ export function CandidateForm({
   mode: Exclude<CandidateState, 'closed'>;
   candidateId: string;
 }) {
+  const { t, money } = useLanguage();
+
   const { state, snapshot, dispatch, notify } = useDemo();
   const navigate = useNavigate();
   const [newId] = useState(() => crypto.randomUUID());
@@ -252,18 +255,20 @@ export function CandidateForm({
       <PageHeading
         title={
           mode === 'admitted'
-            ? 'Complete admission'
+            ? t('Complete admission')
             : mode === 'willing'
-              ? 'New willing student'
-              : 'New follow-up'
+              ? t('New willing student')
+              : t('New follow-up')
         }
         description={
           candidate
-            ? `${candidate.name} · Details are prefilled from the same candidate record.`
-            : 'Start with the right intake stage. The student’s history carries forward.'
+            ? t('{value0} · Details are prefilled from the same candidate record.', {
+                value0: candidate.name,
+              })
+            : t('Start with the right intake stage. The student’s history carries forward.')
         }
       />
-      <nav className="demo-tabs" aria-label="Record stage">
+      <nav className="demo-tabs" aria-label={t('Record stage')}>
         {(['follow_up', 'willing', 'admitted'] as const).map((stage) => (
           <Link
             key={stage}
@@ -272,15 +277,15 @@ export function CandidateForm({
             aria-current={mode === stage ? 'page' : undefined}
           >
             {stage === 'follow_up'
-              ? 'Follow-up'
+              ? t('Follow-up')
               : stage === 'willing'
-                ? 'Willing student'
-                : 'Direct admission'}
+                ? t('Willing student')
+                : t('Direct admission')}
           </Link>
         ))}
       </nav>
       {error && (
-        <Notice title="Review this admission" tone="danger">
+        <Notice title={t('Review this admission')} tone="danger">
           {error}
         </Notice>
       )}
@@ -289,26 +294,28 @@ export function CandidateForm({
         onSubmit={submit}
         submitLabel={
           mode === 'admitted'
-            ? 'Confirm admission & payment'
+            ? t('Confirm admission & payment')
             : mode === 'willing'
-              ? 'Save willing student'
-              : 'Save follow-up'
+              ? t('Save willing student')
+              : t('Save follow-up')
         }
         footer={
           <Button asChild variant="outline">
-            <Link to="/admissions">Cancel</Link>
+            <Link to="/admissions">{t('Cancel')}</Link>
           </Button>
         }
       >
         {full && (
-          <Panel title="Missing-document exception">
+          <Panel title={t('Missing-document exception')}>
             <div className="demo-check">
               <Switch id="document-exception" checked={exception} onCheckedChange={setException} />
-              <Label htmlFor="document-exception">Record an Admin / Principal exception</Label>
+              <Label htmlFor="document-exception">
+                {t('Record an Admin / Principal exception')}
+              </Label>
             </div>
             {exception && (
               <div className="demo-field mt-4">
-                <Label htmlFor="exception-reason">Exception reason</Label>
+                <Label htmlFor="exception-reason">{t('Exception reason')}</Label>
                 <Textarea
                   id="exception-reason"
                   value={exceptionReason}
@@ -330,8 +337,10 @@ export function CandidateForm({
         )}
         {mode === 'willing' && (
           <Panel
-            title="Optional willing fee"
-            description="Skipping collection creates no willing charge, receipt or outstanding balance."
+            title={t('Optional willing fee')}
+            description={t(
+              'Skipping collection creates no willing charge, receipt or outstanding balance.',
+            )}
           >
             <div className="demo-check">
               <Switch
@@ -343,22 +352,24 @@ export function CandidateForm({
                 }}
               />
               <Label htmlFor="collect-willing">
-                Collect willing fee now · {money(willingAmount)}
+                {t('Collect willing fee now ·')}
+                {money(willingAmount)}
               </Label>
             </div>
             <p className="demo-help mt-3">
               {state.settings.creditWilling === 'yes'
-                ? 'This fee will be credited toward admission.'
-                : 'This fee is separate from admission.'}{' '}
-              No prospect reminders are scheduled for willing records.
+                ? t('This fee will be credited toward admission.')
+                : t('This fee is separate from admission.')}{' '}
+              {t('No prospect reminders are scheduled for willing records.')}{' '}
             </p>
           </Panel>
         )}
         {((mode === 'admitted' && due > 0) || (mode === 'willing' && collectWilling)) && (
-          <Notice title="Actual cash received" tone="success">
+          <Notice title={t('Actual cash received')} tone="success">
             <label className="demo-check">
-              <input type="checkbox" checked={cash} onChange={(e) => setCash(e.target.checked)} />I
-              have collected {money(mode === 'admitted' ? due : willingAmount)} in cash.
+              <input type="checkbox" checked={cash} onChange={(e) => setCash(e.target.checked)} />
+              {t('I have collected')} {money(mode === 'admitted' ? due : willingAmount)}{' '}
+              {t('in cash.')}{' '}
             </label>
           </Notice>
         )}

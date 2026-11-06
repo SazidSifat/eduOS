@@ -1,9 +1,12 @@
+import { useLanguage } from '@eduos/ui';
 import { useState } from 'react';
 import { useDemo } from '../../_component/demo-provider';
 import { DemoForm, valueOf, type FormSection } from '../../_component/demo-form';
 import { DemoLink, Notice, PageHeading } from '../../_component/demo-ui';
 
 export function SchoolSettings({ kind }: { kind: 'school' | 'admissions' | 'attendance' }) {
+  const { t } = useLanguage();
+
   const { state, dispatch, notify } = useDemo();
   const [error, setError] = useState('');
   const values = state.settings;
@@ -157,22 +160,22 @@ export function SchoolSettings({ kind }: { kind: 'school' | 'admissions' | 'atte
       <PageHeading
         title={
           kind === 'school'
-            ? 'School profile'
+            ? t('School profile')
             : kind === 'admissions'
-              ? 'Admissions settings'
-              : 'Attendance settings'
+              ? t('Admissions settings')
+              : t('Attendance settings')
         }
-        description="Configure school-level defaults. Saved values apply to this school."
+        description={t('Configure school-level defaults. Saved values apply to this school.')}
       />
       {error && (
-        <Notice title="Review these settings" tone="danger">
+        <Notice title={t('Review these settings')} tone="danger">
           {error}
         </Notice>
       )}
       <DemoForm
         sections={sections}
-        submitLabel="Save settings"
-        footer={<DemoLink to="/settings">Cancel</DemoLink>}
+        submitLabel={t('Save settings')}
+        footer={<DemoLink to="/settings">{t('Cancel')}</DemoLink>}
         onSubmit={async (data) => {
           if (kind === 'admissions' && Number(valueOf(data, 'willingFee')) > 1000000) {
             setError('Use a willing fee of BDT 1,000,000 or less.');
@@ -185,8 +188,8 @@ export function SchoolSettings({ kind }: { kind: 'school' | 'admissions' | 'atte
       />
       {kind === 'admissions' && (
         <div className="demo-actions">
-          <DemoLink to="/settings/academics">Manage class offerings</DemoLink>
-          <DemoLink to="/settings/fees">Configure admission fee items</DemoLink>
+          <DemoLink to="/settings/academics">{t('Manage class offerings')}</DemoLink>
+          <DemoLink to="/settings/fees">{t('Configure admission fee items')}</DemoLink>
         </div>
       )}
     </>

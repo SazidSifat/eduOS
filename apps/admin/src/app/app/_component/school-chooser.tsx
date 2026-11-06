@@ -1,3 +1,4 @@
+import { useLanguage } from '@eduos/ui';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { ArrowUpRight } from 'lucide-react';
@@ -7,6 +8,8 @@ import { SignOutButton } from '../../../components/layout/sign-out-button';
 import { ErrorState, LoadingState } from '../../../components/feedback';
 
 export function SchoolChooser({ userId }: { userId: string }) {
+  const { t } = useLanguage();
+
   const memberships = useQuery(membershipsQuery(userId));
   const schools = memberships.data?.filter((membership) => membership.role !== null) ?? [];
   return (
@@ -14,7 +17,7 @@ export function SchoolChooser({ userId }: { userId: string }) {
       <section className="max-w-2xl space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <h1 className="text-2xl font-semibold">
-            {schools.length ? 'Choose your school' : 'No school access'}
+            {schools.length ? t('Choose your school') : t('No school access')}
           </h1>
           <SignOutButton />
         </div>
@@ -28,12 +31,13 @@ export function SchoolChooser({ userId }: { userId: string }) {
           />
         ) : !schools.length ? (
           <p className="text-muted-foreground">
-            Your account has no active school role. Contact your institution administrator to assign
-            access.
+            {t(
+              'Your account has no active school role. Contact your institution administrator to assign access.',
+            )}{' '}
           </p>
         ) : (
           <>
-            <p className="text-muted-foreground">Choose a school to open its application.</p>
+            <p className="text-muted-foreground">{t('Choose a school to open its application.')}</p>
             <ul className="divide-y divide-border rounded-md border border-border">
               {schools.map((school) => (
                 <li key={school.institutionId}>
@@ -51,7 +55,7 @@ export function SchoolChooser({ userId }: { userId: string }) {
                     <span>
                       <span className="font-medium">{school.name}</span>
                       <span className="mt-1 block text-xs text-muted-foreground">
-                        Institution {school.code}
+                        {t('Institution')} {school.code}
                       </span>
                     </span>
                     <ArrowUpRight size={18} aria-hidden="true" />

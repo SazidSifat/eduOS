@@ -1,3 +1,4 @@
+import { useLanguage } from '@eduos/ui';
 import type { ReactNode } from 'react';
 import {
   Switch,
@@ -25,28 +26,30 @@ export function Choice({
   error?: string | undefined;
   disabled?: boolean;
 }) {
+  const { t } = useLanguage();
+
   return (
     <div className="space-y-2">
-      <Label htmlFor={id}>{label}</Label>
+      <Label htmlFor={id}>{t(label)}</Label>
       <Select value={value} onValueChange={onChange} disabled={disabled}>
         <SelectTrigger
           id={id}
           aria-invalid={Boolean(error)}
           aria-describedby={error ? `${id}-error` : undefined}
         >
-          <SelectValue placeholder="Select an option" />
+          <SelectValue placeholder={t('Select an option')} />
         </SelectTrigger>
         <SelectContent>
           {options.map((option) => (
             <SelectItem key={option.value} value={option.value}>
-              {option.label}
+              {t(option.label)}
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
       {error && (
         <p id={`${id}-error`} role="alert" className="text-xs text-destructive">
-          {error}
+          {t(error)}
         </p>
       )}
     </div>
@@ -67,13 +70,15 @@ export function Toggle({
   onChange: (value: boolean) => void;
   disabled?: boolean;
 }) {
+  const { t } = useLanguage();
+
   return (
     <div className="flex items-start justify-between gap-6 py-3">
       <div>
-        <Label htmlFor={id}>{label}</Label>
+        <Label htmlFor={id}>{t(label)}</Label>
         {description && (
           <p id={`${id}-description`} className="mt-1 text-xs text-muted-foreground">
-            {description}
+            {t(description)}
           </p>
         )}
       </div>
@@ -96,13 +101,13 @@ export function FormSection({
   description?: string;
   children: ReactNode;
 }) {
+  const { t } = useLanguage();
+
   return (
     <section className="border-t border-border py-6">
-      <h2 className="font-semibold">{title}</h2>
-      {description && <p className="mt-1 text-xs text-muted-foreground">{description}</p>}
+      <h2 className="font-semibold">{t(title)}</h2>
+      {description && <p className="mt-1 text-xs text-muted-foreground">{t(description)}</p>}
       <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{children}</div>
     </section>
   );
 }
-export const money = (minor: number) =>
-  new Intl.NumberFormat('en-BD', { style: 'currency', currency: 'BDT' }).format(minor / 100);

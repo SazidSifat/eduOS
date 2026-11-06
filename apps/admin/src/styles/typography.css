@@ -1,0 +1,120 @@
+@font-face {
+  font-family: 'Noto Sans Bengali';
+  src: url('./fonts/noto-sans-bengali-variable.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  unicode-range:
+    U+0951-0952, U+0964-0965, U+0980-09FE, U+1CD0, U+1CD2, U+1CD5-1CD6, U+1CD8, U+1CE1, U+1CEA,
+    U+1CED, U+1CF2, U+1CF5-1CF7, U+200C-200D, U+20B9, U+25CC, U+A8F1, U+11DF0-11DF1;
+}
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  src: url('./fonts/plus-jakarta-sans-latin-variable.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  src: url('./fonts/plus-jakarta-sans-latin-italic-variable.woff2') format('woff2');
+  font-style: italic;
+  font-weight: 400 700;
+  font-display: swap;
+}
+@theme {
+  --font-sans:
+    'Noto Sans Bengali', 'Plus Jakarta Sans', 'Avenir Next', Avenir, 'Segoe UI Variable',
+    'Segoe UI', sans-serif;
+  --text-xs: 1rem;
+  --text-xs--line-height: 1.65;
+  --text-sm: 1rem;
+  --text-sm--line-height: 1.65;
+  --text-base: 1rem;
+  --text-base--line-height: 1.65;
+  --text-lg: 1rem;
+  --text-lg--line-height: 1.65;
+  --text-xl: 1.75rem;
+  --text-xl--line-height: 1.4;
+  --text-2xl: 1.75rem;
+  --text-2xl--line-height: 1.4;
+  --text-3xl: 1.75rem;
+  --text-3xl--line-height: 1.4;
+}
+body {
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: 1.65;
+}
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+:lang(bn) {
+  letter-spacing: normal;
+}
+/* Controls grow with the script and zoom without clipping Bangla vowel marks. */
+[data-slot='input'],
+[data-slot='select-trigger'],
+[data-slot='date-picker'] {
+  min-height: 44px;
+  line-height: 1.5;
+}
+[data-slot='button']:not([data-slot='calendar-day']) {
+  min-height: 40px;
+}
+label,
+.demo-help,
+.demo-error {
+  line-height: 1.65;
+}
+[data-slot='popover-content'] {
+  max-height: min(var(--radix-popover-content-available-height), calc(100dvh - 2rem));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.language-toggle {
+  display: inline-flex;
+  flex-shrink: 0;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--background);
+}
+.admissions-app .language-toggle button,
+.language-toggle button {
+  min-height: 34px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: var(--text-xs);
+  line-height: 1.5;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color 150ms ease-out,
+    color 150ms ease-out;
+}
+.language-toggle button:hover {
+  background: var(--muted);
+}
+.language-toggle button[aria-pressed='true'] {
+  background: var(--muted);
+  color: var(--primary);
+  font-weight: 600;
+}
+.language-toggle button:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .language-toggle button {
+    transition: none;
+  }
+}
+@media print {
+  .language-toggle {
+    display: none;
+  }
+}

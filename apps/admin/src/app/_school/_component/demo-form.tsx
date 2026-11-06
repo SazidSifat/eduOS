@@ -1,3 +1,4 @@
+import { useLanguage } from '@eduos/ui';
 import { useId, type ReactNode } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -73,6 +74,8 @@ export function DemoForm({
   footer?: ReactNode;
   busy?: boolean;
 }) {
+  const { t } = useLanguage();
+
   const id = useId();
   const form = useForm<Record<string, string>>({
     resolver: zodResolver(formSchema(sections)),
@@ -91,21 +94,26 @@ export function DemoForm({
         {sections.map((section) => (
           <section key={section.title} className="demo-panel">
             <header>
-              <h2>{section.title}</h2>
-              {section.description && <p>{section.description}</p>}
+              <h2>{t(section.title)}</h2>
+              {section.description && <p>{t(section.description)}</p>}
             </header>
             <div className="demo-fields">
               {section.fields.map((field) => {
                 const inputId = `${id}-${field.name}`;
                 const error = form.formState.errors[field.name]?.message;
-                const message = typeof error === 'string' ? error : '';
+                const message =
+                  typeof error === 'string'
+                    ? error.endsWith(' is required.')
+                      ? t('{field} is required.', { field: t(field.label.replace(' *', '')) })
+                      : t(error)
+                    : '';
                 return (
                   <div
                     key={field.name}
                     className={field.wide ? 'demo-field demo-field-wide' : 'demo-field'}
                   >
                     <Label htmlFor={inputId}>
-                      {field.label}
+                      {t(field.label)}
                       {field.required ? ' *' : ''}
                     </Label>
                     {field.options ? (
@@ -125,12 +133,12 @@ export function DemoForm({
                               aria-invalid={!!message}
                               aria-describedby={message ? `${inputId}-error` : undefined}
                             >
-                              <SelectValue placeholder="Choose an option" />
+                              <SelectValue placeholder={t('Choose an option')} />
                             </SelectTrigger>
                             <SelectContent>
                               {field.options?.map((option) => (
                                 <SelectItem key={option} value={option}>
-                                  {field.optionLabels?.[option] ?? option}
+                                  {field.optionLabels?.[option] ?? t(option)}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -168,7 +176,7 @@ export function DemoForm({
                               }
                             />
                             <span className="text-muted-foreground">
-                              {control.value === 'yes' ? 'Enabled' : 'Disabled'}
+                              {control.value === 'yes' ? t('Enabled') : t('Disabled')}
                             </span>
                           </div>
                         )}
@@ -192,10 +200,10 @@ export function DemoForm({
                         aria-describedby={message ? `${inputId}-error` : undefined}
                       />
                     )}
-                    {field.helper && <p className="demo-help">{field.helper}</p>}
+                    {field.helper && <p className="demo-help">{t(field.helper)}</p>}
                     {message && (
                       <p className="demo-error" id={`${inputId}-error`} role="alert">
-                        {message}
+                        {t(message)}
                       </p>
                     )}
                   </div>
@@ -208,7 +216,7 @@ export function DemoForm({
         <div className="demo-actions">
           {footer}
           <Button type="submit" disabled={busy || form.formState.isSubmitting}>
-            {submitLabel}
+            {t(submitLabel)}
           </Button>
         </div>
       </form>

@@ -1,4 +1,6 @@
+import { useLanguage } from '../i18n/language-provider.js';
 import { useEffect, useRef, type ComponentProps } from 'react';
+import { bn } from 'react-day-picker/locale';
 import { DayPicker, useDayPicker, type DayButton, type MonthCaption } from 'react-day-picker';
 import { Button } from './button.js';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select.js';
@@ -12,8 +14,10 @@ export function Calendar({
   showOutsideDays = true,
   ...props
 }: ComponentProps<typeof DayPicker>) {
+  const { language } = useLanguage();
   return (
     <DayPicker
+      locale={language === 'bn' ? bn : undefined}
       showOutsideDays={showOutsideDays}
       fixedWeeks
       hideNavigation
@@ -71,6 +75,8 @@ function CalendarCaption({
   children,
   ...props
 }: ComponentProps<typeof MonthCaption>) {
+  const { t, locale } = useLanguage();
+
   const { goToMonth, nextMonth, previousMonth, dayPickerProps } = useDayPicker();
   const month = calendarMonth.date;
   const first = dayPickerProps.startMonth ?? new Date(1900, 0, 1);
@@ -87,7 +93,7 @@ function CalendarCaption({
           variant="ghost"
           size="icon"
           className="size-8 shrink-0"
-          aria-label="Previous month"
+          aria-label={t('Previous month')}
           disabled={!previousMonth}
           onClick={() => {
             if (previousMonth) goToMonth(previousMonth);
@@ -109,7 +115,7 @@ function CalendarCaption({
           value={String(month.getMonth())}
           onValueChange={(value) => goToMonth(new Date(month.getFullYear(), Number(value), 1))}
         >
-          <SelectTrigger aria-label="Month" className="h-8 min-w-0 flex-1 text-sm">
+          <SelectTrigger aria-label={t('Month')} className="h-8 min-w-0 flex-1 text-sm">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -120,7 +126,7 @@ function CalendarCaption({
                 date > new Date(last.getFullYear(), last.getMonth(), 1);
               return (
                 <SelectItem key={index} value={String(index)} disabled={outside}>
-                  {new Intl.DateTimeFormat('en-GB', { month: 'long' }).format(date)}
+                  {new Intl.DateTimeFormat(locale, { month: 'long' }).format(date)}
                 </SelectItem>
               );
             })}
@@ -133,13 +139,13 @@ function CalendarCaption({
             goToMonth(requested < first ? first : requested > last ? last : requested);
           }}
         >
-          <SelectTrigger aria-label="Year" className="h-8 w-[84px] text-sm">
+          <SelectTrigger aria-label={t('Year')} className="h-8 w-[84px] text-sm">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
             {years.map((year) => (
               <SelectItem key={year} value={String(year)}>
-                {year}
+                {new Intl.NumberFormat(locale, { useGrouping: false }).format(year)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -148,7 +154,7 @@ function CalendarCaption({
           variant="ghost"
           size="icon"
           className="size-8 shrink-0"
-          aria-label="Next month"
+          aria-label={t('Next month')}
           disabled={!nextMonth}
           onClick={() => {
             if (nextMonth) goToMonth(nextMonth);

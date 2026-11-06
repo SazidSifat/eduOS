@@ -1,3 +1,4 @@
+import { useLanguage } from '@eduos/ui';
 import { Fragment } from 'react';
 import { Link } from '@tanstack/react-router';
 import { Plus } from 'lucide-react';
@@ -6,6 +7,8 @@ import { DemoLink, Notice, PageHeading, Status } from '../../_component/demo-ui'
 import { unassignedSlots } from './routine-validation';
 
 export function RoutineBuilder() {
+  const { t } = useLanguage();
+
   const { state, snapshot } = useDemo();
   const routine = state.routine;
   const conflicts = snapshot.routineConflicts;
@@ -13,32 +16,42 @@ export function RoutineBuilder() {
   return (
     <>
       <PageHeading
-        title="Class routine"
-        description={`${routine.className} · Academic session ${state.settings.session} · Effective from ${routine.effective}`}
+        title={t('Class routine')}
+        description={t('{value0} · Academic session {value1} · Effective from {value2}', {
+          value0: routine.className,
+          value1: state.settings.session,
+          value2: routine.effective,
+        })}
         action={
           <DemoLink to="/routine/new" primary>
-            Configure routine
+            {t('Configure routine')}{' '}
           </DemoLink>
         }
       />
       <div className="demo-row-actions flex-wrap">
         <Status tone={routine.published ? 'success' : 'warning'}>
-          {routine.published ? `Published · Version ${routine.version}` : 'Draft'}
+          {routine.published
+            ? t('Published · Version {value0}', { value0: routine.version })
+            : t('Draft')}
         </Status>
         <span className="text-muted-foreground">
-          {routine.lessons.length} of {routine.days.length * routine.periods.length} lessons
-          assigned · {missing.length} unassigned · {conflicts.length} conflicts
+          {routine.lessons.length} {t('of')} {routine.days.length * routine.periods.length}
+          {t('lessons assigned ·')}
+          {missing.length}
+          {t('unassigned ·')}
+          {conflicts.length}
+          {t('conflicts')}
         </span>
       </div>
       <div className="demo-routine-wrap">
         <table className="demo-routine-table" style={{ minWidth: 100 + routine.days.length * 170 }}>
-          <caption className="sr-only">Weekly class routine</caption>
+          <caption className="sr-only">{t('Weekly class routine')}</caption>
           <thead>
             <tr>
-              <th scope="col">Period</th>
+              <th scope="col">{t('Period')}</th>
               {routine.days.map((day) => (
                 <th scope="col" key={day}>
-                  {day}
+                  {t(day)}
                 </th>
               ))}
             </tr>
@@ -49,13 +62,16 @@ export function RoutineBuilder() {
                 {index > 0 && (routine.periods[index - 1]?.end ?? '') < period.start && (
                   <tr>
                     <td colSpan={routine.days.length + 1} className="demo-break">
-                      Break · {routine.periods[index - 1]?.end}–{period.start}
+                      {t('Break ·')}
+                      {routine.periods[index - 1]?.end}–{period.start}
                     </td>
                   </tr>
                 )}
                 <tr>
                   <th scope="row" className="demo-period">
-                    <p>Period {period.id}</p>
+                    <p>
+                      {t('Period')} {period.id}
+                    </p>
                     <small>
                       {period.start}–{period.end}
                     </small>
@@ -72,8 +88,15 @@ export function RoutineBuilder() {
                           search={{ day, period: period.id }}
                           aria-label={
                             lesson
-                              ? `Edit ${lesson.subject}, ${day} period ${period.id}`
-                              : `Add lesson, ${day} period ${period.id}`
+                              ? t('Edit {value0}, {value1} period {value2}', {
+                                  value0: lesson.subject,
+                                  value1: day,
+                                  value2: period.id,
+                                })
+                              : t('Add lesson, {value0} period {value1}', {
+                                  value0: day,
+                                  value1: period.id,
+                                })
                           }
                         >
                           {lesson ? (
@@ -81,7 +104,7 @@ export function RoutineBuilder() {
                               <p>{lesson.subject}</p>
                               <small>
                                 {state.members.find((m) => m.id === lesson.teacher)?.name ??
-                                  'Unassigned'}
+                                  t('Unassigned')}
                               </small>
                               <small>
                                 {lesson.room}
@@ -91,8 +114,8 @@ export function RoutineBuilder() {
                           ) : (
                             <>
                               <Plus size={16} aria-hidden="true" />
-                              <p>Add lesson</p>
-                              <small>Unassigned period</small>
+                              <p>{t('Add lesson')}</p>
+                              <small>{t('Unassigned period')}</small>
                             </>
                           )}
                         </Link>
@@ -106,14 +129,15 @@ export function RoutineBuilder() {
         </table>
       </div>
       <div className="demo-actions">
-        <DemoLink to="/routine/teacher">Teacher routine</DemoLink>
+        <DemoLink to="/routine/teacher">{t('Teacher routine')}</DemoLink>
         <DemoLink to="/routine/review" primary>
-          Review & publish
+          {t('Review & publish')}{' '}
         </DemoLink>
       </div>
-      <Notice title="Drafts do not replace the published routine">
-        Publish a complete, conflict-free version with an effective date. Earlier published versions
-        remain available in the routine history.
+      <Notice title={t('Drafts do not replace the published routine')}>
+        {t(
+          'Publish a complete, conflict-free version with an effective date. Earlier published versions remain available in the routine history.',
+        )}{' '}
       </Notice>
     </>
   );

@@ -1,9 +1,13 @@
 import type { SchoolSnapshot } from '@eduos/contracts';
-export function canOpenSchoolPath(snapshot: SchoolSnapshot, path: string) {
+export function canOpenSchoolPath(
+  snapshot: Pick<SchoolSnapshot, 'permissions' | 'modules'>,
+  path: string,
+) {
   const root = path.split('/')[1];
   const permissions = snapshot.permissions;
   const modules = snapshot.modules;
-  if (root === 'settings') return permissions.includes('school.settings');
+  if (root === 'settings')
+    return path.replace(/\/$/, '') === '/settings' || permissions.includes('school.settings');
   if (root === 'admissions')
     return permissions.includes('admissions.read') && modules.includes('admissions');
   if (root === 'attendance')

@@ -1,9 +1,12 @@
+import { useLanguage } from '@eduos/ui';
 import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { Button } from '@eduos/ui';
 import { authClient } from '../../app/login/_api/auth';
 import { queryClient } from '../../lib/query-client';
 export function SignOutButton() {
+  const { t } = useLanguage();
+
   const [failure, setFailure] = useState(false);
   const [pending, setPending] = useState(false);
   const navigate = useNavigate();
@@ -34,11 +37,11 @@ export function SignOutButton() {
           void logout();
         }}
       >
-        {pending ? 'Signing out…' : 'Sign out'}
+        {pending ? t('Signing out…') : t('Sign out')}
       </Button>
       {failure && (
         <p role="alert" className="text-xs text-destructive">
-          Could not sign out. Try again.
+          {t('Could not sign out. Try again.')}{' '}
         </p>
       )}
     </div>

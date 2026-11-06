@@ -1,8 +1,9 @@
+import { useLanguage } from '@eduos/ui';
 import { Link } from '@tanstack/react-router';
 import { Button } from '@eduos/ui';
 import { Printer } from 'lucide-react';
 import { useDemo } from '../../_component/demo-provider';
-import { money } from '../../_component/school-format';
+
 import {
   DataTable,
   DemoLink,
@@ -14,16 +15,20 @@ import {
 } from '../../_component/demo-ui';
 
 export function ReceiptPage({ id }: { id: string }) {
+  const { t, money } = useLanguage();
+
   const { state } = useDemo();
   const payment = state.payments.find((p) => p.id === id);
   const student = state.candidates.find((c) => c.id === payment?.candidateId);
   if (!payment || !student)
     return (
       <EmptyState
-        title="Receipt unavailable"
-        action={<DemoLink to="/fees">Collect a payment</DemoLink>}
+        title={t('Receipt unavailable')}
+        action={<DemoLink to="/fees">{t('Collect a payment')}</DemoLink>}
       >
-        Create a cash collection to view its receipt. Receipts remain available after reloading.
+        {t(
+          'Create a cash collection to view its receipt. Receipts remain available after reloading.',
+        )}{' '}
       </EmptyState>
     );
   const balance = state.charges
@@ -33,12 +38,12 @@ export function ReceiptPage({ id }: { id: string }) {
     <>
       <div className="demo-print-hide">
         <PageHeading
-          title={payment.reversed ? 'Receipt reversed' : 'Payment recorded'}
-          description="The saved cash receipt remains visible in the payment history."
+          title={payment.reversed ? t('Receipt reversed') : t('Payment recorded')}
+          description={t('The saved cash receipt remains visible in the payment history.')}
           action={
             <Button variant="outline" onClick={() => window.print()}>
               <Printer size={16} aria-hidden="true" />
-              Print receipt
+              {t('Print receipt')}{' '}
             </Button>
           }
         />
@@ -46,19 +51,26 @@ export function ReceiptPage({ id }: { id: string }) {
       <Notice
         title={
           payment.reversed
-            ? 'This receipt has been reversed'
-            : `${money(payment.amount)} collected successfully`
+            ? t('This receipt has been reversed')
+            : t('{value0} collected successfully', { value0: money(payment.amount) })
         }
         tone={payment.reversed ? 'danger' : 'success'}
       >
-        {payment.reversed || `${payment.id} · ${payment.date} · Cash`}
+        {payment.reversed ||
+          t('{value0} · {value1} · Cash', { value0: payment.id, value1: payment.date })}
       </Notice>
       <Panel
-        title={state.settings.name ?? 'School'}
-        description={`${state.settings.address ?? ''} · Institution ${state.settings.code}`}
+        title={state.settings.name ?? t('School')}
+        description={t('{value0} · Institution {value1}', {
+          value0: state.settings.address ?? '',
+          value1: state.settings.code,
+        })}
         className="demo-receipt"
       >
-        <p className="mb-6 font-semibold text-primary">CASH RECEIPT · {payment.id}</p>
+        <p className="mb-6 font-semibold text-primary">
+          {t('CASH RECEIPT ·')}
+          {payment.id}
+        </p>
         <Details
           items={[
             ['Student', `${student.name} · ${student.id}`],
@@ -68,7 +80,7 @@ export function ReceiptPage({ id }: { id: string }) {
           ]}
         />
         <div className="my-6">
-          <DataTable caption="Receipt items" headers={['Fee description', 'Period', 'Amount']}>
+          <DataTable caption={t('Receipt items')} headers={['Fee description', 'Period', 'Amount']}>
             {payment.allocations.map((a) => {
               const c = state.charges.find((c) => c.id === a.chargeId);
               return (
@@ -90,18 +102,19 @@ export function ReceiptPage({ id }: { id: string }) {
           ]}
         />
         <p className="demo-help mt-6">
-          Keep the receipt number for future enquiries. Posted entries remain in history after
-          authorized reversal.
+          {t(
+            'Keep the receipt number for future enquiries. Posted entries remain in history after authorized reversal.',
+          )}{' '}
         </p>
       </Panel>
       <div className="demo-actions demo-print-hide">
         <Button asChild variant="outline">
           <Link to="/fees/$studentId" params={{ studentId: student.id }}>
-            View student account
+            {t('View student account')}{' '}
           </Link>
         </Button>
         <DemoLink to="/fees" primary>
-          Collect another payment
+          {t('Collect another payment')}{' '}
         </DemoLink>
       </div>
     </>

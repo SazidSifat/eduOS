@@ -1,3 +1,4 @@
+import { useLanguage } from '@eduos/ui';
 import { useState } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -38,6 +39,8 @@ export function CallForm({
   close?: boolean;
   onDone: () => void;
 }) {
+  const { t } = useLanguage();
+
   const { institutionId, userId } = useAdmissions();
   const cache = useQueryClient();
   const [key, setKey] = useState(() => crypto.randomUUID());
@@ -79,13 +82,13 @@ export function CallForm({
   });
   return (
     <form
-      aria-label={close ? 'Close record' : reopen ? 'Reopen follow-up' : 'Record call'}
+      aria-label={close ? t('Close record') : reopen ? t('Reopen follow-up') : t('Record call')}
       noValidate
       onSubmit={form.handleSubmit((input) => mutation.mutate(input))}
       className="space-y-4 rounded-md border border-border p-5"
     >
       <h2 className="font-semibold">
-        {close ? 'Close record' : reopen ? 'Return to follow-up' : 'Record call outcome'}
+        {close ? t('Close record') : reopen ? t('Return to follow-up') : t('Record call outcome')}
       </h2>
       <fieldset disabled={mutation.isPending} className="grid gap-4 sm:grid-cols-2">
         {!reopen && !close && (
@@ -95,7 +98,7 @@ export function CallForm({
             render={({ field }) => (
               <Choice
                 id="call-outcome"
-                label="Outcome"
+                label={t('Outcome')}
                 value={field.value}
                 onChange={field.onChange}
                 options={[
@@ -110,7 +113,7 @@ export function CallForm({
         )}
         {(reopen || outcome !== 'not_interested') && (
           <div className="space-y-2">
-            <Label htmlFor="call-date">Next follow-up date</Label>
+            <Label htmlFor="call-date">{t('Next follow-up date')}</Label>
             <Controller
               control={form.control}
               name="followUpDate"
@@ -129,33 +132,34 @@ export function CallForm({
             />
             {form.formState.errors.followUpDate && (
               <p id="call-date-error" role="alert" className="text-xs text-destructive">
-                {form.formState.errors.followUpDate.message}
+                {t(form.formState.errors.followUpDate.message)}
               </p>
             )}
           </div>
         )}
         <div className="space-y-2 sm:col-span-2">
-          <Label htmlFor="call-note">Conversation notes</Label>
+          <Label htmlFor="call-note">{t('Conversation notes')}</Label>
           <Textarea id="call-note" {...form.register('note')} />
         </div>
       </fieldset>
       {outcome === 'agreed' && !reopen && !close && (
         <p className="text-xs text-muted-foreground">
-          Use Complete admission to collect the remaining information and fee. Recording agreement
-          alone keeps this record in follow-up.
+          {t(
+            'Use Complete admission to collect the remaining information and fee. Recording agreement alone keeps this record in follow-up.',
+          )}{' '}
         </p>
       )}
       {mutation.isError && (
         <p role="alert" className="text-destructive">
-          {mutation.error.message}
+          {t(mutation.error.message)}
         </p>
       )}
       <div className="flex justify-end gap-2">
         <Button type="button" variant="outline" onClick={onDone} disabled={mutation.isPending}>
-          Cancel
+          {t('Cancel')}{' '}
         </Button>
         <Button type="submit" disabled={mutation.isPending}>
-          {mutation.isPending ? 'Saving…' : 'Save outcome'}
+          {mutation.isPending ? t('Saving…') : t('Save outcome')}
         </Button>
       </div>
     </form>

@@ -7,7 +7,7 @@
   border-top: 1px solid var(--border);
 }
 .demo-history time {
-  font-size: 12px;
+  font-size: 16px;
   color: var(--muted-foreground);
 }
 .demo-history p {
@@ -35,7 +35,7 @@
   background: var(--muted);
 }
 .demo-setting-grid h2 {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
 }
 .demo-setting-grid p {
@@ -102,12 +102,12 @@
 .demo-routine-table .demo-routine-table-head {
   height: 46px;
   background: var(--muted);
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--muted-foreground);
 }
 .demo-routine-table .demo-period {
-  font-size: 12px;
+  font-size: 16px;
   color: var(--muted-foreground);
 }
 .demo-routine-table p {
@@ -115,7 +115,7 @@
 }
 .demo-routine-table small {
   display: block;
-  font-size: 12px;
+  font-size: 16px;
   color: var(--muted-foreground);
   margin-top: 5px;
 }
@@ -124,7 +124,7 @@
   padding: 8px;
   text-align: center;
   background: var(--muted);
-  font-size: 12px;
+  font-size: 16px;
 }
 .demo-routine-table a {
   display: grid;

@@ -1,9 +1,10 @@
+import { useLanguage } from '@eduos/ui';
 import { useState } from 'react';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { z } from 'zod';
 import { Input } from '@eduos/ui';
 import { useDemo } from '../../_component/demo-provider';
-import { DEMO_TODAY, money } from '../../_component/school-format';
+import { DEMO_TODAY } from '../../_component/school-format';
 import { DemoForm, valueOf } from '../../_component/demo-form';
 import {
   DataTable,
@@ -17,6 +18,8 @@ import {
 } from '../../_component/demo-ui';
 
 export function StudentAccount({ studentId }: { studentId: string }) {
+  const { t, money } = useLanguage();
+
   const { state, setFeeDraft } = useDemo();
   const navigate = useNavigate();
   const candidate = state.candidates.find((c) => c.id === studentId && c.state === 'admitted');
@@ -28,10 +31,10 @@ export function StudentAccount({ studentId }: { studentId: string }) {
   if (!candidate)
     return (
       <EmptyState
-        title="Student account unavailable"
-        action={<DemoLink to="/fees">Find a student</DemoLink>}
+        title={t('Student account unavailable')}
+        action={<DemoLink to="/fees">{t('Find a student')}</DemoLink>}
       >
-        Only admitted students have a school fee account in this school.
+        {t('Only admitted students have a school fee account in this school.')}{' '}
       </EmptyState>
     );
   const balance = charges.reduce((sum, c) => sum + c.amount - c.paid, 0);
@@ -43,14 +46,18 @@ export function StudentAccount({ studentId }: { studentId: string }) {
     <>
       <PageHeading
         title={candidate.name}
-        description={`${candidate.id} · ${candidate.className} · Session ${candidate.session}`}
-        action={<DemoLink to="/fees">Back to search</DemoLink>}
+        description={t('{value0} · {value1} · Session {value2}', {
+          value0: candidate.id,
+          value1: candidate.className,
+          value2: candidate.session,
+        })}
+        action={<DemoLink to="/fees">{t('Back to search')}</DemoLink>}
       />
-      <Panel title="Student fee account">
+      <Panel title={t('Student fee account')}>
         <Details
           items={[
             ['Guardian', `${candidate.guardian} · ${candidate.phone}`],
-            ['Enrollment', `Active · ${candidate.className}`],
+            ['Enrollment', t('Active · {value0}', { value0: candidate.className })],
           ]}
         />
       </Panel>
@@ -59,12 +66,12 @@ export function StudentAccount({ studentId }: { studentId: string }) {
           {
             label: 'Open charges',
             value: money(balance),
-            detail: `${charges.length} unpaid items`,
+            detail: t('{value0} unpaid items', { value0: charges.length }),
           },
           {
             label: 'Selected to collect',
             value: money(total),
-            detail: `${Object.keys(selected).length} charge items`,
+            detail: t('{value0} charge items', { value0: Object.keys(selected).length }),
           },
           {
             label: 'Balance after payment',
@@ -74,21 +81,23 @@ export function StudentAccount({ studentId }: { studentId: string }) {
         ]}
       />
       {error && (
-        <Notice title="Review the allocation" tone="danger">
+        <Notice title={t('Review the allocation')} tone="danger">
           {error}
         </Notice>
       )}
       <Panel
-        title="Select charges to collect"
-        description="Allocate cash to particular charges. Amounts can be smaller than the outstanding balance."
+        title={t('Select charges to collect')}
+        description={t(
+          'Allocate cash to particular charges. Amounts can be smaller than the outstanding balance.',
+        )}
       >
         {!charges.length ? (
-          <EmptyState title="No outstanding charges">
-            This student’s current school charges are fully paid.
+          <EmptyState title={t('No outstanding charges')}>
+            {t('This student’s current school charges are fully paid.')}{' '}
           </EmptyState>
         ) : (
           <DataTable
-            caption="Select student fee charges"
+            caption={t('Select student fee charges')}
             headers={['Collect', 'Fee / period', 'Due date', 'Balance', 'Allocate (BDT)']}
           >
             {charges.map((c) => (
@@ -97,7 +106,7 @@ export function StudentAccount({ studentId }: { studentId: string }) {
                   <input
                     type="checkbox"
                     className="size-4 accent-primary"
-                    aria-label={`Select ${c.label}`}
+                    aria-label={t('Select {value0}', { value0: c.label })}
                     checked={Object.hasOwn(selected, c.id)}
                     onChange={(e) =>
                       setSelected((current) => {
@@ -110,14 +119,14 @@ export function StudentAccount({ studentId }: { studentId: string }) {
                   />
                 </td>
                 <td>
-                  <strong>{c.label}</strong>
+                  <strong>{t(c.label)}</strong>
                   <small>{c.period}</small>
                 </td>
                 <td>{c.due}</td>
                 <td>{money(c.amount - c.paid)}</td>
                 <td>
                   <Input
-                    aria-label={`Allocate ${c.label} in BDT`}
+                    aria-label={t('Allocate {value0} in BDT', { value0: c.label })}
                     className="w-32"
                     type="number"
                     step="0.01"
@@ -164,8 +173,8 @@ export function StudentAccount({ studentId }: { studentId: string }) {
               ],
             },
           ]}
-          submitLabel={`Review payment · ${money(total)}`}
-          footer={<DemoLink to="/fees">Cancel</DemoLink>}
+          submitLabel={t('Review payment · {value0}', { value0: money(total) })}
+          footer={<DemoLink to="/fees">{t('Cancel')}</DemoLink>}
           onSubmit={(values) => {
             const allocations = Object.entries(selected).map(([chargeId, amount]) => ({
               chargeId,
@@ -197,7 +206,7 @@ export function StudentAccount({ studentId }: { studentId: string }) {
           }}
         />
       )}
-      <Panel title="Payment history">
+      <Panel title={t('Payment history')}>
         {state.payments.filter((p) => p.candidateId === studentId).length ? (
           <ul className="demo-history">
             {state.payments
@@ -212,13 +221,17 @@ export function StudentAccount({ studentId }: { studentId: string }) {
                     {p.id} · {money(p.amount)}
                   </Link>
                   <p className="demo-help">
-                    {p.date} · Cash · {p.reversed ? 'Reversed' : 'Posted'}
+                    {p.date}
+                    {t('· Cash ·')}
+                    {p.reversed ? t('Reversed') : t('Posted')}
                   </p>
                 </li>
               ))}
           </ul>
         ) : (
-          <p className="text-muted-foreground">No payments have been recorded for this student.</p>
+          <p className="text-muted-foreground">
+            {t('No payments have been recorded for this student.')}
+          </p>
         )}
       </Panel>
     </>

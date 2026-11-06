@@ -1,3 +1,4 @@
+import { useLanguage } from '@eduos/ui';
 import { useState } from 'react';
 import { Button } from '@eduos/ui';
 import { Printer } from 'lucide-react';
@@ -14,6 +15,8 @@ import {
 } from '../../_component/demo-ui';
 
 export function TeacherRoutine() {
+  const { t } = useLanguage();
+
   const { state, snapshot } = useDemo();
   const [teacher, setTeacher] = useState(
     snapshot.identity.role === 'Teacher'
@@ -36,10 +39,10 @@ export function TeacherRoutine() {
   if (!published)
     return (
       <EmptyState
-        title="No published routine"
-        action={<DemoLink to="/routine">Open routine builder</DemoLink>}
+        title={t('No published routine')}
+        action={<DemoLink to="/routine">{t('Open routine builder')}</DemoLink>}
       >
-        Publish the first complete routine to make it available to teachers.
+        {t('Publish the first complete routine to make it available to teachers.')}{' '}
       </EmptyState>
     );
   const lessons = publishedRoutines
@@ -54,24 +57,27 @@ export function TeacherRoutine() {
     <>
       <div className="demo-print-hide">
         <PageHeading
-          title="Teacher routine"
+          title={t('Teacher routine')}
           description={`${state.members.find((m) => m.id === teacher)?.name ?? 'Teacher'} · Academic session ${state.settings.session}`}
           action={
             <Button variant="outline" onClick={() => window.print()}>
               <Printer size={16} />
-              Print routine
+              {t('Print routine')}{' '}
             </Button>
           }
         />
       </div>
-      <Notice title={`Published · Version ${published.version}`} tone="success">
-        Effective from {published.effective} · {published.className}. Unsaved draft changes do not
-        appear in the teacher view.
+      <Notice
+        title={t('Published · Version {value0}', { value0: published.version })}
+        tone="success"
+      >
+        {t('Effective from')} {published.effective} · {published.className}. Unsaved draft changes
+        do not appear in the teacher view.
       </Notice>
       <div className="demo-filters demo-print-hide">
         <Choice
           id="routine-teacher"
-          label="Teacher"
+          label={t('Teacher')}
           value={teacher}
           optionLabels={Object.fromEntries(state.members.map((m) => [m.id, m.name]))}
           options={state.members
@@ -105,12 +111,12 @@ export function TeacherRoutine() {
         ]}
       />
       {!lessons.length ? (
-        <EmptyState title="No teaching periods">
-          This teacher has no lessons in the selected published class routine.
+        <EmptyState title={t('No teaching periods')}>
+          {t('This teacher has no lessons in the selected published class routine.')}{' '}
         </EmptyState>
       ) : (
         <DataTable
-          caption="Published teacher timetable"
+          caption={t('Published teacher timetable')}
           headers={['Day', 'Period / time', 'Subject', 'Class / section', 'Room']}
         >
           {lessons.map((l) => {
@@ -119,7 +125,7 @@ export function TeacherRoutine() {
               <tr key={`${l.routine.classId ?? l.routine.className}-${l.id}`}>
                 <td>{l.day}</td>
                 <td>
-                  Period {l.period}
+                  {t('Period')} {l.period}
                   <small>
                     {p?.start}–{p?.end}
                   </small>
@@ -134,17 +140,19 @@ export function TeacherRoutine() {
           })}
         </DataTable>
       )}
-      <Panel title="Routine history">
+      <Panel title={t('Routine history')}>
         <DataTable
-          caption="Published routine versions"
+          caption={t('Published routine versions')}
           headers={['Version', 'Effective from', 'Class', 'Publication note']}
         >
           {state.routineHistory.toReversed().map((r) => (
             <tr key={`${r.classId ?? r.className}-${r.version}`}>
-              <td>Version {r.version}</td>
+              <td>
+                {t('Version')} {r.version}
+              </td>
               <td>{r.effective}</td>
               <td>{r.className}</td>
-              <td>{r.note || 'Initial school routine'}</td>
+              <td>{r.note || t('Initial school routine')}</td>
             </tr>
           ))}
         </DataTable>

@@ -1,3 +1,4 @@
+import { useLanguage } from '@eduos/ui';
 import { useState } from 'react';
 import type { SchoolSnapshot } from '@eduos/contracts';
 import { useDemo } from '../../_component/demo-provider';
@@ -8,6 +9,8 @@ import { enrollmentHistoryKey } from '../_api/enrollment-history';
 import { EnrollmentDateHistory } from './enrollment-date-history';
 
 export function EnrollmentDates() {
+  const { t } = useLanguage();
+
   const { snapshot } = useDemo();
   const [selected, setSelected] = useState('');
   if (!snapshot.permissions.includes('academics.manage') || !snapshot.modules.includes('academics'))
@@ -17,25 +20,32 @@ export function EnrollmentDates() {
   const labels = Object.fromEntries(
     snapshot.students.map((s) => [
       s.enrollmentId,
-      `${s.name} · ${snapshot.classes.find((c) => c.id === s.classId)?.label ?? 'Archived class'} · Roll ${s.roll}`,
+      t('{value0} · {value1} · Roll {value2}', {
+        value0: s.name,
+        value1: snapshot.classes.find((c) => c.id === s.classId)?.label ?? 'Archived class',
+        value2: s.roll,
+      }),
     ]),
   );
   return (
     <section className="demo-stack" aria-labelledby="enrollment-dates-heading">
       <h2 id="enrollment-dates-heading" className="font-semibold">
-        Enrollment dates
+        {t('Enrollment dates')}{' '}
       </h2>
       <p className="demo-help">
-        Record verified dates for the selected enrollment. Both dates include that day. Leave
-        unknown dates blank; submitted attendance is preserved.
+        {t(
+          'Record verified dates for the selected enrollment. Both dates include that day. Leave unknown dates blank; submitted attendance is preserved.',
+        )}{' '}
       </p>
       {!student ? (
-        <p>No enrolled students are available. Confirm an admission before recording dates.</p>
+        <p>
+          {t('No enrolled students are available. Confirm an admission before recording dates.')}
+        </p>
       ) : (
         <>
           <Choice
             id="enrollment-student"
-            label="Student enrollment"
+            label={t('Student enrollment')}
             value={student.enrollmentId}
             options={snapshot.students.map((s) => s.enrollmentId)}
             optionLabels={labels}
@@ -49,13 +59,15 @@ export function EnrollmentDates() {
 }
 
 function EnrollmentDateEditor({ student }: { student: SchoolSnapshot['students'][number] }) {
+  const { t } = useLanguage();
+
   const { snapshot, dispatch, notify, busy } = useDemo();
   const [error, setError] = useState('');
   const [saved, setSaved] = useState(0);
   return (
     <>
       {error && (
-        <Notice title="Review enrollment dates" tone="danger">
+        <Notice title={t('Review enrollment dates')} tone="danger">
           {error}
         </Notice>
       )}
@@ -90,7 +102,7 @@ function EnrollmentDateEditor({ student }: { student: SchoolSnapshot['students']
             ],
           },
         ]}
-        submitLabel="Save enrollment dates"
+        submitLabel={t('Save enrollment dates')}
         onSubmit={async (values) => {
           const startsOn = valueOf(values, 'startsOn') || null;
           const endsOn = valueOf(values, 'endsOn') || null;

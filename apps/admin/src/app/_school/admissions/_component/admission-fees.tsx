@@ -1,3 +1,4 @@
+import { useLanguage } from '@eduos/ui';
 import { DEMO_TODAY } from '../../_component/school-format';
 import { z } from 'zod';
 import {
@@ -13,7 +14,7 @@ import {
 } from '@eduos/ui';
 import { Plus, Trash2 } from 'lucide-react';
 import type { FeeItem } from '../../_component/demo-model';
-import { money } from '../../_component/school-format';
+
 import { admissionTotal } from '../../_component/school-finance';
 import { Details, Panel } from '../../_component/demo-ui';
 
@@ -47,22 +48,30 @@ export function AdmissionFees({
   onChange: (fees: FeeItem[]) => void;
   credit: number;
 }) {
+  const { t, money } = useLanguage();
+
   function update(id: string, values: Partial<FeeItem>) {
     onChange(fees.map((f) => (f.id === id ? { ...f, ...values } : f)));
   }
   const total = admissionTotal(fees);
   return (
     <Panel
-      title="Fees and payment"
-      description="Configure the admission, session, monthly and custom fees collected with this admission."
+      title={t('Fees and payment')}
+      description={t(
+        'Configure the admission, session, monthly and custom fees collected with this admission.',
+      )}
     >
       <div className="demo-stack">
         {fees.map((fee, index) => (
           <fieldset key={fee.id} className="border-b border-border pb-5">
-            <legend className="sr-only">Fee {index + 1}</legend>
+            <legend className="sr-only">
+              {t('Fee')} {index + 1}
+            </legend>
             <div className="demo-fields">
               <div className="demo-field">
-                <Label htmlFor={`${fee.id}-label`}>Fee name {index + 1}</Label>
+                <Label htmlFor={`${fee.id}-label`}>
+                  {t('Fee name')} {index + 1}
+                </Label>
                 <Input
                   id={`${fee.id}-label`}
                   value={fee.label}
@@ -70,7 +79,7 @@ export function AdmissionFees({
                 />
               </div>
               <div className="demo-field">
-                <Label htmlFor={`${fee.id}-type`}>Type</Label>
+                <Label htmlFor={`${fee.id}-type`}>{t('Type')}</Label>
                 <Select
                   value={fee.type}
                   onValueChange={(value) => {
@@ -95,7 +104,7 @@ export function AdmissionFees({
                 </Select>
               </div>
               <div className="demo-field">
-                <Label htmlFor={`${fee.id}-amount`}>Amount (BDT)</Label>
+                <Label htmlFor={`${fee.id}-amount`}>{t('Amount (BDT)')}</Label>
                 <div className="flex gap-2">
                   <Input
                     id={`${fee.id}-amount`}
@@ -112,7 +121,7 @@ export function AdmissionFees({
                   />
                   <Button
                     variant="ghost"
-                    aria-label={`Remove ${fee.label}`}
+                    aria-label={t('Remove {value0}', { value0: fee.label })}
                     disabled={fees.length === 1}
                     onClick={() => onChange(fees.filter((f) => f.id !== fee.id))}
                   >
@@ -123,7 +132,7 @@ export function AdmissionFees({
               {fee.type === 'monthly' && (
                 <>
                   <div className="demo-field">
-                    <Label htmlFor={`${fee.id}-start`}>First billing date</Label>
+                    <Label htmlFor={`${fee.id}-start`}>{t('First billing date')}</Label>
                     <DatePicker
                       id={`${fee.id}-start`}
                       value={fee.start || null}
@@ -131,7 +140,7 @@ export function AdmissionFees({
                     />
                   </div>
                   <div className="demo-field">
-                    <Label htmlFor={`${fee.id}-end`}>Last billing date (optional)</Label>
+                    <Label htmlFor={`${fee.id}-end`}>{t('Last billing date (optional)')}</Label>
                     <DatePicker
                       id={`${fee.id}-end`}
                       value={fee.end || null}
@@ -161,12 +170,13 @@ export function AdmissionFees({
             }
           >
             <Plus size={16} />
-            Add fee
+            {t('Add fee')}{' '}
           </Button>
         </div>
         <p className="demo-help">
-          The first monthly installment is collected now. Future charges require a separate cash
-          collection. Short months use the last available day.
+          {t(
+            'The first monthly installment is collected now. Future charges require a separate cash collection. Short months use the last available day.',
+          )}{' '}
         </p>
         <Details
           items={[

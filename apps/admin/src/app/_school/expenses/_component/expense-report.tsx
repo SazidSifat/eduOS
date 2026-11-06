@@ -1,7 +1,8 @@
+import { useLanguage } from '@eduos/ui';
 import { useState } from 'react';
 import { DatePicker, Label } from '@eduos/ui';
 import { useDemo } from '../../_component/demo-provider';
-import { DEMO_TODAY, money } from '../../_component/school-format';
+import { DEMO_TODAY } from '../../_component/school-format';
 import {
   Choice,
   ExportButton,
@@ -12,6 +13,8 @@ import {
 } from '../../_component/demo-ui';
 
 export function ExpenseReport() {
+  const { t, money } = useLanguage();
+
   const { state } = useDemo();
   const [date, setDate] = useState(DEMO_TODAY);
   const [category, setCategory] = useState('All categories');
@@ -36,8 +39,8 @@ export function ExpenseReport() {
   return (
     <>
       <PageHeading
-        title="Expense report"
-        description="Review school expenditure by category and reconcile actual payments."
+        title={t('Expense report')}
+        description={t('Review school expenditure by category and reconcile actual payments.')}
         action={
           <ExportButton
             filename="school-expense-report"
@@ -48,7 +51,7 @@ export function ExpenseReport() {
       />
       <div className="demo-filters">
         <div>
-          <Label htmlFor="expense-report-date">Month containing</Label>
+          <Label htmlFor="expense-report-date">{t('Month containing')}</Label>
           <DatePicker
             id="expense-report-date"
             value={date}
@@ -59,7 +62,7 @@ export function ExpenseReport() {
         </div>
         <Choice
           id="report-category"
-          label="Category"
+          label={t('Category')}
           value={category}
           options={['All categories', ...state.categories]}
           onChange={setCategory}
@@ -70,7 +73,7 @@ export function ExpenseReport() {
           {
             label: 'Recorded requests',
             value: money(total),
-            detail: `${items.length} expense records`,
+            detail: t('{value0} expense records', { value0: items.length }),
           },
           { label: 'Paid', value: money(paid), detail: 'Posted payment vouchers' },
           { label: 'Approved unpaid', value: money(approved), detail: 'Awaiting cash payment' },
@@ -82,8 +85,10 @@ export function ExpenseReport() {
         ]}
       />
       <Panel
-        title="Spending by category"
-        description="Category values reconcile to the selected period’s recorded expense total."
+        title={t('Spending by category')}
+        description={t(
+          'Category values reconcile to the selected period’s recorded expense total.',
+        )}
       >
         {groups.length ? (
           <dl className="demo-stack">
@@ -92,7 +97,7 @@ export function ExpenseReport() {
                 key={group.label}
                 className="grid gap-3 sm:grid-cols-[180px_minmax(0,1fr)_140px]"
               >
-                <dt className="font-semibold">{group.label}</dt>
+                <dt className="font-semibold">{t(group.label)}</dt>
                 <div className="self-center rounded bg-muted" aria-hidden="true">
                   <div
                     className="h-2 rounded bg-primary"
@@ -110,13 +115,14 @@ export function ExpenseReport() {
           </dl>
         ) : (
           <p className="text-muted-foreground">
-            No expense records match this period and category.
+            {t('No expense records match this period and category.')}{' '}
           </p>
         )}
       </Panel>
-      <Notice title="Reporting basis">
-        Recorded values include draft and pending requests. Paid totals include actual recorded
-        vouchers. School expenses stay separate from student fee collections.
+      <Notice title={t('Reporting basis')}>
+        {t(
+          'Recorded values include draft and pending requests. Paid totals include actual recorded vouchers. School expenses stay separate from student fee collections.',
+        )}{' '}
       </Notice>
     </>
   );

@@ -13,24 +13,12 @@
   .demo-app {
     display: block;
   }
+  /* Hide the old hamburger header; bottom nav replaces it */
   .demo-mobile-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 20px;
-    border-bottom: 1px solid var(--border);
-    background: var(--background);
+    display: none;
   }
   .demo-sidebar {
     display: none;
-    position: static;
-    height: auto;
-    max-height: 70dvh;
-    border-bottom: 1px solid var(--border);
-    border-right: 0;
-  }
-  .demo-sidebar-open {
-    display: flex;
   }
   .demo-school {
     display: none;
@@ -41,8 +29,9 @@
   .demo-navigation {
     padding: 12px 20px;
   }
+  /* Reserve space at bottom for the floating pill nav (64px bar + 16px gap + 16px breathing room) */
   .demo-main {
-    padding: 24px 20px 40px;
+    padding: 24px 20px calc(96px + env(safe-area-inset-bottom));
   }
   .demo-context > span {
     display: none;
@@ -66,6 +55,10 @@
   .demo-heading > a {
     min-height: 44px;
   }
+  /* Show the bottom nav inside the school workspace */
+  .demo-app .mobile-bottom-nav {
+    display: flex;
+  }
 }
 @media (max-width: 600px) {
   .demo-fields {
@@ -82,7 +75,7 @@
     padding: 14px;
   }
   .demo-metrics dd {
-    font-size: 24px;
+    font-size: 28px;
   }
   .demo-setting-grid {
     grid-template-columns: minmax(0, 1fr);
@@ -99,7 +92,7 @@
     flex: 1;
   }
   .demo-heading h1 {
-    font-size: 24px;
+    font-size: 28px;
   }
   .demo-roster-table {
     display: none;

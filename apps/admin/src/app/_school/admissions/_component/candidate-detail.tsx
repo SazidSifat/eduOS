@@ -1,8 +1,9 @@
+import { useLanguage } from '@eduos/ui';
 import { useState } from 'react';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { Button } from '@eduos/ui';
 import { useDemo } from '../../_component/demo-provider';
-import { money, DEMO_TODAY } from '../../_component/school-format';
+import { DEMO_TODAY } from '../../_component/school-format';
 import { DemoForm, valueOf } from '../../_component/demo-form';
 import {
   DataTable,
@@ -17,16 +18,18 @@ import {
 import type { Candidate } from '../../_component/demo-model';
 
 export function CandidateDetail({ candidateId }: { candidateId: string }) {
+  const { t, money } = useLanguage();
+
   const { state } = useDemo();
   const [closing, setClosing] = useState(false);
   const candidate = state.candidates.find((c) => c.id === candidateId);
   if (!candidate)
     return (
       <EmptyState
-        title="Record unavailable"
-        action={<DemoLink to="/admissions">Open admission directory</DemoLink>}
+        title={t('Record unavailable')}
+        action={<DemoLink to="/admissions">{t('Open admission directory')}</DemoLink>}
       >
-        This record is not available in your current school access.
+        {t('This record is not available in your current school access.')}{' '}
       </EmptyState>
     );
   const schedules = state.schedules.filter((s) => s.candidateId === candidate.id);
@@ -34,15 +37,20 @@ export function CandidateDetail({ candidateId }: { candidateId: string }) {
   return (
     <>
       <PageHeading
-        title={candidate.state === 'admitted' ? 'Admission confirmed' : candidate.name}
-        description={`${candidate.name} · ${candidate.id} · ${candidate.className} · Session ${candidate.session}`}
+        title={candidate.state === 'admitted' ? t('Admission confirmed') : candidate.name}
+        description={t('{value0} · {value1} · {value2} · Session {value3}', {
+          value0: candidate.name,
+          value1: candidate.id,
+          value2: candidate.className,
+          value3: candidate.session,
+        })}
         action={
           candidate.state === 'admitted' ? (
-            <DemoLink to="/admissions/admitted">Admitted students</DemoLink>
+            <DemoLink to="/admissions/admitted">{t('Admitted students')}</DemoLink>
           ) : (
             <Button asChild>
               <Link to="/admissions/new" search={{ mode: 'admitted', candidate: candidate.id }}>
-                Complete admission
+                {t('Complete admission')}{' '}
               </Link>
             </Button>
           )
@@ -59,7 +67,7 @@ export function CandidateDetail({ candidateId }: { candidateId: string }) {
                 : 'neutral'
           }
         >
-          {candidate.state.replace('_', '-')}
+          {t(candidate.state)}
         </Status>
         {candidate.state !== 'admitted' && (
           <>
@@ -71,34 +79,36 @@ export function CandidateDetail({ candidateId }: { candidateId: string }) {
                   candidate: candidate.id,
                 }}
               >
-                Edit details
+                {t('Edit details')}{' '}
               </Link>
             </Button>
             {candidate.state === 'follow_up' && (
               <Button asChild variant="outline">
                 <Link to="/admissions/new" search={{ mode: 'willing', candidate: candidate.id }}>
-                  Mark willing
+                  {t('Mark willing')}{' '}
                 </Link>
               </Button>
             )}
             {candidate.state !== 'closed' && (
               <Button variant="ghost" onClick={() => setClosing(true)}>
-                Close record
+                {t('Close record')}{' '}
               </Button>
             )}
           </>
         )}
       </div>
       {candidate.state === 'admitted' && (
-        <Notice title="Student and enrollment created" tone="success">
-          Admitted on {candidate.admittedOn}. Prospect reminders are cancelled. Future monthly
-          charges require their own collection.
+        <Notice title={t('Student and enrollment created')} tone="success">
+          {t('Admitted on')} {candidate.admittedOn}. Prospect reminders are cancelled. Future
+          monthly charges require their own collection.
         </Notice>
       )}
       <div className="demo-columns demo-columns-wide">
         <div className="demo-stack">
           <Panel
-            title={candidate.state === 'admitted' ? 'Student record' : 'Contact and assignment'}
+            title={
+              candidate.state === 'admitted' ? t('Student record') : t('Contact and assignment')
+            }
           >
             <Details
               items={[
@@ -117,14 +127,14 @@ export function CandidateDetail({ candidateId }: { candidateId: string }) {
             />
           </Panel>
           <Panel
-            title="Conversation history"
-            description="Newest first. Original notes stay in the same candidate record."
+            title={t('Conversation history')}
+            description={t('Newest first. Original notes stay in the same candidate record.')}
           >
             <ol className="demo-history">
               {candidate.calls.map((call, i) => (
                 <li key={`${call.date}-${i}`}>
                   <time>{call.date}</time>
-                  <p className="font-semibold">{call.outcome}</p>
+                  <p className="font-semibold">{t(call.outcome)}</p>
                   <p className="text-muted-foreground">{call.note}</p>
                 </li>
               ))}
@@ -137,7 +147,9 @@ export function CandidateDetail({ candidateId }: { candidateId: string }) {
           ) : candidate.state === 'closed' ? (
             <ReopenRecord candidate={candidate} />
           ) : (
-            <Panel title={candidate.state === 'admitted' ? 'Admission payment' : 'Willing fee'}>
+            <Panel
+              title={candidate.state === 'admitted' ? t('Admission payment') : t('Willing fee')}
+            >
               <Details
                 items={[
                   ['Willing fee collected', money(candidate.willingPaid)],
@@ -149,7 +161,7 @@ export function CandidateDetail({ candidateId }: { candidateId: string }) {
                 {candidate.state === 'admitted' ? (
                   <Button asChild>
                     <Link to="/fees/$studentId" params={{ studentId: candidate.id }}>
-                      View fee account
+                      {t('View fee account')}{' '}
                     </Link>
                   </Button>
                 ) : candidate.willingPaid === 0 ? (
@@ -158,11 +170,11 @@ export function CandidateDetail({ candidateId }: { candidateId: string }) {
                       to="/admissions/new"
                       search={{ mode: 'willing', candidate: candidate.id }}
                     >
-                      Optional willing collection
+                      {t('Optional willing collection')}{' '}
                     </Link>
                   </Button>
                 ) : (
-                  <Status tone="success">Collected</Status>
+                  <Status tone="success">{t('Collected')}</Status>
                 )}
               </div>
             </Panel>
@@ -170,16 +182,16 @@ export function CandidateDetail({ candidateId }: { candidateId: string }) {
         </div>
       </div>
       {!!receipts.length && (
-        <Panel title="Receipts">
+        <Panel title={t('Receipts')}>
           <DataTable
-            caption="Candidate payment receipts"
+            caption={t('Candidate payment receipts')}
             headers={['Receipt', 'Collected on', 'Kind', 'Cash received', 'Action']}
           >
             {receipts.map((p) => (
               <tr key={p.id}>
                 <td>{p.id}</td>
                 <td>{p.date}</td>
-                <td>{p.kind}</td>
+                <td>{t(p.kind)}</td>
                 <td>{money(p.amount)}</td>
                 <td>
                   <Link
@@ -187,7 +199,7 @@ export function CandidateDetail({ candidateId }: { candidateId: string }) {
                     to="/fees/receipts/$receiptId"
                     params={{ receiptId: p.id }}
                   >
-                    View receipt
+                    {t('View receipt')}{' '}
                   </Link>
                 </td>
               </tr>
@@ -197,22 +209,24 @@ export function CandidateDetail({ candidateId }: { candidateId: string }) {
       )}
       {!!schedules.length && (
         <Panel
-          title="Monthly billing schedules"
-          description="Future bills are charges awaiting collection; no automatic payment is taken."
+          title={t('Monthly billing schedules')}
+          description={t(
+            'Future bills are charges awaiting collection; no automatic payment is taken.',
+          )}
         >
           <DataTable
-            caption="Student monthly schedules"
+            caption={t('Student monthly schedules')}
             headers={['Fee', 'Installment', 'Next bill', 'Ends', 'State']}
           >
             {schedules.map((s) => (
               <tr key={s.id}>
-                <td>{s.label}</td>
+                <td>{t(s.label)}</td>
                 <td>{money(s.amount)}</td>
                 <td>{s.next}</td>
-                <td>{s.end || 'No end date'}</td>
+                <td>{s.end || t('No end date')}</td>
                 <td>
                   <Status tone={s.active ? 'success' : 'neutral'}>
-                    {s.active ? 'Active' : 'Stopped'}
+                    {s.active ? t('Active') : t('Stopped')}
                   </Status>
                 </td>
               </tr>
@@ -224,13 +238,15 @@ export function CandidateDetail({ candidateId }: { candidateId: string }) {
   );
 }
 function CallEditor({ candidate }: { candidate: Candidate }) {
+  const { t } = useLanguage();
+
   const { dispatch, notify } = useDemo();
   const navigate = useNavigate();
   const [error, setError] = useState('');
   return (
     <>
       {error && (
-        <Notice title="Review this call" tone="danger">
+        <Notice title={t('Review this call')} tone="danger">
           {error}
         </Notice>
       )}
@@ -253,7 +269,7 @@ function CallEditor({ candidate }: { candidate: Candidate }) {
             ],
           },
         ]}
-        submitLabel="Save call"
+        submitLabel={t('Save call')}
         onSubmit={async (values) => {
           const outcome = valueOf(values, 'outcome');
           const nextCall = valueOf(values, 'date');
@@ -284,6 +300,8 @@ function CallEditor({ candidate }: { candidate: Candidate }) {
   );
 }
 function ReopenRecord({ candidate }: { candidate: Candidate }) {
+  const { t } = useLanguage();
+
   const { dispatch, notify } = useDemo();
   return (
     <DemoForm
@@ -309,7 +327,7 @@ function ReopenRecord({ candidate }: { candidate: Candidate }) {
           ],
         },
       ]}
-      submitLabel="Reopen follow-up"
+      submitLabel={t('Reopen follow-up')}
       onSubmit={async (values) => {
         const nextCall = valueOf(values, 'date');
         if (
@@ -329,6 +347,8 @@ function ReopenRecord({ candidate }: { candidate: Candidate }) {
 }
 
 function CloseCandidate({ candidateId, done }: { candidateId: string; done: () => void }) {
+  const { t } = useLanguage();
+
   const { dispatch, notify } = useDemo();
   return (
     <DemoForm
@@ -340,7 +360,7 @@ function CloseCandidate({ candidateId, done }: { candidateId: string; done: () =
           ],
         },
       ]}
-      submitLabel="Confirm closure"
+      submitLabel={t('Confirm closure')}
       onSubmit={async (values) => {
         if (
           !(await dispatch({

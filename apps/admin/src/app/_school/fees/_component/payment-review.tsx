@@ -1,8 +1,8 @@
+import { useLanguage } from '@eduos/ui';
 import { useState } from 'react';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { Button } from '@eduos/ui';
 import { useDemo } from '../../_component/demo-provider';
-import { money } from '../../_component/school-format';
 
 import {
   DataTable,
@@ -15,6 +15,8 @@ import {
 } from '../../_component/demo-ui';
 
 export function PaymentReview({ studentId }: { studentId: string }) {
+  const { t, money } = useLanguage();
+
   const { state, snapshot, dispatch, feeDraft, setFeeDraft, notify } = useDemo();
   const navigate = useNavigate();
   const [confirmed, setConfirmed] = useState(false);
@@ -23,10 +25,10 @@ export function PaymentReview({ studentId }: { studentId: string }) {
   if (!candidate || !feeDraft || feeDraft.candidateId !== studentId)
     return (
       <EmptyState
-        title="No payment to review"
-        action={<DemoLink to="/fees">Choose a student</DemoLink>}
+        title={t('No payment to review')}
+        action={<DemoLink to="/fees">{t('Choose a student')}</DemoLink>}
       >
-        Select the charges in a student fee account before reviewing a collection.
+        {t('Select the charges in a student fee account before reviewing a collection.')}{' '}
       </EmptyState>
     );
   const total = feeDraft.allocations.reduce((sum, a) => sum + a.amount, 0);
@@ -61,27 +63,31 @@ export function PaymentReview({ studentId }: { studentId: string }) {
   return (
     <>
       <PageHeading
-        title="Review payment"
-        description="Check the student, allocations and cash amount before issuing a receipt."
+        title={t('Review payment')}
+        description={t('Check the student, allocations and cash amount before issuing a receipt.')}
       />
       {error && (
-        <Notice title="Payment not posted" tone="danger">
+        <Notice title={t('Payment not posted')} tone="danger">
           {error}
         </Notice>
       )}
       <Panel
-        title={`Payment for ${candidate.name}`}
-        description={`${candidate.id} · ${candidate.className} · Guardian: ${candidate.guardian}`}
+        title={t('Payment for {value0}', { value0: candidate.name })}
+        description={t('{value0} · {value1} · Guardian: {value2}', {
+          value0: candidate.id,
+          value1: candidate.className,
+          value2: candidate.guardian,
+        })}
       >
         <DataTable
-          caption="Payment allocation review"
+          caption={t('Payment allocation review')}
           headers={['Charge', 'Period', 'Cash allocation']}
         >
           {feeDraft.allocations.map((a) => {
             const charge = state.charges.find((c) => c.id === a.chargeId);
             return (
               <tr key={a.chargeId}>
-                <td>{charge?.label}</td>
+                <td>{t(charge?.label)}</td>
                 <td>{charge?.period}</td>
                 <td>{money(a.amount)}</td>
               </tr>
@@ -99,25 +105,29 @@ export function PaymentReview({ studentId }: { studentId: string }) {
             ]}
           />
         </div>
-        {feeDraft.note && <p className="mt-5 text-muted-foreground">Note: {feeDraft.note}</p>}
+        {feeDraft.note && (
+          <p className="mt-5 text-muted-foreground">
+            {t('Note:')} {feeDraft.note}
+          </p>
+        )}
       </Panel>
-      <Notice title="Cash receipt confirmation" tone="success">
+      <Notice title={t('Cash receipt confirmation')} tone="success">
         <label className="demo-check">
           <input
             type="checkbox"
             checked={confirmed}
             onChange={(e) => setConfirmed(e.target.checked)}
           />
-          I have received {money(total)} in cash from this student’s guardian.
+          {t('I have received')} {money(total)} {t('in cash from this student’s guardian.')}{' '}
         </label>
       </Notice>
       <div className="demo-actions">
         <Button asChild variant="outline">
           <Link to="/fees/$studentId" params={{ studentId }}>
-            Back to allocation
+            {t('Back to allocation')}{' '}
           </Link>
         </Button>
-        <Button onClick={collect}>Confirm cash & issue receipt</Button>
+        <Button onClick={collect}>{t('Confirm cash & issue receipt')}</Button>
       </div>
     </>
   );

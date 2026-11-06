@@ -1,3 +1,4 @@
+import { useLanguage } from '@eduos/ui';
 import { createContext, useContext, type ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import type { accessSchema, admissionSetupSchema } from '@eduos/contracts';
@@ -35,13 +36,17 @@ export function AdmissionsShell({
   );
 }
 export function AdmissionsProvider({ children }: { children: ReactNode }) {
+  const { t } = useLanguage();
+
   const { userId, institutionId, access } = useInstitution();
   const enabled =
     access.permissions.includes('admissions.read') && access.modules.includes('admissions');
   const setup = useQuery({ ...admissionSetupQuery(userId, institutionId), enabled });
   if (!enabled)
     return (
-      <p role="alert">Admissions access unavailable. Contact your institution administrator.</p>
+      <p role="alert">
+        {t('Admissions access unavailable. Contact your institution administrator.')}
+      </p>
     );
   if (setup.isError)
     return (

@@ -1,3 +1,4 @@
+import { useLanguage } from '@eduos/ui';
 import { Link } from '@tanstack/react-router';
 import {
   Button,
@@ -39,11 +40,13 @@ export function PageHeading({
   description: string;
   action?: ReactNode;
 }) {
+  const { t } = useLanguage();
+
   return (
     <header className="demo-heading">
       <div>
-        <h1>{title}</h1>
-        <p>{description}</p>
+        <h1>{t(title)}</h1>
+        <p>{t(description)}</p>
       </div>
       {action}
     </header>
@@ -60,11 +63,13 @@ export function Panel({
   children: ReactNode;
   className?: string;
 }) {
+  const { t } = useLanguage();
+
   return (
     <section className={`demo-panel ${className}`}>
       <header>
-        <h2>{title}</h2>
-        {description && <p>{description}</p>}
+        <h2>{t(title)}</h2>
+        {description && <p>{t(description)}</p>}
       </header>
       {children}
     </section>
@@ -79,9 +84,11 @@ export function Notice({
   children?: ReactNode;
   tone?: 'info' | 'warning' | 'success' | 'danger';
 }) {
+  const { t } = useLanguage();
+
   return (
     <div className={`demo-notice demo-${tone}`} role={tone === 'danger' ? 'alert' : undefined}>
-      <p className="font-semibold">{title}</p>
+      <p className="font-semibold">{t(title)}</p>
       {children && <div className="mt-1">{children}</div>}
     </div>
   );
@@ -93,31 +100,40 @@ export function Status({
   children: ReactNode;
   tone?: 'neutral' | 'success' | 'warning' | 'danger' | 'info';
 }) {
-  return <span className={`demo-badge demo-${tone}`}>{children}</span>;
+  const { t } = useLanguage();
+  return (
+    <span className={`demo-badge demo-${tone}`}>
+      {typeof children === 'string' ? t(children) : children}
+    </span>
+  );
 }
 export function Metrics({
   items,
 }: {
   items: { label: string; value: string | number; detail: string }[];
 }) {
+  const { t } = useLanguage();
+
   return (
     <dl className="demo-metrics">
       {items.map((item) => (
         <div key={item.label}>
-          <dt>{item.label}</dt>
+          <dt>{t(item.label)}</dt>
           <dd>{item.value}</dd>
-          <p>{item.detail}</p>
+          <p>{t(item.detail)}</p>
         </div>
       ))}
     </dl>
   );
 }
 export function Details({ items }: { items: [string, ReactNode][] }) {
+  const { t } = useLanguage();
+
   return (
     <dl className="demo-details">
       {items.map(([label, value]) => (
         <div key={label}>
-          <dt>{label}</dt>
+          <dt>{t(label)}</dt>
           <dd>{value}</dd>
         </div>
       ))}
@@ -133,15 +149,17 @@ export function DataTable({
   children: ReactNode;
   caption: string;
 }) {
+  const { t } = useLanguage();
+
   return (
     <div className="demo-table-wrap">
       <table className="demo-table">
-        <caption className="sr-only">{caption}</caption>
+        <caption className="sr-only">{t(caption)}</caption>
         <thead>
           <tr>
             {headers.map((header) => (
               <th key={header} scope="col">
-                {header}
+                {t(header)}
               </th>
             ))}
           </tr>
@@ -160,17 +178,21 @@ export function EmptyState({
   children: ReactNode;
   action?: ReactNode;
 }) {
+  const { t } = useLanguage();
+
   return (
     <div className="demo-empty">
-      <h2>{title}</h2>
+      <h2>{t(title)}</h2>
       <p>{children}</p>
       {action}
     </div>
   );
 }
 export function Tabs({ items }: { items: { label: string; to: DemoPath; active: boolean }[] }) {
+  const { t } = useLanguage();
+
   return (
-    <nav className="demo-tabs" aria-label="Module views">
+    <nav className="demo-tabs" aria-label={t('Module views')}>
       {items.map((item) => (
         <Link
           key={item.to}
@@ -180,7 +202,7 @@ export function Tabs({ items }: { items: { label: string; to: DemoPath; active: 
           data-active={item.active ? 'true' : undefined}
           className={item.active ? 'demo-tab-active' : ''}
         >
-          {item.label}
+          {t(item.label)}
         </Link>
       ))}
     </nav>
@@ -209,9 +231,11 @@ export function Choice({
   optionLabels?: Record<string, string>;
   onChange: (value: string) => void;
 }) {
+  const { t } = useLanguage();
+
   return (
     <div>
-      <Label htmlFor={id}>{label}</Label>
+      <Label htmlFor={id}>{t(label)}</Label>
       <Select value={value} onValueChange={onChange}>
         <SelectTrigger id={id}>
           <SelectValue />
@@ -219,7 +243,7 @@ export function Choice({
         <SelectContent>
           {options.map((option) => (
             <SelectItem key={option} value={option}>
-              {optionLabels?.[option] ?? option}
+              {optionLabels?.[option] ?? t(option)}
             </SelectItem>
           ))}
         </SelectContent>
@@ -236,13 +260,19 @@ export function ExportButton({
   headers: string[];
   rows: (string | number)[][];
 }) {
+  const { t } = useLanguage();
+
   function download() {
     const escape = (value: string | number) =>
       `"${String(value)
         .replace(/^[=+@-]/, "'$&")
         .replaceAll('"', '""')}"`;
     const blob = new Blob(
-      [[headers, ...rows].map((row) => row.map(escape).join(',')).join('\r\n')],
+      [
+        [headers.map((header) => t(header)), ...rows]
+          .map((row) => row.map(escape).join(','))
+          .join('\r\n'),
+      ],
       { type: 'text/csv;charset=utf-8' },
     );
     const url = URL.createObjectURL(blob);
@@ -255,7 +285,7 @@ export function ExportButton({
   return (
     <Button variant="outline" onClick={download}>
       <Download size={16} aria-hidden="true" />
-      Export CSV
+      {t('Export CSV')}{' '}
     </Button>
   );
 }

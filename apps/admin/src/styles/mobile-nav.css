@@ -1,0 +1,252 @@
+/* ============================================================
+   Mobile Bottom Navigation Bar — floating card
+   Visible only on mobile (< 900px), controlled via responsive.css
+   ============================================================ */
+
+.mobile-bottom-nav {
+  display: none; /* shown via media query in responsive.css */
+  position: fixed;
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 32px);
+  max-width: 480px;
+  z-index: 100;
+  height: 56px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--background) 88%, transparent);
+  border: 1px solid var(--border);
+  box-shadow:
+    0 4px 24px color-mix(in srgb, var(--foreground) 10%, transparent),
+    0 1px 4px color-mix(in srgb, var(--foreground) 6%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  align-items: stretch;
+  justify-content: stretch;
+  padding: 0 8px;
+  overflow: hidden;
+}
+
+.mobile-bottom-nav-tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 6px 4px;
+  border: 0;
+  background: transparent;
+  color: var(--muted-foreground);
+  text-decoration: none;
+  cursor: pointer;
+  position: relative;
+  border-radius: 6px;
+  transition:
+    color 150ms ease-out,
+    background-color 150ms ease-out;
+  -webkit-tap-highlight-color: transparent;
+  min-width: 0;
+}
+
+.mobile-bottom-nav-tab:hover {
+  color: var(--foreground);
+  background: color-mix(in srgb, var(--muted) 70%, transparent);
+}
+
+.mobile-bottom-nav-tab:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+  border-radius: 6px;
+}
+
+.mobile-bottom-nav-tab-active {
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
+/* Active state: icon color + subtle background wash only — no bar, no label */
+.mobile-bottom-nav-indicator {
+  display: none;
+}
+
+.mobile-bottom-nav-label {
+  display: none;
+}
+
+/* ============================================================
+   Mobile Nav Sheet (slide-up "More" overlay)
+   ============================================================ */
+
+.mobile-sheet-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  border: 0;
+  background: transparent;
+  color: var(--foreground);
+}
+
+.mobile-sheet-overlay::backdrop {
+  background: transparent;
+}
+
+.mobile-sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--foreground) 40%, transparent);
+  animation: mobile-sheet-fade-in 150ms ease-out both;
+}
+
+.mobile-sheet-panel {
+  position: relative;
+  z-index: 1;
+  background: var(--background);
+  border-top: 1px solid var(--border);
+  border-radius: 12px 12px 0 0;
+  max-height: 70dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  animation: mobile-sheet-slide-up 200ms ease-out both;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.mobile-sheet-handle {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border);
+  margin: 12px auto 4px;
+}
+
+.mobile-sheet-content {
+  padding: 8px 0 16px;
+}
+
+.mobile-sheet-nav {
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-sheet-section-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+  padding: 12px 20px 6px;
+}
+
+.mobile-sheet-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 20px;
+  color: var(--muted-foreground);
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  transition:
+    background-color 150ms ease-out,
+    color 150ms ease-out;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-sheet-nav-item:hover {
+  background: var(--muted);
+  color: var(--foreground);
+}
+
+.mobile-sheet-nav-item:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+}
+
+.mobile-sheet-nav-item-active {
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+  font-weight: 600;
+}
+
+.mobile-sheet-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 8px 0;
+}
+
+.mobile-sheet-account {
+  padding: 12px 20px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mobile-sheet-role {
+  font-size: 13px;
+  color: var(--muted-foreground);
+  margin-bottom: 8px;
+}
+
+.mobile-sheet-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+@keyframes mobile-sheet-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes mobile-sheet-slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobile-sheet-backdrop,
+  .mobile-sheet-panel {
+    animation: none;
+  }
+  .mobile-bottom-nav-tab,
+  .mobile-bottom-nav-indicator {
+    transition: none;
+  }
+}
+
+/* Show bottom nav on mobile for _school routes (900px breakpoint matches layout.css) */
+/* Applied by responsive.css inside the demo-app scope */
+
+/* Show bottom nav on mobile for institution shell (lg = 1024px, matches Tailwind lg:) */
+@media (max-width: 1023px) {
+  .admissions-app:not(.demo-app) .mobile-bottom-nav {
+    display: flex;
+  }
+  .admissions-app:not(.demo-app) #main-content {
+    padding-bottom: calc(96px + env(safe-area-inset-bottom));
+  }
+}
+
+@media print {
+  .mobile-bottom-nav,
+  .mobile-sheet-overlay {
+    display: none !important;
+  }
+}

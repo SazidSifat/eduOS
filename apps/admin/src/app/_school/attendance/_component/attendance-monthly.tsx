@@ -1,3 +1,4 @@
+import { useLanguage } from '@eduos/ui';
 import { useState } from 'react';
 import { DatePicker, Label } from '@eduos/ui';
 import { useDemo } from '../../_component/demo-provider';
@@ -12,6 +13,8 @@ import {
 } from '../../_component/demo-ui';
 
 export function AttendanceMonthly() {
+  const { t, language } = useLanguage();
+
   const { state, classes, roster } = useDemo();
   const [date, setDate] = useState(DEMO_TODAY);
   const [classId, setClassId] = useState(classes[0]?.id ?? '');
@@ -49,8 +52,8 @@ export function AttendanceMonthly() {
   return (
     <>
       <PageHeading
-        title="Monthly attendance"
-        description="Review daily statuses, repeated absence and missing registers."
+        title={t('Monthly attendance')}
+        description={t('Review daily statuses, repeated absence and missing registers.')}
         action={
           <ExportButton
             filename="class-attendance"
@@ -70,7 +73,7 @@ export function AttendanceMonthly() {
       />
       <div className="demo-filters">
         <div>
-          <Label htmlFor="monthly-date">Month containing</Label>
+          <Label htmlFor="monthly-date">{t('Month containing')}</Label>
           <DatePicker
             id="monthly-date"
             value={date}
@@ -81,7 +84,7 @@ export function AttendanceMonthly() {
         </div>
         <Choice
           id="monthly-class"
-          label="Class / section"
+          label={t('Class / section')}
           options={classes.map((c) => c.label)}
           value={classes.find((c) => c.id === classId)?.label ?? ''}
           onChange={(label) => {
@@ -117,12 +120,13 @@ export function AttendanceMonthly() {
         ]}
       />
       <p className="demo-help">
-        P Present · A Absent · L Late · H Weekly closure · — No submitted register. Scroll
-        horizontally for the full month.
+        {t(
+          'P Present · A Absent · L Late · H Weekly closure · — No submitted register. Scroll horizontally for the full month.',
+        )}{' '}
       </p>
       <div className="demo-monthly">
         <DataTable
-          caption="Monthly student attendance matrix"
+          caption={t('Monthly student attendance matrix')}
           headers={['Student', ...days.map((day) => day.slice(-2)), 'P / A / L', 'Rate']}
         >
           {students.map((s) => {
@@ -145,7 +149,7 @@ export function AttendanceMonthly() {
                   const mark = registers.find((r) => r.date === day)?.marks[s.id];
                   return (
                     <td key={day} className={mark === 'Absent' ? 'text-destructive' : ''}>
-                      {mark ? mark.slice(0, 1) : closed ? 'H' : '—'}
+                      {mark ? t(mark).slice(0, 1) : closed ? (language === 'bn' ? 'ছ' : 'H') : '—'}
                     </td>
                   );
                 })}
@@ -158,9 +162,10 @@ export function AttendanceMonthly() {
           })}
         </DataTable>
       </div>
-      <Notice title="Unsubmitted days are excluded">
-        Missing registers and holidays are not counted as student absence. Only submitted, marked
-        days contribute to the attendance-rate denominator.
+      <Notice title={t('Unsubmitted days are excluded')}>
+        {t(
+          'Missing registers and holidays are not counted as student absence. Only submitted, marked days contribute to the attendance-rate denominator.',
+        )}{' '}
       </Notice>
     </>
   );

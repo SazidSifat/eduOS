@@ -1,3 +1,4 @@
+import { useLanguage } from '@eduos/ui';
 import { useState } from 'react';
 import { z } from 'zod';
 import { Button, Input, Label } from '@eduos/ui';
@@ -26,6 +27,8 @@ const roleScopes: Record<z.infer<typeof roles>, string> = {
 };
 
 export function PeopleSettings() {
+  const { t } = useLanguage();
+
   const { state, dispatch, notify, snapshot } = useDemo();
   const [editing, setEditing] = useState<string | null>(null);
 
@@ -51,9 +54,9 @@ export function PeopleSettings() {
   return (
     <>
       <PageHeading
-        title="People and access"
-        description="Manage institution memberships and review explicit school access."
-        action={<Button onClick={() => setEditing('')}>Add existing account</Button>}
+        title={t('People and access')}
+        description={t('Manage institution memberships and review explicit school access.')}
+        action={<Button onClick={() => setEditing('')}>{t('Add existing account')}</Button>}
       />
 
       <Metrics
@@ -71,17 +74,17 @@ export function PeopleSettings() {
 
       <div className="demo-filters">
         <div>
-          <Label htmlFor="people-search">Find a member</Label>
+          <Label htmlFor="people-search">{t('Find a member')}</Label>
           <Input
             id="people-search"
             value={peopleFilter.search}
             onChange={(e) => setPeopleFilter({ search: e.target.value })}
-            placeholder="Search name or school role"
+            placeholder={t('Search name or school role')}
           />
         </div>
         <Choice
           id="people-role-filter"
-          label="Role"
+          label={t('Role')}
           value={peopleFilter.role}
           options={['All school roles', ...roles.options]}
           onChange={(role) => setPeopleFilter({ role })}
@@ -89,12 +92,12 @@ export function PeopleSettings() {
       </div>
 
       {!filteredMembers.length ? (
-        <EmptyState title="No members found">
-          Try adjusting the search query or role filter.
+        <EmptyState title={t('No members found')}>
+          {t('Try adjusting the search query or role filter.')}{' '}
         </EmptyState>
       ) : (
         <DataTable
-          caption="Institution memberships"
+          caption={t('Institution memberships')}
           headers={['Member', 'Role', 'Scope', 'Membership', 'Action']}
         >
           {filteredMembers.map((m) => (
@@ -102,19 +105,19 @@ export function PeopleSettings() {
               <td>
                 <p className="font-semibold">{m.name}</p>
                 <small className="text-muted-foreground">
-                  {m.id === snapshot.identity.id ? 'Current account' : state.settings.name}
+                  {m.id === snapshot.identity.id ? t('Current account') : state.settings.name}
                 </small>
               </td>
-              <td>{m.role}</td>
-              <td className="text-muted-foreground">{roleScopes[m.role] ?? 'Staff member'}</td>
+              <td>{t(m.role)}</td>
+              <td className="text-muted-foreground">{roleScopes[m.role] ?? t('Staff member')}</td>
               <td>
                 <Status tone={m.active ? 'success' : 'neutral'}>
-                  {m.active ? 'Active' : 'Inactive'}
+                  {m.active ? t('Active') : t('Inactive')}
                 </Status>
               </td>
               <td>
                 <Button variant="outline" size="sm" onClick={() => setEditing(m.id)}>
-                  Review
+                  {t('Review')}{' '}
                 </Button>
               </td>
             </tr>
@@ -122,15 +125,17 @@ export function PeopleSettings() {
         </DataTable>
       )}
 
-      <Notice title="Access follows the active membership" tone="info">
-        Changing or revoking access takes effect on protected school operations. Platform operator
-        access is separate.
+      <Notice title={t('Access follows the active membership')} tone="info">
+        {t(
+          'Changing or revoking access takes effect on protected school operations. Platform operator access is separate.',
+        )}{' '}
       </Notice>
 
-      <Panel title="Recent access changes" description="School membership audit history">
+      <Panel title={t('Recent access changes')} description={t('School membership audit history')}>
         <p className="text-xs text-muted-foreground">
-          Role assignments and status modifications are audited with the actor timestamp. Last
-          active Admin cannot be revoked.
+          {t(
+            'Role assignments and status modifications are audited with the actor timestamp. Last active Admin cannot be revoked.',
+          )}{' '}
         </p>
       </Panel>
 
@@ -139,7 +144,9 @@ export function PeopleSettings() {
           key={editing || 'new'}
           sections={[
             {
-              title: member ? `Membership · ${member.name}` : 'Add an existing account',
+              title: member
+                ? t('Membership · {value0}', { value0: member.name })
+                : 'Add an existing account',
               description: member
                 ? 'Update role or active status for this school member.'
                 : 'Associate an existing authenticated user by their email address.',
@@ -176,10 +183,10 @@ export function PeopleSettings() {
           ]}
           footer={
             <Button variant="outline" onClick={() => setEditing(null)}>
-              Cancel
+              {t('Cancel')}{' '}
             </Button>
           }
-          submitLabel="Save membership"
+          submitLabel={t('Save membership')}
           onSubmit={async (values) => {
             const role = roles.safeParse(valueOf(values, 'role'));
             if (!role.success) return;
